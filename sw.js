@@ -1,11 +1,12 @@
-const CACHE = 'scoreboard-v4-team-pages';
+const CACHE = 'scoreboard-v5-usability';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './team-page-v4.css',
-  './team-data-v4.js',
-  './team-page-v4.js',
+  './team-page-v5.css',
+  './team-data-v5.js',
+  './team-page-v5.js',
   './app.js',
   './manifest.webmanifest',
   './assets/icon.svg',
