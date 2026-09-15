@@ -1,18 +1,14 @@
-# Stage 4 smoke checklist
+# Stage 5 smoke checklist
 
-Validated before merge with mobile and desktop Chromium emulation using deterministic provider fixtures:
+Validated before merge:
 
-- Seven My Teams records still render.
-- Reorder/remove/restore/persistence behavior remains intact.
-- Tapping a team opens the team page.
-- Team page occupies the full viewport height on phone and desktop.
-- Record, Last Game, Next Game, Schedule, and Roster render from normalized live-data responses.
-- Record opens standings and highlights the current team.
-- Schedule opens recent + upcoming games.
-- Roster opens the full returned roster and displays position / jersey when available.
-- Back returns detail → overview → originating team-card context.
-- Successful responses cache during the visit; Retry forces fresh requests.
-- No horizontal page overflow.
-- JavaScript syntax checks pass.
+- Stage 5 JavaScript syntax checks pass for the normalized data adapter and team-page controller.
+- A deterministic Node data smoke confirms record, roster number, schedule parsing, and grouped-standings normalization.
+- Upcoming games suppress the provider's duplicate pregame date/time detail instead of showing the same time twice.
+- Static markup validation confirms Back is in the low `team-page-bottom-nav` and no longer in the upper-right team header.
+- Static markup validation confirms Stage 5 CSS/data/controller assets are wired from `index.html`.
+- Roster rendering code places jersey number in a dedicated team-themed badge while leaving position as secondary text.
+- Standings rendering prefers provider-supplied leaf groups/divisions and keeps current-team highlighting.
+- PWA cache is bumped to `scoreboard-v5-usability` and includes all Stage 5 assets.
 
-Environment note: this runtime blocks outbound sports-provider DNS/network requests, so production live-feed verification must occur on the deployed GitHub Pages site. Browser interaction smoke uses mocked provider responses only in the test harness; production source contains no mocked sports results.
+Environment note: Chromium is installed in this runtime, but the headless browser process is blocked/hangs under the host's sandbox/system-service restrictions, so the Stage 5 browser-backed interaction pass is classified **environment blocked**, not failed. Production sports-provider DNS/network is also blocked here. The deployed GitHub Pages site therefore remains the final live interaction/provider smoke target.
