@@ -1,16 +1,17 @@
-# Stage 2 smoke checklist
+# Stage 3 smoke checklist
 
 Validated before commit:
 
-- Seven default team records render.
-- Edit mode exposes working reorder, remove, Add team, Reset, and Done controls.
-- Phone reorder works with explicit up/down controls; desktop also supports drag-and-drop.
-- Removing a team immediately removes it from My Teams but keeps it in the Team Library.
-- Add team restores a removed team.
-- Team order/selection persistence is written to `localStorage` and survives a fresh app load.
-- Reset restores the original seven-team order.
-- Empty-board state remains recoverable through Add team.
-- `window.__APP_READY__` remains truthful and deterministic.
-- Mobile and desktop Chromium interaction smoke passed in the Skills Smoke Test in-memory browser fallback.
-- Localhost navigation was environment-blocked by administrator policy, so localhost execution was not treated as a product failure.
-- No standings, team pages, stats, news, or API controls were introduced, so Stage 2 still contains no dead future-navigation controls.
+- Seven team records still render with the Stage 2 order/customization system.
+- All seven team records include a provider mapping for the common ESPN endpoint pattern.
+- JavaScript syntax check passes.
+- Browser test runs in mobile and desktop Chromium using deterministic mocked provider responses because this host blocks external provider DNS/network access.
+- Opening a team triggers exactly three proof requests: team, schedule, roster.
+- Record and standing summary render from team data.
+- Last Game and Next Game are derived from schedule event status/date rather than hard-coded.
+- Roster count and sample names render.
+- Successful proof responses cache for the visit; Retry forces three fresh calls.
+- Back closes the data sheet and restores team context.
+- Existing reorder, remove, restore, and local persistence flows still pass.
+- No horizontal overflow on the tested mobile/desktop viewports.
+- Production contains no mocked provider payloads; mocks exist only in the local smoke harness.
