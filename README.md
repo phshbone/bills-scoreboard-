@@ -1,11 +1,10 @@
 # Bill's Scoreboard
 
-## Stage 2 — Customizable My Teams
+## Stage 3 — Live Data Proof
 
-The current release remains a complete, working **MY TEAMS** board, but the board is now user-configurable without touching code.
+The current release keeps the approved **My Teams** board and Stage 2 customization, then adds one new complete capability: tap any team plaque to open a compact live-data proof view.
 
-Included team library:
-
+### Current teams
 - New York Giants — NFL
 - New York Yankees — MLB
 - New York Mets — MLB
@@ -14,20 +13,32 @@ Included team library:
 - Army Black Knights — NCAA football
 - Indiana Fever — WNBA
 
-### Stage 2 contract
+### Working Stage 3 capability
+- Tap any plaque outside Edit mode to open live data.
+- Keyless ESPN public JSON endpoints are used for the proof layer.
+- Team endpoint supplies record / standing summary when available.
+- Team schedule endpoint supplies the event list; Scoreboard derives Last Game / Next Game / Live Now itself.
+- Roster endpoint is checked independently and reports the returned roster count plus a small sample.
+- Team, schedule, and roster requests fail independently so one unavailable feed does not break the whole sheet.
+- Successful responses are cached in memory for the current visit; Retry forces a fresh request.
+- Back closes the live-data proof and returns focus to the originating team plaque.
 
-- Tap **Edit** to manage the board.
-- Reorder teams with explicit ↑ / ↓ controls on phone; desktop can also drag cards.
-- Remove a team from My Teams without deleting it from the Team Library.
-- **Add team** restores any removed team.
-- **Reset** restores the original seven-team order.
-- Selection and order persist locally between visits.
-- The seven current plaques remain the approved responsive visual source of truth.
-- No paid services, Cloudflare dependency, live sports API, or fake future data are required.
-- `window.__APP_READY__` remains available for deterministic browser verification.
+### Provider status
+ESPN's public site JSON endpoints are keyless and cover all seven current sports/teams through a common URL pattern, but they are not a documented/support-contract API. They are therefore a **Stage 3 proof provider**, not permanently locked infrastructure.
 
-The product/interaction decisions for later stages are recorded in `SCOREBOARD-LOCK.md`.
+TheSportsDB free V1 was evaluated first. Its free next/previous team schedule calls are home-event limited, and its free table lookup is limited to featured soccer leagues, so it is not sufficient by itself for Scoreboard's true Last Game / Next Game / standings requirements.
 
-### Planned later functional increments
+### Existing Stage 2 capability preserved
+- Edit mode
+- Phone up/down reorder
+- Desktop drag-and-drop reorder
+- Remove / restore through Team Library
+- Reset to original seven-team order
+- Local persistence
 
-Next comes live sports data and the first working team view. Later increments add standings, schedules/rosters, basic/full stats, global and team-specific news, and additional team artwork/library entries. Deep strategy/analyst synthesis is explicitly deferred until the core scoreboard is complete.
+### Stage contract
+- No paid services.
+- No Cloudflare dependency.
+- No fake data in production.
+- No exposed controls for unfinished standings, full schedules, full rosters, stats, or news.
+- The provider is behind team metadata/adaptor logic so it can be replaced later without redesigning the board.

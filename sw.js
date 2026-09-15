@@ -1,7 +1,10 @@
-const CACHE = 'scoreboard-v2-team-customization';
+const CACHE = 'scoreboard-v3-live-data-proof';
 const ASSETS = [
   './',
   './index.html',
+  './styles.css',
+  './live-data.js',
+  './app.js',
   './manifest.webmanifest',
   './assets/icon.svg',
   './assets/giants.webp',
