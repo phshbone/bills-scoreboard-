@@ -1,8 +1,8 @@
 # Bill's Scoreboard
 
-## Stage 4 — Team Pages
+## Stage 5 — Team Page Usability
 
-This release preserves the approved **My Teams** board and Stage 2 customization, keeps the Stage 3 provider adapter, and turns the live-data proof into the first real team-page experience.
+This release keeps the approved **My Teams** board, customization, live data, schedule, roster, and standings from Stage 4, then makes the team pages easier to use on a phone.
 
 ### Current teams
 - New York Giants — NFL
@@ -13,35 +13,26 @@ This release preserves the approved **My Teams** board and Stage 2 customization
 - Army Black Knights — NCAA football
 - Indiana Fever — WNBA
 
-### Working Stage 4 capability
-- Tap any plaque outside Edit mode to open a full-height team page.
-- Record / standing summary is live and opens a standings view when standings data is available.
-- Last Game and Next Game are derived by Scoreboard from the schedule feed.
-- Schedule opens a working recent + upcoming schedule view.
-- Roster opens a working full roster view with position / jersey when supplied.
-- Back is context-sensitive: detail view → team overview → My Teams board.
-- Provider/debug wording stays out of the normal interface when all feeds succeed.
-- Successful responses are cached during the visit; Retry forces fresh requests.
+### Working Stage 5 capability
+- Team/detail pages remain full-height.
+- Back navigation now lives in a persistent low thumb-zone bar instead of the upper-right header.
+- Supporting/muted text is one deliberate size step larger across overview cards, schedules, standings, and rosters.
+- Standings use the provider's smaller leaf groups/divisions when available instead of presenting a single long aggregate table. The current team remains highlighted.
+- Roster rows now use a small team-themed jersey-number badge. Yankees use a subtle pinstripe badge; the other current teams use their own team-color treatments.
+- Jersey number is carried by the badge while position remains readable beside the player name.
+- Upcoming game rows no longer repeat the provider's duplicate date/time string when the formatted local date/time already supplies it.
+- Contextual Back remains detail → team overview → originating My Teams card.
+- Retry, in-visit caching, and Stage 2 team customization remain intact.
 
 ### Data architecture
-The UI consumes normalized Scoreboard objects rather than provider-specific response shapes. Stage 4 continues to use ESPN public JSON as the working primary provider, but those endpoints are unofficial and remain replaceable behind the adapter.
+The UI still consumes normalized Scoreboard objects rather than provider-specific response shapes. ESPN public JSON remains the working primary provider until a demonstrated gap justifies another source. No paid service, API key, or Cloudflare Worker is required.
 
-The app now asks for four independent sources where supported: team, schedule, roster, and league standings. One failed feed does not break the others.
+Optional game fields for venue, attendance, capacity, weather, and broadcast remain reserved but are not exposed.
 
-No paid service, API key, or Cloudflare Worker is required.
-
-### Optional game context reserved, not exposed
-The normalized game model reserves optional fields for venue, attendance, capacity, weather, and broadcast. Those fields may remain empty and do not create controls or blank UI. Weather, attendance trends, and similar pattern features are intentionally deferred until the core scoreboard is complete.
-
-### Existing customization preserved
-- Edit mode
-- Phone up/down reorder
-- Desktop drag-and-drop reorder
-- Remove / restore through Team Library
-- Reset to original seven-team order
-- Local persistence
+### Deferred
+Full team-page visual theming, deeper roster biography, Basic/Full Stats, News, weather, attendance analysis, and global top-level navigation remain later complete increments.
 
 ### Stage contract
-- No fake data in production.
+- No fake sports data in production.
 - No dead controls.
-- Stats, news, weather, attendance analysis, and global top-level navigation remain deferred until each can ship as a complete functional increment.
+- Usability changes do not remove or weaken the working Stage 4 features.
