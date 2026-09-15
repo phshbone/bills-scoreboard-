@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#080d16" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="description" content="A focused personal sports dashboard for Bill's teams." />
+  <title>scoreboard · my teams</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
+  <style>
+    :root {
+      --bg: #05080d;
+      --panel: #0a1019;
+      --panel-hi: #121b28;
+      --steel: #263244;
+      --text: #f4f7fb;
+      --muted: #9ba8b8;
+      --accent: #7f91a7;
+      --safe-top: max(18px, env(safe-area-inset-top));
+      --safe-bottom: max(22px, env(safe-area-inset-bottom));
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      background: var(--bg);
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 50% -10%, rgba(70, 96, 130, .24), transparent 42%),
+        linear-gradient(180deg, #090f19 0%, #05080d 66%, #030507 100%);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overscroll-behavior-y: none;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .13;
+      background-image:
+        linear-gradient(115deg, transparent 0 47%, rgba(255,255,255,.16) 48% 50%, transparent 51% 100%);
+      background-size: 24px 16px;
+      mask-image: linear-gradient(to bottom, black, transparent 72%);
+    }
+
+    .app {
+      width: min(1240px, 100%);
+      margin: 0 auto;
+      padding: var(--safe-top) clamp(14px, 3vw, 34px) var(--safe-bottom);
+    }
+
+    header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+      margin: 10px 2px 22px;
+      padding: 0 2px 16px;
+      border-bottom: 1px solid rgba(159, 179, 205, .16);
+    }
+
+    .brand {
+      margin: 0 0 4px;
+      color: var(--muted);
+      font-size: clamp(.78rem, 2.3vw, .95rem);
+      font-weight: 800;
+      letter-spacing: .24em;
+      text-transform: lowercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.85rem, 7vw, 3.55rem);
+      line-height: .96;
+      letter-spacing: -.04em;
+      font-weight: 900;
+    }
+
+    .count {
+      flex: 0 0 auto;
+      margin-bottom: 2px;
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    #team-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: clamp(14px, 2.5vw, 24px);
+    }
+
+    .team-card {
+      position: relative;
+      margin: 0;
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid rgba(154, 173, 200, .2);
+      border-radius: clamp(12px, 2vw, 18px);
+      background: linear-gradient(145deg, rgba(37, 50, 68, .72), rgba(6, 10, 16, .95));
+      box-shadow:
+        0 13px 34px rgba(0, 0, 0, .34),
+        inset 0 1px 0 rgba(255,255,255,.07);
+      isolation: isolate;
+    }
+
+    .team-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      border-radius: inherit;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.025);
+    }
+
+    .team-card img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1672 / 941;
+      object-fit: contain;
+      background: #06090d;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+
+    @media (min-width: 760px) {
+      #team-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .team-card {
+        transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+      }
+      .team-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(183, 201, 224, .32);
+        box-shadow:
+          0 18px 42px rgba(0, 0, 0, .42),
+          inset 0 1px 0 rgba(255,255,255,.09);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" aria-labelledby="page-title">
+    <header>
+      <div>
+        <p class="brand">scoreboard</p>
+        <h1 id="page-title">MY TEAMS</h1>
+      </div>
+      <div class="count" id="team-count" aria-live="polite"></div>
+    </header>
+
+    <section id="team-grid" aria-label="My sports teams"></section>
+
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const teams = Object.freeze([
+        { id: 'giants', name: 'New York Giants', league: 'NFL', sport: 'football', image: 'assets/giants.webp' },
+        { id: 'yankees', name: 'New York Yankees', league: 'MLB', sport: 'baseball', image: 'assets/yankees.webp' },
+        { id: 'mets', name: 'New York Mets', league: 'MLB', sport: 'baseball', image: 'assets/mets.webp' },
+        { id: 'jets', name: 'New York Jets', league: 'NFL', sport: 'football', image: 'assets/jets.webp' },
+        { id: 'rangers', name: 'New York Rangers', league: 'NHL', sport: 'hockey', image: 'assets/rangers.webp' },
+        { id: 'army', name: 'Army Black Knights', league: 'NCAA', sport: 'football', image: 'assets/army.webp' },
+        { id: 'fever', name: 'Indiana Fever', league: 'WNBA', sport: 'basketball', image: 'assets/fever.webp' }
+      ]);
+
+      const grid = document.getElementById('team-grid');
+      const count = document.getElementById('team-count');
+
+      const fragment = document.createDocumentFragment();
+      teams.forEach((team) => {
+        const figure = document.createElement('figure');
+        figure.className = 'team-card';
+        figure.dataset.teamId = team.id;
+        figure.dataset.league = team.league;
+        figure.dataset.sport = team.sport;
+
+        const img = document.createElement('img');
+        img.src = team.image;
+        img.alt = `${team.name} team plaque`;
+        img.loading = 'eager';
+        img.decoding = 'async';
+        img.width = 1000;
+        img.height = 563;
+
+        const caption = document.createElement('figcaption');
+        caption.className = 'sr-only';
+        caption.textContent = `${team.name} · ${team.league}`;
+
+        figure.append(img, caption);
+        fragment.appendChild(figure);
+      });
+
+      grid.appendChild(fragment);
+      count.textContent = `${teams.length} teams`;
+
+      window.SCOREBOARD_TEAMS = teams;
+      window.__APP_READY__ = true;
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').catch(() => {
+            // The board remains fully usable online if service-worker registration is unavailable.
+          });
+        }, { once: true });
+      }
+    })();
+  </script>
+</body>
+</html>
