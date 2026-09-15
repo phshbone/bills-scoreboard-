@@ -1,10 +1,10 @@
 # Bill's Scoreboard
 
-## Stage 1 — Team Board
+## Stage 2 — Customizable My Teams
 
-This release is intentionally limited to one complete function: a responsive **MY TEAMS** board using the approved team plaque artwork.
+The current release remains a complete, working **MY TEAMS** board, but the board is now user-configurable without touching code.
 
-Included teams:
+Included team library:
 
 - New York Giants — NFL
 - New York Yankees — MLB
@@ -14,17 +14,20 @@ Included teams:
 - Army Black Knights — NCAA football
 - Indiana Fever — WNBA
 
-### Stage 1 contract
+### Stage 2 contract
 
-- No dead navigation.
-- No fake roster, schedule, standings, stats, news, or API data.
-- No paid services or Cloudflare dependency.
-- Plaque artwork is the responsive visual source of truth: resize/reflow the frame, preserve the artwork.
-- Stable team IDs and league/sport metadata are present so later stages can add team pages and data without restructuring the board.
-- Static PWA shell supports offline caching.
-- Team artwork is stored locally in the repository; no image CDN or paid storage is required.
-- Browser smoke coverage is included for desktop and mobile Chromium emulation.
+- Tap **Edit** to manage the board.
+- Reorder teams with explicit ↑ / ↓ controls on phone; desktop can also drag cards.
+- Remove a team from My Teams without deleting it from the Team Library.
+- **Add team** restores any removed team.
+- **Reset** restores the original seven-team order.
+- Selection and order persist locally between visits.
+- The seven current plaques remain the approved responsive visual source of truth.
+- No paid services, Cloudflare dependency, live sports API, or fake future data are required.
+- `window.__APP_READY__` remains available for deterministic browser verification.
 
-### Planned later stages
+The product/interaction decisions for later stages are recorded in `SCOREBOARD-LOCK.md`.
 
-Standings, team pages, live sports data, news, and optional additional teams are intentionally deferred until each can ship as its own complete working increment.
+### Planned later functional increments
+
+Next comes live sports data and the first working team view. Later increments add standings, schedules/rosters, basic/full stats, global and team-specific news, and additional team artwork/library entries. Deep strategy/analyst synthesis is explicitly deferred until the core scoreboard is complete.

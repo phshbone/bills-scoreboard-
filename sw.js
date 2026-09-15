@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v1-team-board';
+const CACHE = 'scoreboard-v2-team-customization';
 const ASSETS = [
   './',
   './index.html',
@@ -28,7 +28,5 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
-  event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
-  );
+  event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request)));
 });
