@@ -75,3 +75,12 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - ESPN public JSON remains the primary working provider until a concrete missing-data or reliability problem justifies a fallback. Do not add providers preemptively.
 - The normalized game object reserves optional `venue`, `attendance`, `capacity`, `weather`, and `broadcast` context fields. Empty fields are valid and must not create dead UI.
 - Weather, attendance trends, venue-capacity analysis, and similar pattern features are deferred and can be added later without changing the core game model.
+
+## Stage 5 usability lock — Team page ergonomics (2026-09-15)
+- Team-page Back belongs in a persistent low thumb-zone control area, not the upper-right header.
+- Supporting/muted text on team pages should be at least one deliberate size step larger than the Stage 4 baseline; primary white values can remain visually dominant.
+- Standings should prefer separate provider-supplied leaf groups/divisions over a single large aggregate table when that structure exists.
+- The selected team remains visibly highlighted inside standings.
+- Roster rows use a compact team-themed jersey-number badge. The badge is presentation only and does not require image assets or a new data provider.
+- Jersey number belongs in the badge; position remains as secondary roster text. Deeper biography remains deferred unless a demonstrated need justifies it.
+- Full team-page visual theming is still deferred; Stage 5 only establishes lightweight team-theme hooks through roster badges.
