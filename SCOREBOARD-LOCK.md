@@ -22,7 +22,7 @@ Every stage must finish as a complete, deployable application. No dead navigatio
 - Back returns to the exact prior context when practical, including prior feed/scroll position.
 
 ## Team page
-Opening a team will eventually show last game, next game, and current record first, followed by working destinations for Schedule, Roster, Stats, Standings, and team-specific News.
+Opening a team shows last game, next game, current record, Schedule, Roster, and Standings when that data is available. Stats and team-specific News remain later increments.
 
 ## Live game rules
 The data provider supplies game facts/status; the app determines presentation:
@@ -64,3 +64,14 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Scoreboard owns the semantic rule for Last Game / Next Game / Live Now rather than trusting provider-specific labels.
 - A failure in one feed must not make the whole team proof view fail.
 - TheSportsDB free V1 is not the primary proof provider because its team next/previous calls are home-event limited and its free standings/table coverage does not satisfy the current U.S. leagues.
+
+## Stage 4 structural lock — Team pages and optional game context (2026-09-15)
+- Team pages are full-height views on phone; the Stage 3 partial-height proof sheet is retired.
+- Back navigation is contextual: detail screen → team overview → My Teams, preserving originating team context.
+- Record / division position is the standings entry point. It is actionable only when standings data is actually available.
+- Schedule and Roster controls are shown only when their underlying data is usable.
+- Normal operation does not display provider/debug wording. Feed errors may surface only when they affect usable data.
+- The UI consumes normalized Scoreboard objects. Provider-specific response shapes stay inside the adapter layer.
+- ESPN public JSON remains the primary working provider until a concrete missing-data or reliability problem justifies a fallback. Do not add providers preemptively.
+- The normalized game object reserves optional `venue`, `attendance`, `capacity`, `weather`, and `broadcast` context fields. Empty fields are valid and must not create dead UI.
+- Weather, attendance trends, venue-capacity analysis, and similar pattern features are deferred and can be added later without changing the core game model.

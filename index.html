@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#080d16" />
   <meta name="color-scheme" content="dark" />
-  <meta name="description" content="A focused personal sports dashboard with customizable teams and a live-data proof layer." />
+  <meta name="description" content="A focused personal sports dashboard with customizable teams and live team pages." />
   <title>scoreboard · my teams</title>
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="./styles.css" />
-
+  <link rel="stylesheet" href="./team-page-v4.css" />
 </head>
 <body>
   <main class="app" aria-labelledby="page-title">
@@ -52,28 +52,41 @@
     </div>
   </div>
 
-  <div class="modal" id="data-modal" hidden role="dialog" aria-modal="true" aria-labelledby="data-title">
-    <div class="sheet">
-      <div class="sheet-header">
-        <div>
-          <p class="brand">live data proof</p>
+  <div class="team-page" id="data-modal" hidden role="dialog" aria-modal="true" aria-labelledby="data-title">
+    <div class="team-page-shell">
+      <div class="team-page-header">
+        <div class="team-page-heading">
+          <p class="brand" id="team-page-kicker">scoreboard</p>
           <h2 id="data-title">Team</h2>
         </div>
         <button class="button" id="close-data" type="button">Back</button>
       </div>
-      <div class="data-provider" id="data-provider">ESPN public JSON · keyless · unofficial endpoint</div>
-      <div class="data-status-line" id="data-status" aria-live="polite">
-        <span class="status-dot" id="data-status-dot" aria-hidden="true"></span>
-        <span id="data-status-text">Connecting…</span>
+
+      <div class="team-page-content">
+        <section id="team-overview-view">
+          <div class="data-status-line" id="data-status" aria-live="polite">
+            <span class="status-dot" id="data-status-dot" aria-hidden="true"></span>
+            <span id="data-status-text">Connecting…</span>
+          </div>
+          <div class="data-grid" id="data-grid"></div>
+          <div class="retry-row"><button class="button" id="retry-data" type="button">Retry</button></div>
+        </section>
+
+        <section class="team-detail-view" id="team-detail-view" hidden aria-labelledby="detail-title">
+          <div class="detail-header">
+            <div>
+              <p class="brand" id="detail-kicker">team</p>
+              <h3 id="detail-title">Detail</h3>
+            </div>
+          </div>
+          <div id="detail-content"></div>
+        </section>
       </div>
-      <div class="data-grid" id="data-grid"></div>
-      <div class="retry-row"><button class="button" id="retry-data" type="button">Retry</button></div>
     </div>
   </div>
 
-
-  <script src="./live-data.js" defer></script>
+  <script src="./team-data-v4.js" defer></script>
+  <script src="./team-page-v4.js" defer></script>
   <script src="./app.js" defer></script>
-
 </body>
 </html>
