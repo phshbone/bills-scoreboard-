@@ -1,9 +1,11 @@
-const CACHE = 'scoreboard-v3-live-data-proof';
+const CACHE = 'scoreboard-v4-team-pages';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
-  './live-data.js',
+  './team-page-v4.css',
+  './team-data-v4.js',
+  './team-page-v4.js',
   './app.js',
   './manifest.webmanifest',
   './assets/icon.svg',
