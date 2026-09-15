@@ -55,3 +55,12 @@ The data provider supplies game facts/status; the app determines presentation:
 
 ## Deferred late-stage concept
 Deep game-strategy analysis combining play-by-play, statistical context, manager comments, and public analyst commentary is explicitly deferred until the core scoreboard is complete.
+
+## Stage 3 data-provider proof (2026-09-15)
+- Stage 3 uses ESPN public site JSON as a **proof provider**, not as a permanent vendor lock.
+- The endpoints are keyless and share one pattern across NFL, MLB, NHL, WNBA, and college football.
+- Because the ESPN endpoints are public but unofficial/unsupported, all provider details stay behind the Scoreboard data mapping layer.
+- The team endpoint may supply record and `standingSummary`; the schedule endpoint supplies events; the roster endpoint supplies players.
+- Scoreboard owns the semantic rule for Last Game / Next Game / Live Now rather than trusting provider-specific labels.
+- A failure in one feed must not make the whole team proof view fail.
+- TheSportsDB free V1 is not the primary proof provider because its team next/previous calls are home-event limited and its free standings/table coverage does not satisfy the current U.S. leagues.
