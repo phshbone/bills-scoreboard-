@@ -1,8 +1,8 @@
 # Bill's Scoreboard
 
-## Stage 3 — Live Data Proof
+## Stage 4 — Team Pages
 
-The current release keeps the approved **My Teams** board and Stage 2 customization, then adds one new complete capability: tap any team plaque to open a compact live-data proof view.
+This release preserves the approved **My Teams** board and Stage 2 customization, keeps the Stage 3 provider adapter, and turns the live-data proof into the first real team-page experience.
 
 ### Current teams
 - New York Giants — NFL
@@ -13,22 +13,27 @@ The current release keeps the approved **My Teams** board and Stage 2 customizat
 - Army Black Knights — NCAA football
 - Indiana Fever — WNBA
 
-### Working Stage 3 capability
-- Tap any plaque outside Edit mode to open live data.
-- Keyless ESPN public JSON endpoints are used for the proof layer.
-- Team endpoint supplies record / standing summary when available.
-- Team schedule endpoint supplies the event list; Scoreboard derives Last Game / Next Game / Live Now itself.
-- Roster endpoint is checked independently and reports the returned roster count plus a small sample.
-- Team, schedule, and roster requests fail independently so one unavailable feed does not break the whole sheet.
-- Successful responses are cached in memory for the current visit; Retry forces a fresh request.
-- Back closes the live-data proof and returns focus to the originating team plaque.
+### Working Stage 4 capability
+- Tap any plaque outside Edit mode to open a full-height team page.
+- Record / standing summary is live and opens a standings view when standings data is available.
+- Last Game and Next Game are derived by Scoreboard from the schedule feed.
+- Schedule opens a working recent + upcoming schedule view.
+- Roster opens a working full roster view with position / jersey when supplied.
+- Back is context-sensitive: detail view → team overview → My Teams board.
+- Provider/debug wording stays out of the normal interface when all feeds succeed.
+- Successful responses are cached during the visit; Retry forces fresh requests.
 
-### Provider status
-ESPN's public site JSON endpoints are keyless and cover all seven current sports/teams through a common URL pattern, but they are not a documented/support-contract API. They are therefore a **Stage 3 proof provider**, not permanently locked infrastructure.
+### Data architecture
+The UI consumes normalized Scoreboard objects rather than provider-specific response shapes. Stage 4 continues to use ESPN public JSON as the working primary provider, but those endpoints are unofficial and remain replaceable behind the adapter.
 
-TheSportsDB free V1 was evaluated first. Its free next/previous team schedule calls are home-event limited, and its free table lookup is limited to featured soccer leagues, so it is not sufficient by itself for Scoreboard's true Last Game / Next Game / standings requirements.
+The app now asks for four independent sources where supported: team, schedule, roster, and league standings. One failed feed does not break the others.
 
-### Existing Stage 2 capability preserved
+No paid service, API key, or Cloudflare Worker is required.
+
+### Optional game context reserved, not exposed
+The normalized game model reserves optional fields for venue, attendance, capacity, weather, and broadcast. Those fields may remain empty and do not create controls or blank UI. Weather, attendance trends, and similar pattern features are intentionally deferred until the core scoreboard is complete.
+
+### Existing customization preserved
 - Edit mode
 - Phone up/down reorder
 - Desktop drag-and-drop reorder
@@ -37,8 +42,6 @@ TheSportsDB free V1 was evaluated first. Its free next/previous team schedule ca
 - Local persistence
 
 ### Stage contract
-- No paid services.
-- No Cloudflare dependency.
 - No fake data in production.
-- No exposed controls for unfinished standings, full schedules, full rosters, stats, or news.
-- The provider is behind team metadata/adaptor logic so it can be replaced later without redesigning the board.
+- No dead controls.
+- Stats, news, weather, attendance analysis, and global top-level navigation remain deferred until each can ship as a complete functional increment.
