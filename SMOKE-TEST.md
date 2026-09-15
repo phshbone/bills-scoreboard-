@@ -1,17 +1,18 @@
-# Stage 3 smoke checklist
+# Stage 4 smoke checklist
 
-Validated before commit:
+Validated before merge with mobile and desktop Chromium emulation using deterministic provider fixtures:
 
-- Seven team records still render with the Stage 2 order/customization system.
-- All seven team records include a provider mapping for the common ESPN endpoint pattern.
-- JavaScript syntax check passes.
-- Browser test runs in mobile and desktop Chromium using deterministic mocked provider responses because this host blocks external provider DNS/network access.
-- Opening a team triggers exactly three proof requests: team, schedule, roster.
-- Record and standing summary render from team data.
-- Last Game and Next Game are derived from schedule event status/date rather than hard-coded.
-- Roster count and sample names render.
-- Successful proof responses cache for the visit; Retry forces three fresh calls.
-- Back closes the data sheet and restores team context.
-- Existing reorder, remove, restore, and local persistence flows still pass.
-- No horizontal overflow on the tested mobile/desktop viewports.
-- Production contains no mocked provider payloads; mocks exist only in the local smoke harness.
+- Seven My Teams records still render.
+- Reorder/remove/restore/persistence behavior remains intact.
+- Tapping a team opens the team page.
+- Team page occupies the full viewport height on phone and desktop.
+- Record, Last Game, Next Game, Schedule, and Roster render from normalized live-data responses.
+- Record opens standings and highlights the current team.
+- Schedule opens recent + upcoming games.
+- Roster opens the full returned roster and displays position / jersey when available.
+- Back returns detail → overview → originating team-card context.
+- Successful responses cache during the visit; Retry forces fresh requests.
+- No horizontal page overflow.
+- JavaScript syntax checks pass.
+
+Environment note: this runtime blocks outbound sports-provider DNS/network requests, so production live-feed verification must occur on the deployed GitHub Pages site. Browser interaction smoke uses mocked provider responses only in the test harness; production source contains no mocked sports results.
