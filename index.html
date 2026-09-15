@@ -11,6 +11,7 @@
   <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="./styles.css" />
   <link rel="stylesheet" href="./team-page-v4.css" />
+  <link rel="stylesheet" href="./team-page-v5.css" />
 </head>
 <body>
   <main class="app" aria-labelledby="page-title">
@@ -59,7 +60,6 @@
           <p class="brand" id="team-page-kicker">scoreboard</p>
           <h2 id="data-title">Team</h2>
         </div>
-        <button class="button" id="close-data" type="button">Back</button>
       </div>
 
       <div class="team-page-content">
@@ -82,11 +82,15 @@
           <div id="detail-content"></div>
         </section>
       </div>
+
+      <nav class="team-page-bottom-nav" aria-label="Team page navigation">
+        <button class="button" id="close-data" type="button">← Back to My Teams</button>
+      </nav>
     </div>
   </div>
 
-  <script src="./team-data-v4.js" defer></script>
-  <script src="./team-page-v4.js" defer></script>
+  <script src="./team-data-v5.js" defer></script>
+  <script src="./team-page-v5.js" defer></script>
   <script src="./app.js" defer></script>
 </body>
 </html>
