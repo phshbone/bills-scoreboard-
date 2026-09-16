@@ -1,7 +1,7 @@
 {
-  "name": "Bill's Scoreboard",
+  "name": "Bill's Scoreboard Sports Page",
   "short_name": "Scoreboard",
-  "description": "A customizable personal sports dashboard with live team data.",
+  "description": "A customizable personal sports dashboard with live scores, standings, schedules, rosters and stats.",
   "id": "./",
   "start_url": "./",
   "scope": "./",
@@ -9,5 +9,8 @@
   "background_color": "#05080d",
   "theme_color": "#080d16",
   "orientation": "any",
-  "icons": [{"src":"./assets/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+  "icons": [
+    {"src":"./assets/icon-192.webp","sizes":"192x192","type":"image/webp","purpose":"any"},
+    {"src":"./assets/icon-512.webp","sizes":"512x512","type":"image/webp","purpose":"any maskable"}
+  ]
 }
