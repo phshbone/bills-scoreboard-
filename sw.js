@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b3-baseball-batting';
+const CACHE = 'scoreboard-v11b4-knicks';
 const ASSETS = [
   './',
   './index.html',
@@ -44,7 +44,8 @@ const ASSETS = [
   './assets/eagles.webp',
   './assets/phillies.webp',
   './assets/flyers.webp',
-  './assets/sixers.webp'
+  './assets/sixers.webp',
+  './assets/knicks.webp'
 ];
 
 self.addEventListener('install', event => {
