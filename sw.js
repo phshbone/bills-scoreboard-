@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v5-live-score';
+const CACHE = 'scoreboard-v6-basic-stats-live-awareness';
 const ASSETS = [
   './',
   './index.html',
@@ -6,12 +6,17 @@ const ASSETS = [
   './team-page-v4.css',
   './team-page-v5.css',
   './roster-groups-v5.css',
-  './live-score-v5.css',
+  './live-score-v6.css',
+  './basic-stats-v6.css',
+  './live-awareness-v6.css',
   './team-data-v5.js',
+  './standings-repair-v6.js',
   './team-page-v5.js',
   './roster-groups-v5.js',
-  './live-score-v5.js',
+  './live-score-v6.js',
   './app.js',
+  './basic-stats-v6.js',
+  './live-awareness-v6.js',
   './manifest.webmanifest',
   './assets/icon.svg',
   './assets/giants.webp',
