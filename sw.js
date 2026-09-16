@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b2-swipe-repair';
+const CACHE = 'scoreboard-v11b3-baseball-batting';
 const ASSETS = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const ASSETS = [
   './team-page-v8.css',
   './roster-groups-v5.css',
   './live-score-v6.css',
+  './live-batting-v11.css',
   './basic-stats-v6.css',
   './live-awareness-v6.css',
   './full-stats-v7.css',
@@ -22,7 +23,7 @@ const ASSETS = [
   './team-data-freshness-v8.js',
   './team-page-v8.js',
   './roster-groups-v8.js',
-  './live-score-v6.js',
+  './live-score-v11.js',
   './app.js',
   './basic-stats-v6.js',
   './full-stats-v7.js',

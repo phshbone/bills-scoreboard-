@@ -1,0 +1,34 @@
+.live-score-team {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.live-score-batting .live-score-team {
+  color: #f6fbff;
+}
+
+.live-score-bat {
+  width: 23px;
+  height: 23px;
+  flex: 0 0 23px;
+  display: inline-grid;
+  place-items: center;
+  color: #d7b16a;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.65));
+}
+
+.live-score-bat svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 560px) {
+  .live-score-bat {
+    width: 21px;
+    height: 21px;
+    flex-basis: 21px;
+  }
+}
