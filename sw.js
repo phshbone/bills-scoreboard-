@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v9-repairs';
+const CACHE = 'scoreboard-v10-global-standings';
 const ASSETS = [
   './',
   './index.html',
@@ -14,6 +14,7 @@ const ASSETS = [
   './home-score-rail-v8.css',
   './home-score-overlay-v9.css',
   './mlb-depth-chart-v9.css',
+  './global-standings-v10.css',
   './team-data-v8.js',
   './standings-repair-v6.js',
   './nfl-standings-v9.js',
@@ -27,6 +28,7 @@ const ASSETS = [
   './mlb-depth-chart-v9.js',
   './live-awareness-v6.js',
   './home-score-rail-v8.js',
+  './global-standings-v10.js',
   './manifest.webmanifest',
   './assets/icon.svg',
   './assets/giants.webp',
