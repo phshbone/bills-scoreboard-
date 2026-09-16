@@ -5,11 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#080d16" />
   <meta name="color-scheme" content="dark" />
+  <meta name="application-name" content="Bills Scoreboard Sports Page" />
   <meta name="description" content="A focused personal sports dashboard with customizable teams and live team pages." />
-  <title>scoreboard · my teams</title>
+  <title>Bills Scoreboard · My Teams</title>
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./assets/icon.svg" />
   <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./branding-v11.css" />
   <link rel="stylesheet" href="./team-page-v4.css" />
   <link rel="stylesheet" href="./team-page-v5.css" />
   <link rel="stylesheet" href="./team-page-v8.css" />
@@ -26,9 +29,12 @@
 <body>
   <main class="app" aria-labelledby="page-title">
     <header>
-      <div class="title-block">
-        <p class="brand">scoreboard</p>
-        <h1 id="page-title">MY TEAMS</h1>
+      <div class="header-identity">
+        <img class="app-brand-mark" src="./assets/icon.svg" alt="Bills Scoreboard Sports Page" width="60" height="60" />
+        <div class="title-block">
+          <p class="brand">Bills Scoreboard</p>
+          <h1 id="page-title">MY TEAMS</h1>
+        </div>
       </div>
       <div class="header-actions">
         <div class="count" id="team-count" aria-live="polite"></div>
