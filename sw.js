@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v10-1-swipe-standings';
+const CACHE = 'scoreboard-v11b1-update-reliability';
 const ASSETS = [
   './',
   './index.html',
@@ -55,5 +55,32 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
-  event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request)));
+
+  const request = event.request;
+
+  // Navigations are network-first so a fresh launch receives the newest app shell.
+  // Cached HTML remains the offline fallback.
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          if (response && response.ok) {
+            const copy = response.clone();
+            event.waitUntil(caches.open(CACHE).then(cache => cache.put('./index.html', copy)));
+          }
+          return response;
+        })
+        .catch(async () => {
+          return (await caches.match(request))
+            || (await caches.match('./index.html'))
+            || (await caches.match('./'));
+        })
+    );
+    return;
+  }
+
+  // Versioned app assets remain cache-first for speed/offline use.
+  event.respondWith(
+    caches.match(request).then(cached => cached || fetch(request))
+  );
 });
