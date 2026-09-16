@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b1-update-reliability';
+const CACHE = 'scoreboard-v11a2-philly-teams';
 const ASSETS = [
   './',
   './index.html',
@@ -37,7 +37,11 @@ const ASSETS = [
   './assets/jets.webp',
   './assets/rangers.webp',
   './assets/army.webp',
-  './assets/fever.webp'
+  './assets/fever.webp',
+  './assets/eagles.webp',
+  './assets/phillies.webp',
+  './assets/flyers.webp',
+  './assets/sixers.webp'
 ];
 
 self.addEventListener('install', event => {

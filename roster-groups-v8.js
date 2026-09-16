@@ -6,12 +6,6 @@
   const teamPage = document.getElementById('data-modal');
   if (!detailContent || !detailTitle || !teamPage) return;
 
-  const sportByTeam = Object.freeze({
-    giants: 'football', jets: 'football', army: 'football',
-    yankees: 'baseball', mets: 'baseball',
-    rangers: 'hockey', fever: 'basketball'
-  });
-
   const aliases = Object.freeze({
     football: {
       QB: ['QB','QUARTERBACK'], RB: ['RB','HB','RUNNING BACK','HALFBACK'], FB: ['FB','FULLBACK'],
@@ -54,6 +48,12 @@
     basketball: ['PG','SG','G','GF','SF','PF','F','FC','C']
   });
 
+  function currentSport() {
+    const id = teamPage.dataset.teamId;
+    const teams = Array.isArray(window.SCOREBOARD_TEAMS) ? window.SCOREBOARD_TEAMS : [];
+    return teams.find(team => team.id === id)?.sport || '';
+  }
+
   function canonicalPosition(raw, sport) {
     const value = String(raw || '').trim().toUpperCase();
     if (!value) return 'OTHER';
@@ -81,7 +81,7 @@
     if (detailTitle.textContent.trim() !== 'Roster') return;
     const list = detailContent.querySelector('.roster-list');
     if (!list || list.dataset.positionGrouped === 'true') return;
-    const sport = sportByTeam[teamPage.dataset.teamId] || '';
+    const sport = currentSport();
     const rows = [...list.querySelectorAll(':scope > .roster-row')];
     if (!rows.length) return;
 
