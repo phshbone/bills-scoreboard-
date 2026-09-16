@@ -111,3 +111,13 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Full Stats preserves the previously locked sticky-header, sticky-player-column, vertical-shading, horizontal-scroll, and column-emphasis behavior.
 - Full Stats is conditional; a team does not receive a Full Stats control unless at least one usable athlete-stat response has been confirmed.
 - No paid provider, API key, Cloudflare dependency, or new account is introduced by Stage 7.
+
+## Stage 8 lock — Compact score rail, roster completeness, and schedule depth (2026-09-16)
+- The home score rail remains full-width but is a single compact line so the plaque artwork and ripped-metal effect stay visually dominant.
+- Final rails include status, score, and date on one line; live rails include status, score, and current game-state detail on one line.
+- Roster normalization must preserve every unique recognized player returned by the feed, consolidate duplicates, and never drop a player solely because the position label is unfamiliar.
+- Unknown or missing roster positions remain visible as `Other / Unassigned`; empty position headings are not fabricated.
+- Roster headings represent provider-listed primary positions, not inferred real-world lineup assignments.
+- Football schedules show the full remaining provider-returned season because the schedule is naturally short.
+- Longer-season sports use an initial upcoming window with a real incremental `Show next` control until all provider-returned games can be reached.
+- In-visit team data becomes stale after a short freshness window; reopening a team after that window refreshes the feeds, while Retry remains the immediate manual refresh.
