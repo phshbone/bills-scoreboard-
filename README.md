@@ -1,8 +1,8 @@
 # Bill's Scoreboard
 
-## Stage 6 — Basic Stats + Live Awareness + Standings Repair
+## Stage 7 — Full Stats + Home Score Rails
 
-This release preserves the approved **My Teams** board, customization, full-height team pages, schedules, grouped rosters, low thumb-zone Back control, and the Stage 5 live-game interaction, then adds three complete capabilities: Basic Stats, reliable live-score awareness, and an MLB division-standings repair.
+This release preserves the approved **My Teams** board, live scoring, grouped rosters, standings repair, Basic Stats, team customization, and phone-first navigation, then adds two complete capabilities: at-a-glance home scores and the first dense Full Stats view.
 
 ### Current teams
 - New York Giants — NFL
@@ -13,18 +13,24 @@ This release preserves the approved **My Teams** board, customization, full-heig
 - Army Black Knights — NCAA football
 - Indiana Fever — WNBA
 
-### Working Stage 6 capability
-- **Basic Stats:** when a usable team-leaders feed is returned, the team overview gets a working Basic Stats card. It opens a lightweight current team-leader view with up to six sport-appropriate categories. If the feed is unusable, no dead control is shown.
-- **Live score repair:** the live-score overlay now reads the league scoreboard feed rather than depending on the team schedule response for current scores. It shows both teams, current score, game-state detail, manual Refresh, and automatic 30-second refresh while live.
-- **My Teams LIVE awareness:** selected-team plaques receive a small upper-right `LIVE` pill while that team is actively playing. League scoreboards are checked once per league, not once per team, and the board refreshes live state periodically while the app is open.
-- **MLB standings repair:** MLB uses the public MLB StatsAPI standings feed as a demonstrated fallback so American/National League divisions can render as separate groups. If that fallback is unavailable, the existing ESPN standings path remains the fallback.
-- Existing position-grouped rosters, jersey-number badges, schedule, record, Last Game, Next Game, Retry, caching, reordering, removal/restoration, and contextual Back remain intact.
+### Working Stage 7 capability
+- **Home score rails:** each plaque can show a compact metal score strip across its lower edge. A live game shows `LIVE` plus the current score and game-state detail. Otherwise the rail shows the most recent completed result and date; if no completed result is returned, it can fall back to the next game.
+- The original plaque artwork remains the primary visual and the entire card remains one tap target for the team page.
+- Score rails hide automatically during Edit mode so reorder/remove controls stay unobstructed.
+- **Full Stats:** when a usable athlete-stat response is verified, the team page gains a working Full Stats card.
+- Full Stats loads current roster player season data on demand and groups available columns by provider stat category.
+- Full Stats tables use a sticky header, sticky player-name column, alternating vertical column shading, horizontal scrolling, row separators, and tap-to-emphasize columns as previously locked.
+- Full Stats stays hidden when the provider does not return usable athlete statistics, avoiding a dead destination.
+- Basic Stats remains the lighter quick-view option.
+- Existing live-score popup, LIVE plaque pill, schedules, standings, grouped rosters, jersey-number badges, Retry, caching, reordering, removal/restoration, and contextual Back remain intact.
 
 ### Data architecture
-The UI continues to consume normalized Scoreboard data rather than provider-specific response shapes. ESPN public JSON remains the primary general sports source. MLB StatsAPI is used only for the demonstrated MLB division-standings gap. No paid service, API key, or Cloudflare Worker is required.
+ESPN public JSON remains the primary general sports source. MLB StatsAPI remains limited to the demonstrated MLB standings gap. Full Stats uses the provider's athlete season-stat endpoint only when the user opens that view; roster/player results are cached during the visit and player requests are concurrency-limited.
+
+No paid service, API key, Cloudflare Worker, or new account is required.
 
 ### Deferred
-- Full sortable/dense Stats tables
+- Custom user-selected stat columns
 - Sports News and team News
 - Full team-page visual themes
 - Weather and attendance analysis
@@ -33,5 +39,6 @@ The UI continues to consume normalized Scoreboard data rather than provider-spec
 
 ### Stage contract
 - No fake sports data in production.
-- No dead controls: Basic Stats appears only after usable data is confirmed.
-- A failure in the Basic Stats, live-awareness, or MLB-standings helper does not remove the already-working core team page.
+- No dead controls: Full Stats appears only after a usable athlete-stat response is confirmed.
+- Score-rail failures do not affect plaque navigation or the existing team pages.
+- Existing Stage 6 features remain functional if any Stage 7 helper fails.
