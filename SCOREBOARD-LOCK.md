@@ -16,11 +16,12 @@ Every stage must finish as a complete, deployable application. No dead navigatio
 - Home score information is informational and must not create a second conflicting tap target; the whole plaque continues to open the team page.
 
 ## Main navigation
-- Planned top level: `Standings | My Teams | Sports News`.
-- Visible controls are primary navigation.
-- Horizontal swipe is only an optional shortcut on those top-level screens.
+- Planned top-level spatial order is `Sports News ← My Teams → Standings`.
+- On phone, horizontal swipe is the primary top-level navigation; do not cover content with a floating global taskbar.
+- Only complete top-level screens participate. Sports News is not exposed until it is functional.
 - Team/detail pages do not use global swipe navigation.
 - Horizontal content always wins over app navigation.
+- Top-level swipe should ignore extreme screen-edge starts so browser/system edge gestures are not deliberately competed with.
 - Back returns to the exact prior context when practical, including prior feed/scroll position.
 
 ## Team page
@@ -134,12 +135,22 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 
 ## Stage 10 lock — Top-level navigation and global standings (2026-09-16)
 - My Teams remains the default/home screen and the center of the product.
-- The top-level navigation exposes only completed destinations. Stage 10 shows `Standings` and `My Teams`; `Sports News` is added only when its screen is functional.
-- Primary navigation belongs in a persistent low thumb zone and is hidden during Edit mode so team-management controls remain unambiguous.
 - Global Standings derives its league choices from the user's currently active My Teams leagues rather than a hard-coded sports portal menu.
 - League standings load through the same normalized `ScoreboardData` chain used by team pages, including the MLB division fallback and NFL division repair.
 - All selected My Teams clubs in the active league are highlighted; multiple selected teams in one league may be highlighted simultaneously.
 - NCAA global standings may use the selected team's relevant returned group rather than implying that a universal national table is always comparable.
-- Horizontal overflow belongs to the standings table container; the app shell itself must not gain horizontal page scrolling.
 - A Retry control appears only after an actual standings-load failure; no dead or decorative controls are permitted.
 - Yankees MLB depth-chart provider-shape cleanup and the possible FINAL→NEXT home-score timing rule are explicitly deferred and do not block Stage 10.
+
+## Stage 10.1 lock — Swipe navigation correction + richer standings (2026-09-16)
+- Stage 10's floating bottom navigation bar is superseded and removed; it must not cover standings or team content.
+- On phone, My Teams is spatially centered: swipe left opens Standings; swipe right is reserved for Sports News once that complete screen exists.
+- From Standings, swipe right returns to My Teams.
+- Global swipe is disabled while editing, while team/modal overlays are open, and when a gesture begins inside content that genuinely owns horizontal scrolling.
+- Extreme-edge swipe starts are ignored to reduce conflict with system/browser gestures.
+- Top-level screens preserve their vertical scroll position when switching.
+- Global standings should expose more useful sport-specific information without shrinking text or forcing page-level horizontal scrolling.
+- Phone standings use three primary columns (Team / Record / PCT, or PTS for NHL) and place secondary sport-specific fields beneath the team name.
+- MLB secondary fields may include GB, last 10, home, away, run differential, and streak; analogous provider-returned fields are used for NFL, NHL, WNBA, and NCAA.
+- Missing secondary values stay absent rather than being fabricated.
+- Sports News remains unexposed until functional; Stage 10.1 establishes its future swipe direction but no dead destination.
