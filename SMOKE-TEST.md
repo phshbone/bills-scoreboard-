@@ -7,7 +7,9 @@ Validated before merge with executed runtime/browser checks plus source/data-flo
 - Deterministic browser smoke at a 390×844 viewport: **PASS**.
 - Score-overlay assertion confirms the Stage 9 override removes the rail background image/color, border, and box shadow so score text sits directly over the plaque artwork.
 - NFL standings fixture confirms the division-level hierarchy normalizes to eight leaf groups (AFC/NFC East, North, South, West) and selects NFC East for a Giants fixture.
-- MLB depth-chart fixture confirms explicit `2B` and `CF` positions survive normalization and preserve provider rank order for Starter / 2nd / later depth labels.
+- MLB depth-chart parser fixture confirms explicit `2B` and `CF` positions survive normalization and preserve provider rank order for Starter / 2nd / later depth labels.
+- Integration fixture confirms the conditional MLB Depth Chart card appears only after a usable response, opens successfully, renders 2B/CF plus starter/backup ordering, and returns to the team page through its Back control.
+- Integration fixture confirms the direct score text stays within the plaque bounds and that the Stage 9 depth/overlay additions do not introduce desktop horizontal overflow at 1280×900.
 - New Stage 9 JavaScript files pass syntax checks.
 
 ## Static/regression review
