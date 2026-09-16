@@ -1,0 +1,192 @@
+/* Stage 11 — branding, Philadelphia expansion, score alignment, and zoom/accessibility resilience. */
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  margin-bottom: 8px;
+}
+
+.brand-mark {
+  display: block;
+  flex: 0 0 auto;
+  width: clamp(36px, 7vw, 48px);
+  height: clamp(36px, 7vw, 48px);
+  object-fit: cover;
+  border-radius: 9px;
+  border: 1px solid rgba(185, 205, 230, .22);
+  box-shadow: 0 5px 16px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.brand-copy {
+  min-width: 0;
+  line-height: 1;
+}
+
+.brand-copy .brand {
+  margin: 0;
+  color: #e9eef6;
+  font-size: clamp(.72rem, 2.1vw, .9rem);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.brand-tagline {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: clamp(.61rem, 1.75vw, .72rem);
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Keep the ripped-metal / team identity side clear by anchoring game information to the wordmark side. */
+.home-score-rail {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.home-score-line {
+  max-width: 96%;
+  margin-left: auto;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* Philadelphia team jersey-badge hooks. */
+.team-page[data-team-id='eagles'] .jersey-badge {
+  --jersey-fill: linear-gradient(145deg, #0d5149, #07352f);
+  --jersey-ink: #f4f7f5;
+  --jersey-border: rgba(177,190,192,.58);
+}
+
+.team-page[data-team-id='phillies'] .jersey-badge {
+  --jersey-fill: linear-gradient(145deg, #c82131 0 68%, #165ea7 68% 82%, #f2f3f4 82% 100%);
+  --jersey-ink: #fff;
+  --jersey-border: rgba(235,238,242,.52);
+}
+
+.team-page[data-team-id='flyers'] .jersey-badge {
+  --jersey-fill: linear-gradient(145deg, #f36b21 0 62%, #1d1d1d 62% 100%);
+  --jersey-ink: #fff;
+  --jersey-border: rgba(255,255,255,.38);
+}
+
+.team-page[data-team-id='sixers'] .jersey-badge {
+  --jersey-fill: linear-gradient(145deg, #1768ad 0 58%, #d92336 58% 78%, #f1f2f3 78% 100%);
+  --jersey-ink: #fff;
+  --jersey-border: rgba(235,238,242,.52);
+}
+
+/* Display Zoom / narrow logical viewport support. Keep controls reachable and permit text to reflow instead of clipping. */
+.button,
+.icon-button,
+.library-team,
+.standings-league-tab,
+.action-panel {
+  min-height: 44px;
+}
+
+.library-team > span:nth-child(2),
+.library-team-name,
+.library-team-meta,
+.global-team-name,
+.global-standing-secondary,
+.data-value,
+.data-sub,
+.roster-name,
+.roster-meta,
+.game-row-main,
+.game-row-sub {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.global-standing-secondary {
+  white-space: normal;
+}
+
+@media (max-width: 430px) {
+  header {
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 10px 12px;
+  }
+
+  .title-block {
+    flex: 1 1 190px;
+  }
+
+  .header-actions {
+    margin-left: auto;
+  }
+
+  .brand-lockup {
+    margin-bottom: 7px;
+  }
+
+  .brand-copy .brand,
+  .brand-tagline {
+    white-space: normal;
+  }
+
+  .library-team {
+    grid-template-columns: minmax(62px, 74px) minmax(0, 1fr) auto;
+    gap: 9px;
+  }
+
+  .library-team img {
+    width: 100%;
+    max-width: 74px;
+  }
+
+  .home-score-rail {
+    padding-inline: 10px;
+  }
+
+  .home-score-line {
+    max-width: 100%;
+    line-height: 1.12;
+  }
+}
+
+@media (max-width: 350px) {
+  .app {
+    padding-inline: 10px;
+  }
+
+  h1 {
+    font-size: clamp(1.65rem, 9vw, 2.25rem);
+  }
+
+  .header-actions {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .edit-toolbar {
+    padding: 9px;
+  }
+
+  .library-team {
+    grid-template-columns: 58px minmax(0, 1fr) auto;
+  }
+
+  .library-team img {
+    max-width: 58px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
