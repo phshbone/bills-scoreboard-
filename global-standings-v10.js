@@ -283,7 +283,7 @@
     if (!document.getElementById('depth-chart-overlay')?.hidden) return true;
     let node = target instanceof Element ? target : null;
     while (node && node !== document.body) {
-      if (node.matches('input, textarea, select, [contenteditable="true"], .standings-league-tabs, .global-standings-table-wrap')) return true;
+      if (node.matches('input, textarea, select, [contenteditable="true"], .standings-league-tabs')) return true;
       const style = getComputedStyle(node);
       if ((style.overflowX === 'auto' || style.overflowX === 'scroll') && node.scrollWidth > node.clientWidth + 4) return true;
       node = node.parentElement;
