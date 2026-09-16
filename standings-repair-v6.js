@@ -31,6 +31,14 @@
     return known[id] || '';
   }
 
+  function splitRecord(item, names) {
+    const wanted = new Set(names.map(name => String(name).toLowerCase().replace(/[^a-z0-9]/g, '')));
+    const records = Array.isArray(item?.records?.splitRecords) ? item.records.splitRecords : [];
+    const found = records.find(record => wanted.has(String(record?.type || record?.description || '').toLowerCase().replace(/[^a-z0-9]/g, '')));
+    if (!found || found.wins == null || found.losses == null) return '';
+    return `${found.wins}-${found.losses}`;
+  }
+
   function normalizeMlbStandings(payload) {
     const groups = [];
     const records = Array.isArray(payload?.records) ? payload.records : [];
@@ -46,7 +54,16 @@
           name: team.name || team.teamName || team.clubName || 'Team',
           record: `${item?.wins ?? '—'}-${item?.losses ?? '—'}`,
           pct: item?.winningPercentage || '',
-          gb: item?.gamesBack == null ? '' : String(item.gamesBack)
+          gb: item?.gamesBack == null ? '' : String(item.gamesBack),
+          extras: {
+            gb: item?.gamesBack == null ? '' : String(item.gamesBack),
+            lastTen: splitRecord(item, ['lastTen', 'last10']),
+            home: splitRecord(item, ['home']),
+            away: splitRecord(item, ['away']),
+            streak: item?.streak?.streakCode || '',
+            diff: item?.runDifferential == null ? '' : String(item.runDifferential),
+            gamesPlayed: item?.gamesPlayed == null ? '' : String(item.gamesPlayed)
+          }
         };
       });
       if (entries.length) {
