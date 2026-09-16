@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v5-roster-groups';
+const CACHE = 'scoreboard-v5-live-score';
 const ASSETS = [
   './',
   './index.html',
@@ -6,9 +6,11 @@ const ASSETS = [
   './team-page-v4.css',
   './team-page-v5.css',
   './roster-groups-v5.css',
+  './live-score-v5.css',
   './team-data-v5.js',
   './team-page-v5.js',
   './roster-groups-v5.js',
+  './live-score-v5.js',
   './app.js',
   './manifest.webmanifest',
   './assets/icon.svg',
