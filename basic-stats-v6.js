@@ -227,8 +227,10 @@
 
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && !document.getElementById('basic-stats-overlay')?.hidden) {
-      event.stopPropagation();
+      event.stopImmediatePropagation();
       closeOverlay();
     }
   });
+
+  window.ScoreboardBasicStats = Object.freeze({ loadStats, chooseStats });
 })();
