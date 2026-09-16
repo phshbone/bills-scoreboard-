@@ -12,6 +12,8 @@ Every stage must finish as a complete, deployable application. No dead navigatio
 - Phone must have reliable non-drag reorder controls; desktop may additionally support drag-and-drop.
 - Removed teams remain in the library and can be restored.
 - Future teams can be added to the library without redesigning the board.
+- My Teams may carry an at-a-glance score rail integrated into the lower edge of the existing plaque without shrinking or replacing the plaque artwork.
+- Score rails are informational and must not create a second conflicting tap target; the whole plaque continues to open the team page.
 
 ## Main navigation
 - Planned top level: `Standings | My Teams | Sports News`.
@@ -22,7 +24,7 @@ Every stage must finish as a complete, deployable application. No dead navigatio
 - Back returns to the exact prior context when practical, including prior feed/scroll position.
 
 ## Team page
-Opening a team shows last game, next game, current record, Schedule, Roster, Standings, and Basic Stats when usable data is available. Full Stats and team-specific News remain later increments.
+Opening a team shows last game, next game, current record, Schedule, Roster, Standings, Basic Stats, and Full Stats when usable data is available. Team-specific News remains a later increment.
 
 ## Live game rules
 The data provider supplies game facts/status; the app determines presentation:
@@ -32,17 +34,20 @@ The data provider supplies game facts/status; the app determines presentation:
 - postponed/cancelled events are not treated as normal completed/next games
 - My Teams may show a small `LIVE` indicator when a selected team has an in-progress event
 - the detailed live-score view should use a scoreboard/game source that actually carries current scores rather than assuming the schedule payload does
+- when a game is live, the home score rail replaces the previous final result with the current live score/state; after the game becomes final, that result becomes the newest completed result.
 
 ## Stats
 - Basic Stats is the default lightweight view and may show current team leaders when a usable leaders feed is available.
 - Basic Stats must remain hidden rather than expose a dead control if current leader data is unavailable.
-- Full Stats is a denser expansion/view; Custom columns may be added later.
+- Full Stats is a denser player-table view and must also remain hidden until a usable athlete-stat response has been verified.
+- Full Stats loads player season data only on demand and should cache successful player responses during the visit.
 - Full tables use a sticky column header and sticky player-name column.
 - Alternating vertical column shading runs continuously from the header through the data rows.
 - Faint row separators and stronger stat-group separators aid tracking.
 - Horizontal scrolling is reserved for the stat table while it has focus/interaction.
-- A tapped stat header may optionally emphasize that column.
+- A tapped stat header may emphasize that column.
 - A duplicated footer header is not part of the initial stats design; the sticky header solves the same problem with less screen loss.
+- Custom user-selected columns remain a later enhancement.
 
 ## News
 - Sports News is the broad/global feed.
@@ -97,3 +102,12 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - MLB division grouping is a demonstrated provider gap. MLB StatsAPI is permitted as an MLB-only standings fallback while ESPN remains the general primary sports source.
 - If the MLB fallback fails, the existing ESPN standings path remains usable rather than breaking the team page.
 - No paid provider, API key, or Cloudflare dependency is introduced by Stage 6.
+
+## Stage 7 lock — Full Stats and home score rails (2026-09-15)
+- Keep the existing large metal plaques; integrate at-a-glance game information as a compact lower score rail rather than shrinking the artwork in the first implementation.
+- Rail priority is `LIVE` current score/state → most recent completed result/date → next game only when no completed result is available.
+- Rails hide during Edit mode to avoid interference with reorder/remove controls.
+- Full Stats uses the current roster plus athlete season-stat responses, fetched only when needed and with concurrency limits.
+- Full Stats preserves the previously locked sticky-header, sticky-player-column, vertical-shading, horizontal-scroll, and column-emphasis behavior.
+- Full Stats is conditional; a team does not receive a Full Stats control unless at least one usable athlete-stat response has been confirmed.
+- No paid provider, API key, Cloudflare dependency, or new account is introduced by Stage 7.
