@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v10-1-swipe-standings';
+const CACHE = 'scoreboard-v11-branding-philly-accessibility';
 const ASSETS = [
   './',
   './index.html',
@@ -15,6 +15,7 @@ const ASSETS = [
   './home-score-overlay-v9.css',
   './mlb-depth-chart-v9.css',
   './global-standings-v10.css',
+  './stage11-v11.css',
   './team-data-v8.js',
   './standings-repair-v6.js',
   './nfl-standings-v9.js',
@@ -30,14 +31,22 @@ const ASSETS = [
   './home-score-rail-v8.js',
   './global-standings-v10.js',
   './manifest.webmanifest',
-  './assets/icon.svg',
+  './assets/bills-scoreboard-mark.webp',
+  './assets/bills-scoreboard-banner.webp',
+  './assets/icon-192.webp',
+  './assets/icon-512.webp',
+  './assets/apple-touch-icon.png',
   './assets/giants.webp',
   './assets/yankees.webp',
   './assets/mets.webp',
   './assets/jets.webp',
   './assets/rangers.webp',
   './assets/army.webp',
-  './assets/fever.webp'
+  './assets/fever.webp',
+  './assets/eagles.webp',
+  './assets/phillies.webp',
+  './assets/flyers.webp',
+  './assets/sixers.webp'
 ];
 
 self.addEventListener('install', event => {
@@ -53,7 +62,35 @@ self.addEventListener('activate', event => {
   );
 });
 
+async function networkFirst(request) {
+  const cache = await caches.open(CACHE);
+  try {
+    const response = await fetch(request, { cache: 'no-store' });
+    if (response && response.ok) cache.put(request, response.clone()).catch(() => {});
+    return response;
+  } catch (error) {
+    const cached = await cache.match(request);
+    if (cached) return cached;
+    throw error;
+  }
+}
+
+async function cacheFirst(request) {
+  const cache = await caches.open(CACHE);
+  const cached = await cache.match(request);
+  if (cached) return cached;
+  const response = await fetch(request);
+  if (response && response.ok) cache.put(request, response.clone()).catch(() => {});
+  return response;
+}
+
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
-  event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request)));
+  const url = new URL(event.request.url);
+
+  // Provider/API traffic should never be pinned by the app-shell cache.
+  if (url.origin !== self.location.origin) return;
+
+  const shellRequest = event.request.mode === 'navigate' || /\.(?:html|js|css|webmanifest)$/.test(url.pathname);
+  event.respondWith(shellRequest ? networkFirst(event.request) : cacheFirst(event.request));
 });
