@@ -61,21 +61,20 @@ self.addEventListener('fetch', event => {
   // Navigations are network-first so a fresh launch receives the newest app shell.
   // Cached HTML remains the offline fallback.
   if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request)
-        .then(response => {
-          if (response && response.ok) {
-            const copy = response.clone();
-            event.waitUntil(caches.open(CACHE).then(cache => cache.put('./index.html', copy)));
-          }
-          return response;
-        })
-        .catch(async () => {
-          return (await caches.match(request))
-            || (await caches.match('./index.html'))
-            || (await caches.match('./'));
-        })
-    );
+    event.respondWith((async () => {
+      try {
+        const response = await fetch(request);
+        if (response && response.ok) {
+          const cache = await caches.open(CACHE);
+          await cache.put('./index.html', response.clone());
+        }
+        return response;
+      } catch {
+        return (await caches.match(request))
+          || (await caches.match('./index.html'))
+          || (await caches.match('./'));
+      }
+    })());
     return;
   }
 
