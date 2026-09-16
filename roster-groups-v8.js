@@ -7,9 +7,10 @@
   if (!detailContent || !detailTitle || !teamPage) return;
 
   const sportByTeam = Object.freeze({
-    giants: 'football', jets: 'football', army: 'football',
-    yankees: 'baseball', mets: 'baseball',
-    rangers: 'hockey', fever: 'basketball'
+    giants: 'football', jets: 'football', army: 'football', eagles: 'football',
+    yankees: 'baseball', mets: 'baseball', phillies: 'baseball',
+    rangers: 'hockey', flyers: 'hockey',
+    fever: 'basketball', sixers: 'basketball'
   });
 
   const aliases = Object.freeze({
