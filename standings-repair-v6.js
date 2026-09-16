@@ -84,7 +84,7 @@
     const season = seasonFrom(snapshot);
     const key = String(season);
     if (!force && mlbCache.has(key)) return mlbCache.get(key);
-    const url = `${MLB_STANDINGS}?leagueId=103,104&season=${encodeURIComponent(season)}&standingsTypes=regularSeason&hydrate=team,division,league,records`;
+    const url = `${MLB_STANDINGS}?leagueId=103,104&season=${encodeURIComponent(season)}&standingsTypes=regularSeason&hydrate=team,division,league`;
     const groups = normalizeMlbStandings(await fetchJson(url));
     if (groups.length) mlbCache.set(key, groups);
     return groups;
