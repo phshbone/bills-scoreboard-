@@ -131,3 +131,15 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Depth Chart owns field-position depth and Starter/backup order; those labels must come from provider rank/order rather than inference from roster order.
 - A baseball team receives no Depth Chart control when the provider response is missing or unusable.
 - The ESPN depth-chart and NFL division-standings additions are demonstrated-gap repairs, not a change to the broader normalized-provider architecture.
+
+## Stage 10 lock — Top-level navigation and global standings (2026-09-16)
+- My Teams remains the default/home screen and the center of the product.
+- The top-level navigation exposes only completed destinations. Stage 10 shows `Standings` and `My Teams`; `Sports News` is added only when its screen is functional.
+- Primary navigation belongs in a persistent low thumb zone and is hidden during Edit mode so team-management controls remain unambiguous.
+- Global Standings derives its league choices from the user's currently active My Teams leagues rather than a hard-coded sports portal menu.
+- League standings load through the same normalized `ScoreboardData` chain used by team pages, including the MLB division fallback and NFL division repair.
+- All selected My Teams clubs in the active league are highlighted; multiple selected teams in one league may be highlighted simultaneously.
+- NCAA global standings may use the selected team's relevant returned group rather than implying that a universal national table is always comparable.
+- Horizontal overflow belongs to the standings table container; the app shell itself must not gain horizontal page scrolling.
+- A Retry control appears only after an actual standings-load failure; no dead or decorative controls are permitted.
+- Yankees MLB depth-chart provider-shape cleanup and the possible FINAL→NEXT home-score timing rule are explicitly deferred and do not block Stage 10.
