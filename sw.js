@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11a3-branding';
+const CACHE = 'scoreboard-v11b2-swipe-repair';
 const ASSETS = [
   './',
   './index.html',
@@ -30,6 +30,7 @@ const ASSETS = [
   './live-awareness-v6.js',
   './home-score-rail-v8.js',
   './global-standings-v10.js',
+  './swipe-repair-v11.js',
   './manifest.webmanifest',
   './assets/icon.svg',
   './assets/giants.webp',
