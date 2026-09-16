@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v10-global-standings';
+const CACHE = 'scoreboard-v10-1-swipe-standings';
 const ASSETS = [
   './',
   './index.html',
