@@ -1,0 +1,39 @@
+.roster-completeness-note,
+.schedule-window-note {
+  color: var(--muted);
+  font-size: .92rem;
+  line-height: 1.4;
+}
+.roster-completeness-note {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(173,193,220,.13);
+  border-radius: 11px;
+  background: rgba(8,13,21,.52);
+}
+.schedule-more-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 2px 2px;
+}
+.schedule-more-button {
+  flex: 0 0 auto;
+  min-height: 44px;
+}
+.schedule-more-row .schedule-window-note {
+  text-align: right;
+}
+.game-list > .schedule-window-note {
+  padding: 12px 4px 2px;
+}
+@media (max-width: 560px) {
+  .schedule-more-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .schedule-more-row .schedule-window-note {
+    text-align: left;
+  }
+}
