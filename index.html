@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="./home-score-rail-v8.css" />
   <link rel="stylesheet" href="./home-score-overlay-v9.css" />
   <link rel="stylesheet" href="./mlb-depth-chart-v9.css" />
+  <link rel="stylesheet" href="./global-standings-v10.css" />
 </head>
 <body>
   <main class="app" aria-labelledby="page-title">
@@ -35,18 +36,34 @@
       </div>
     </header>
 
-    <section class="edit-toolbar" aria-label="Edit My Teams controls">
-      <span class="edit-note">Reorder with ↑/↓ on phone or drag on desktop. Changes save automatically.</span>
-      <button class="button" id="add-team" type="button">Add team</button>
-      <button class="button" id="reset-teams" type="button">Reset</button>
+    <section class="app-screen" id="my-teams-screen" aria-label="My Teams">
+      <section class="edit-toolbar" aria-label="Edit My Teams controls">
+        <span class="edit-note">Reorder with ↑/↓ on phone or drag on desktop. Changes save automatically.</span>
+        <button class="button" id="add-team" type="button">Add team</button>
+        <button class="button" id="reset-teams" type="button">Reset</button>
+      </section>
+
+      <section id="team-grid" aria-label="My sports teams"></section>
+      <section class="empty-state" id="empty-state" aria-live="polite">
+        <strong>Your board is empty.</strong>
+        Open Edit → Add team to restore a team from your library.
+      </section>
     </section>
 
-    <section id="team-grid" aria-label="My sports teams"></section>
-    <section class="empty-state" id="empty-state" aria-live="polite">
-      <strong>Your board is empty.</strong>
-      Open Edit → Add team to restore a team from your library.
+    <section class="app-screen standings-screen" id="standings-screen" hidden aria-label="Standings">
+      <div class="standings-league-tabs" id="standings-league-tabs" aria-label="Choose league"></div>
+      <div class="global-standings-status" id="global-standings-status" aria-live="polite"></div>
+      <div class="global-standings-content" id="global-standings-content"></div>
+      <div class="global-standings-actions">
+        <button class="button" id="global-standings-retry" type="button" hidden>Retry</button>
+      </div>
     </section>
   </main>
+
+  <nav class="primary-nav" id="primary-nav" aria-label="Scoreboard sections">
+    <button class="primary-nav-button" type="button" data-screen="standings">Standings</button>
+    <button class="primary-nav-button active" type="button" data-screen="teams" aria-current="page">My Teams</button>
+  </nav>
 
   <div class="modal" id="library-modal" hidden role="dialog" aria-modal="true" aria-labelledby="library-title">
     <div class="sheet">
@@ -111,5 +128,6 @@
   <script src="./mlb-depth-chart-v9.js" defer></script>
   <script src="./live-awareness-v6.js" defer></script>
   <script src="./home-score-rail-v8.js" defer></script>
+  <script src="./global-standings-v10.js" defer></script>
 </body>
 </html>
