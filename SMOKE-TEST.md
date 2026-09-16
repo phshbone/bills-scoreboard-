@@ -1,17 +1,27 @@
-# Stage 8 smoke checklist
+# Stage 9 smoke checklist
 
-Validated before merge by source inspection and deterministic data-shape review:
+Validated before merge with executed runtime/browser checks plus source/data-flow review.
 
-- `index.html` replaces the Stage 7 home score rail with the Stage 8 compact one-line rail and wires the Stage 8 team-data, team-page, roster-grouping, and freshness helpers.
-- PWA cache is bumped to `scoreboard-v8-home-rail-roster-schedule` and includes every new Stage 8 asset.
-- Home score rails remain `pointer-events: none`, stay hidden in Edit mode, and keep the entire plaque as the single team navigation target.
-- Final score/date and live score/game-state are rendered on one line with overflow protection rather than a tall two-line block.
-- Roster normalization walks grouped/direct roster collections, unwraps `athlete`/`player` records, de-duplicates by player identity, and retains unrecognized positions instead of filtering them out.
-- Position normalization includes additional baseball, football, hockey, and basketball aliases; an empty/missing position is routed to `Other / Unassigned`.
-- Roster detail reports the unique player count and explains that headings use provider-listed primary positions, so the absence of an empty 2B/CF/etc. heading is not treated as proof that a player vanished.
-- Football schedule rendering uses the full `games.upcoming` collection returned by the provider instead of the prior eight-game slice.
-- Non-football schedules start with 12 upcoming games and expose a working `Show next 12 games` control only when more returned games remain.
-- Team-data freshness wrapper forces a feed refresh when reopening a team after two minutes; Retry still forces a refresh immediately.
-- Existing MLB standings fallback, Basic Stats, Full Stats, live-score popup, LIVE plaque pill, grouped roster styling, jersey badges, low Back control, and team customization remain wired.
+## Executed evidence
+- Playwright runtime preflight: **RUNTIME READY — EXECUTED**. Python Playwright is installed and system Chromium at `/usr/bin/chromium` launched and rendered a minimal page.
+- Deterministic browser smoke at a 390×844 viewport: **PASS**.
+- Score-overlay assertion confirms the Stage 9 override removes the rail background image/color, border, and box shadow so score text sits directly over the plaque artwork.
+- NFL standings fixture confirms the division-level hierarchy normalizes to eight leaf groups (AFC/NFC East, North, South, West) and selects NFC East for a Giants fixture.
+- MLB depth-chart parser fixture confirms explicit `2B` and `CF` positions survive normalization and preserve provider rank order for Starter / 2nd / later depth labels.
+- Integration fixture confirms the conditional MLB Depth Chart card appears only after a usable response, opens successfully, renders 2B/CF plus starter/backup ordering, and returns to the team page through its Back control.
+- Integration fixture confirms the direct score text stays within the plaque bounds and that the Stage 9 depth/overlay additions do not introduce desktop horizontal overflow at 1280×900.
+- New Stage 9 JavaScript files pass syntax checks.
 
-Environment note: this runtime cannot perform the normal browser-backed/deployed-provider smoke because outbound browser/provider access is blocked. Final visual/provider verification remains the deployed GitHub Pages check on the user's phone. No production mock sports data was added.
+## Static/regression review
+- `index.html` loads the NFL standings repair after the existing MLB standings wrapper and before the freshness wrapper, preserving wrapper order.
+- MLB Depth Chart is loaded after the board/team plumbing and only adds a control after a usable depth-chart response is verified.
+- The existing Roster remains based on provider primary roster positions; Stage 9 does not manufacture empty 2B/CF groups or relabel roster players from guesses.
+- NFL standings failure falls back to the existing standings snapshot rather than breaking the team page.
+- The score overlay remains a presentation-only child of the existing plaque and inherits the existing `pointer-events: none` / Edit-mode behavior from the Stage 8 rail implementation.
+- PWA cache is bumped to `scoreboard-v9-repairs` and includes all Stage 9 CSS/JS assets.
+- Existing live scoring, LIVE plaque pill, MLB standings fallback, Basic/Full Stats, grouped roster, schedule depth, low Back control, and team customization remain wired.
+
+## Validation limitation
+The browser runtime is usable, but this host does not reliably permit the browser itself to reach the deployed GitHub Pages site and live sports-provider endpoints. Deployed-provider verification therefore remains a real-device/deployed smoke on the user's phone. No production mock sports data was added.
+
+Overall pre-merge classification: **PASS WITH WARNINGS** — deterministic browser behavior is executed; live deployed-provider behavior remains environment-blocked here.

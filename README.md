@@ -1,8 +1,8 @@
 # Bill's Scoreboard
 
-## Stage 8 — Home Rail Refinement + Roster Reliability + Schedule Depth
+## Stage 9 — Repair Pass: Direct Score Overlay + NFL Divisions + MLB Depth Chart
 
-This release preserves the approved **My Teams** board, live scoring, standings repair, Basic/Full Stats, grouped rosters, customization, and phone-first navigation, then tightens three areas exposed by live use.
+This release preserves the approved **My Teams** board, live scoring, Basic/Full Stats, schedules, grouped rosters, customization, and phone-first navigation, then repairs three issues isolated by the Stage 8 diagnostic smoke pass.
 
 ### Current teams
 - New York Giants — NFL
@@ -13,39 +13,41 @@ This release preserves the approved **My Teams** board, live scoring, standings 
 - Army Black Knights — NCAA football
 - Indiana Fever — WNBA
 
-### Working Stage 8 capability
-- **One-line home score rail:** the large metal plaques remain unchanged in size. The prior two-line bottom block is replaced by a much shorter single-line metal rail such as `FINAL · NYY 8 — MIN 1 · Tue, Sep 15` or `LIVE · NYY 4 — MIN 2 · Top 6th`.
-- The rail blends into the plaque color family, remains presentation-only, and disappears in Edit mode.
-- **Roster reliability:** roster normalization now handles more returned roster shapes, consolidates duplicates, preserves every unique player it recognizes, and expands position aliases across baseball, football, hockey, and basketball.
-- The roster view reports how many unique players are being shown and explains that headings reflect the provider's listed primary positions; empty position groups are not fabricated.
-- Players without a usable position are retained under `Other / Unassigned` rather than disappearing.
-- **Schedule depth:** NFL and Army football now show the entire remaining schedule returned by the provider instead of stopping after eight upcoming games.
-- MLB, NHL, and WNBA keep a readable rolling window and expose a working `Show next 12 games` control until all returned upcoming games are visible.
-- Team data is treated as stale after two minutes when reopening a team page, so completed/live/upcoming changes do not remain trapped indefinitely in the in-visit cache. Retry still forces an immediate refresh.
+### Working Stage 9 capability
+- **Direct score overlay:** the separate bottom metal plate is removed visually. The existing one-line score text now sits directly on the plaque artwork with text-shadow contrast, so the ripped-metal artwork remains dominant.
+- The score overlay remains presentation-only, keeps the full plaque as the one tap target, and still disappears in Edit mode.
+- **NFL division standings repair:** NFL team loads make a division-level standings request and replace the fallback conference-wide table only when usable division groups are returned. The existing standings renderer then shows AFC/NFC divisions separately and keeps the selected team highlighted.
+- **MLB depth chart:** baseball team pages can add a conditional Depth Chart card after a usable provider depth-chart response is confirmed.
+- The baseball Roster remains truthful to the provider's primary roster-position labels; the new Depth Chart is the separate field-position view for positions such as 2B/CF and for provider starter/backup ranking.
+- The depth-chart helper tries both commonly observed ESPN depth-chart path variants and can resolve the provider's numeric team id when the abbreviation path is insufficient.
+- If depth-chart data is unavailable or unusable, no dead Depth Chart control is shown.
 
 ### Existing capability preserved
 - live-score popup with 30-second refresh while live
 - upper-right LIVE plaque pill
-- MLB division standings fallback
+- MLB division standings fallback through MLB StatsAPI
 - Basic Stats and Full Stats
 - grouped roster + jersey-number badges
+- full remaining football schedule and paged long-season schedules
 - Record / Last Game / Next Game
 - low thumb-zone Back
 - team reorder/remove/restore + persistence
+- two-minute in-visit team-data freshness rule plus manual Retry
 
 ### Data architecture
-ESPN public JSON remains the primary general sports source. MLB StatsAPI remains limited to the demonstrated MLB standings gap. No paid service, API key, Cloudflare Worker, or new account is required.
+ESPN public JSON remains the primary general sports source. MLB StatsAPI remains limited to the demonstrated MLB standings gap. Stage 9 adds only demonstrated data-shape repairs: an ESPN division-level NFL standings request and an ESPN MLB depth-chart feed. No paid service, API key, Cloudflare Worker, or new account is required.
 
 ### Deferred
 - Custom user-selected stat columns
 - Sports News and team News
 - Full team-page visual themes
 - Weather and attendance analysis
-- Starter/backup depth labels unless a trustworthy source supplies them
+- Non-baseball depth-chart UI unless a demonstrated need justifies it
 - Deep game-strategy analysis
 
 ### Stage contract
 - No fake sports data in production.
-- No player is intentionally discarded because its position label is unfamiliar; unknown positions remain visible.
-- Schedule controls are real and only appear when more returned games exist.
-- Stage 8 refinements do not create new competing tap targets on the home plaques.
+- Roster primary-position labels are not rewritten into guessed field positions.
+- Starter/backup labels come only from a depth-chart source that actually supplies ranking/order.
+- NFL division grouping falls back to the existing standings data if the division-level request fails.
+- Stage 9 repairs do not create a competing tap target on the home plaques.

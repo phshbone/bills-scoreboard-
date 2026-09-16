@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v8-home-rail-roster-schedule';
+const CACHE = 'scoreboard-v9-repairs';
 const ASSETS = [
   './',
   './index.html',
@@ -12,8 +12,11 @@ const ASSETS = [
   './live-awareness-v6.css',
   './full-stats-v7.css',
   './home-score-rail-v8.css',
+  './home-score-overlay-v9.css',
+  './mlb-depth-chart-v9.css',
   './team-data-v8.js',
   './standings-repair-v6.js',
+  './nfl-standings-v9.js',
   './team-data-freshness-v8.js',
   './team-page-v8.js',
   './roster-groups-v8.js',
@@ -21,6 +24,7 @@ const ASSETS = [
   './app.js',
   './basic-stats-v6.js',
   './full-stats-v7.js',
+  './mlb-depth-chart-v9.js',
   './live-awareness-v6.js',
   './home-score-rail-v8.js',
   './manifest.webmanifest',
