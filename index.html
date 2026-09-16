@@ -5,10 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#080d16" />
   <meta name="color-scheme" content="dark" />
-  <meta name="description" content="A focused personal sports dashboard with customizable teams and live team pages." />
-  <title>scoreboard · my teams</title>
+  <meta name="description" content="Bill's Scoreboard Sports Page — a customizable personal sports dashboard with live team data." />
+  <meta name="apple-mobile-web-app-title" content="Bill's Scoreboard" />
+  <meta property="og:title" content="Bill's Scoreboard Sports Page" />
+  <meta property="og:description" content="A customizable personal sports dashboard with live scores, standings, schedules, rosters and stats." />
+  <meta property="og:image" content="https://phshbone.github.io/bills-scoreboard-/assets/bills-scoreboard-banner.webp" />
+  <title>Bill's Scoreboard · My Teams</title>
   <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
+  <link rel="icon" href="./assets/icon-192.webp" type="image/webp" />
+  <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" />
   <link rel="stylesheet" href="./styles.css" />
   <link rel="stylesheet" href="./team-page-v4.css" />
   <link rel="stylesheet" href="./team-page-v5.css" />
@@ -22,12 +27,19 @@
   <link rel="stylesheet" href="./home-score-overlay-v9.css" />
   <link rel="stylesheet" href="./mlb-depth-chart-v9.css" />
   <link rel="stylesheet" href="./global-standings-v10.css" />
+  <link rel="stylesheet" href="./stage11-v11.css" />
 </head>
 <body>
   <main class="app" aria-labelledby="page-title">
     <header>
       <div class="title-block">
-        <p class="brand">scoreboard</p>
+        <div class="brand-lockup" aria-label="Bill's Scoreboard Sports Page">
+          <img class="brand-mark" src="./assets/bills-scoreboard-mark.webp" alt="" width="48" height="48" />
+          <div class="brand-copy">
+            <p class="brand">Bill's Scoreboard</p>
+            <p class="brand-tagline">Sports Page</p>
+          </div>
+        </div>
         <h1 id="page-title">MY TEAMS</h1>
       </div>
       <div class="header-actions">
