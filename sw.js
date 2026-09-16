@@ -1,8 +1,9 @@
-const CACHE = 'scoreboard-v11a2-philly-teams';
+const CACHE = 'scoreboard-v11a3-branding';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
+  './branding-v11.css',
   './team-page-v4.css',
   './team-page-v5.css',
   './team-page-v8.css',
