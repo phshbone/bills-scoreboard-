@@ -216,7 +216,7 @@
 
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && !document.getElementById('live-score-overlay')?.hidden) {
-      event.stopPropagation();
+      event.stopImmediatePropagation();
       closeOverlay();
     }
   });
