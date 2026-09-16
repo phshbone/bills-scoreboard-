@@ -14,6 +14,7 @@ const ASSETS = [
   './home-score-rail-v8.css',
   './team-data-v8.js',
   './standings-repair-v6.js',
+  './team-data-freshness-v8.js',
   './team-page-v8.js',
   './roster-groups-v8.js',
   './live-score-v6.js',
