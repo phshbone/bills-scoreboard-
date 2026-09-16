@@ -13,7 +13,8 @@
         { id: 'eagles', name: 'Philadelphia Eagles', league: 'NFL', sport: 'football', image: 'assets/eagles.webp', defaultSelected: false, provider: { sport: 'football', league: 'nfl', team: 'phi' } },
         { id: 'phillies', name: 'Philadelphia Phillies', league: 'MLB', sport: 'baseball', image: 'assets/phillies.webp', defaultSelected: false, provider: { sport: 'baseball', league: 'mlb', team: 'phi' } },
         { id: 'flyers', name: 'Philadelphia Flyers', league: 'NHL', sport: 'hockey', image: 'assets/flyers.webp', defaultSelected: false, provider: { sport: 'hockey', league: 'nhl', team: 'phi' } },
-        { id: 'sixers', name: 'Philadelphia 76ers', league: 'NBA', sport: 'basketball', image: 'assets/sixers.webp', defaultSelected: false, provider: { sport: 'basketball', league: 'nba', team: 'phi' } }
+        { id: 'sixers', name: 'Philadelphia 76ers', league: 'NBA', sport: 'basketball', image: 'assets/sixers.webp', defaultSelected: false, provider: { sport: 'basketball', league: 'nba', team: 'phi' } },
+        { id: 'knicks', name: 'New York Knicks', league: 'NBA', sport: 'basketball', image: 'assets/knicks.webp', defaultSelected: false, provider: { sport: 'basketball', league: 'nba', team: 'ny' } }
       ]);
 
       const byId = new Map(teamLibrary.map(team => [team.id, team]));
