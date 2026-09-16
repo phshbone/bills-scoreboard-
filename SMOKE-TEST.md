@@ -1,27 +1,37 @@
-# Stage 9 smoke checklist
+# Stage 10 smoke checklist
 
-Validated before merge with executed runtime/browser checks plus source/data-flow review.
+Validated before merge with executed browser fixtures plus source/data-flow review.
 
 ## Executed evidence
-- Playwright runtime preflight: **RUNTIME READY — EXECUTED**. Python Playwright is installed and system Chromium at `/usr/bin/chromium` launched and rendered a minimal page.
-- Deterministic browser smoke at a 390×844 viewport: **PASS**.
-- Score-overlay assertion confirms the Stage 9 override removes the rail background image/color, border, and box shadow so score text sits directly over the plaque artwork.
-- NFL standings fixture confirms the division-level hierarchy normalizes to eight leaf groups (AFC/NFC East, North, South, West) and selects NFC East for a Giants fixture.
-- MLB depth-chart parser fixture confirms explicit `2B` and `CF` positions survive normalization and preserve provider rank order for Starter / 2nd / later depth labels.
-- Integration fixture confirms the conditional MLB Depth Chart card appears only after a usable response, opens successfully, renders 2B/CF plus starter/backup ordering, and returns to the team page through its Back control.
-- Integration fixture confirms the direct score text stays within the plaque bounds and that the Stage 9 depth/overlay additions do not introduce desktop horizontal overflow at 1280×900.
-- New Stage 9 JavaScript files pass syntax checks.
+- Python Playwright is installed and system Chromium at `/usr/bin/chromium` launches successfully.
+- Direct `file://` navigation is blocked by this host's administrator policy, so the Stage 10 browser smoke used the existing in-memory DOM fallback rather than bypassing the restriction.
+- Stage 10 JavaScript passes `node --check` syntax validation.
+- Deterministic browser fixture at 390×844: **PASS**.
+- The fixture switches from My Teams to Standings and updates the page title correctly.
+- League controls are generated from active selected teams rather than from a hard-coded menu.
+- NFL fixture renders all eight AFC/NFC division groups and simultaneously highlights both selected New York teams in their relevant divisions.
+- MLB fixture renders the returned division group and highlights the selected Yankees row through the normalized `standingRow` path.
+- Switching back to My Teams restores the My Teams screen and title.
+- Standings table horizontal overflow remains inside the table scroller; the 390px page itself has no horizontal overflow.
+- Desktop regression at 1280×900 also shows no page-level horizontal overflow.
 
 ## Static/regression review
-- `index.html` loads the NFL standings repair after the existing MLB standings wrapper and before the freshness wrapper, preserving wrapper order.
-- MLB Depth Chart is loaded after the board/team plumbing and only adds a control after a usable depth-chart response is verified.
-- The existing Roster remains based on provider primary roster positions; Stage 9 does not manufacture empty 2B/CF groups or relabel roster players from guesses.
-- NFL standings failure falls back to the existing standings snapshot rather than breaking the team page.
-- The score overlay remains a presentation-only child of the existing plaque and inherits the existing `pointer-events: none` / Edit-mode behavior from the Stage 8 rail implementation.
-- PWA cache is bumped to `scoreboard-v9-repairs` and includes all Stage 9 CSS/JS assets.
-- Existing live scoring, LIVE plaque pill, MLB standings fallback, Basic/Full Stats, grouped roster, schedule depth, low Back control, and team customization remain wired.
+- `index.html` keeps My Teams as the default screen and adds only one new complete destination: Standings.
+- Sports News is intentionally not exposed as a dead top-level tab.
+- The global standings helper loads after the complete `ScoreboardData` wrapper chain, so MLB and NFL repairs remain available to the global screen.
+- Global standings uses one representative active team per league to load the normalized league snapshot, while every selected team in that league is used for row highlighting.
+- NCAA uses the selected team's relevant standings group rather than fabricating a generic national table.
+- Retry is hidden during normal success/loading flow and becomes available only after a real standings-load failure.
+- The low top-level navigation is behind team-page and modal z-index layers, so existing team pages/library dialogs retain visual and interaction priority.
+- Edit mode hides the top-level navigation to avoid mixing team-management controls with section navigation.
+- PWA cache is bumped to `scoreboard-v10-global-standings` and includes the new Stage 10 CSS/JS.
+- Existing plaque scores, live scoring, schedules, team standings, Basic/Full Stats, roster grouping, MLB standings fallback, NFL division repair, team customization, and team-page Back remain wired.
+
+## Known cleanup not treated as Stage 10 failure
+- Yankees MLB depth-chart live response still does not reliably expose the conditional Depth Chart control and remains a later adapter cleanup.
+- The proposed home score `FINAL → NEXT` timing change remains deferred.
 
 ## Validation limitation
-The browser runtime is usable, but this host does not reliably permit the browser itself to reach the deployed GitHub Pages site and live sports-provider endpoints. Deployed-provider verification therefore remains a real-device/deployed smoke on the user's phone. No production mock sports data was added.
+The browser runtime works for deterministic in-memory fixtures, but this host does not reliably permit browser outbound navigation to GitHub Pages/live provider endpoints. Final deployed-provider verification remains the user's real-device smoke.
 
-Overall pre-merge classification: **PASS WITH WARNINGS** — deterministic browser behavior is executed; live deployed-provider behavior remains environment-blocked here.
+Overall pre-merge classification: **PASS WITH LIVE VERIFICATION RECOMMENDED**.
