@@ -1,6 +1,6 @@
 {
-  "name": "Bill's Scoreboard",
-  "short_name": "Scoreboard",
+  "name": "Bills Scoreboard Sports Page",
+  "short_name": "Bills Scoreboard",
   "description": "A customizable personal sports dashboard with live team data.",
   "id": "./",
   "start_url": "./",
