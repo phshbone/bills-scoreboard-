@@ -1,0 +1,23 @@
+.board-live-pill {
+  position: absolute;
+  z-index: 4;
+  top: 11px;
+  right: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 54px;
+  min-height: 30px;
+  padding: 4px 10px;
+  border: 1px solid rgba(121,202,142,.58);
+  border-radius: 999px;
+  color: #c8f1d2;
+  background: rgba(14, 63, 36, .88);
+  box-shadow: 0 5px 16px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.12);
+  backdrop-filter: blur(8px);
+  font-size: .76rem;
+  font-weight: 950;
+  letter-spacing: .08em;
+  pointer-events: none;
+}
+body.editing .board-live-pill { display: none; }
