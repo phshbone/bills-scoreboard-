@@ -12,8 +12,8 @@ Every stage must finish as a complete, deployable application. No dead navigatio
 - Phone must have reliable non-drag reorder controls; desktop may additionally support drag-and-drop.
 - Removed teams remain in the library and can be restored.
 - Future teams can be added to the library without redesigning the board.
-- My Teams may carry an at-a-glance score rail integrated into the lower edge of the existing plaque without shrinking or replacing the plaque artwork.
-- Score rails are informational and must not create a second conflicting tap target; the whole plaque continues to open the team page.
+- My Teams may carry at-a-glance game information integrated into the existing plaque without shrinking or replacing the plaque artwork.
+- Home score information is informational and must not create a second conflicting tap target; the whole plaque continues to open the team page.
 
 ## Main navigation
 - Planned top level: `Standings | My Teams | Sports News`.
@@ -34,7 +34,7 @@ The data provider supplies game facts/status; the app determines presentation:
 - postponed/cancelled events are not treated as normal completed/next games
 - My Teams may show a small `LIVE` indicator when a selected team has an in-progress event
 - the detailed live-score view should use a scoreboard/game source that actually carries current scores rather than assuming the schedule payload does
-- when a game is live, the home score rail replaces the previous final result with the current live score/state; after the game becomes final, that result becomes the newest completed result.
+- when a game is live, the home score treatment replaces the previous final result with the current live score/state; after the game becomes final, that result becomes the newest completed result.
 
 ## Stats
 - Basic Stats is the default lightweight view and may show current team leaders when a usable leaders feed is available.
@@ -121,3 +121,13 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Football schedules show the full remaining provider-returned season because the schedule is naturally short.
 - Longer-season sports use an initial upcoming window with a real incremental `Show next` control until all provider-returned games can be reached.
 - In-visit team data becomes stale after a short freshness window; reopening a team after that window refreshes the feeds, while Retry remains the immediate manual refresh.
+
+## Stage 9 lock — Direct score overlay, NFL divisions, and MLB depth chart (2026-09-16)
+- Stage 8's visible metal score plate is superseded: keep the single-line score content but render it directly over the existing plaque artwork with text-shadow contrast and no opaque rail background, border, or plate effect.
+- Score text remains presentation-only and never becomes a competing tap target.
+- NFL standings should request division-level hierarchy and prefer eight AFC/NFC division leaf groups when usable data is returned; failure falls back to the prior standings snapshot.
+- Baseball Roster remains a primary-position roster view and must not invent empty 2B/CF/etc. groups simply because a real lineup uses those positions.
+- MLB may expose a separate conditional Depth Chart view when a usable depth-chart response exists.
+- Depth Chart owns field-position depth and Starter/backup order; those labels must come from provider rank/order rather than inference from roster order.
+- A baseball team receives no Depth Chart control when the provider response is missing or unusable.
+- The ESPN depth-chart and NFL division-standings additions are demonstrated-gap repairs, not a change to the broader normalized-provider architecture.
