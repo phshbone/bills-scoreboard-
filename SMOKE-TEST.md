@@ -1,14 +1,16 @@
-# Stage 5 smoke checklist
+# Stage 6 smoke checklist
 
 Validated before merge:
 
-- Stage 5 JavaScript syntax checks pass for the normalized data adapter and team-page controller.
-- A deterministic Node data smoke confirms record, roster number, schedule parsing, and grouped-standings normalization.
-- Upcoming games suppress the provider's duplicate pregame date/time detail instead of showing the same time twice.
-- Static markup validation confirms Back is in the low `team-page-bottom-nav` and no longer in the upper-right team header.
-- Static markup validation confirms Stage 5 CSS/data/controller assets are wired from `index.html`.
-- Roster rendering code places jersey number in a dedicated team-themed badge while leaving position as secondary text.
-- Standings rendering prefers provider-supplied leaf groups/divisions and keeps current-team highlighting.
-- PWA cache is bumped to `scoreboard-v5-usability` and includes all Stage 5 assets.
+- JavaScript syntax checks pass for all Stage 6 helpers.
+- Deterministic live-score data smoke confirms a league-scoreboard event can resolve the selected team, opponent, current score, and in-game detail. The test fixture resolves Yankees 3, Twins 1, Top 5th.
+- Deterministic MLB standings smoke confirms the MLB fallback normalizes separate division groups and selects/highlights the Yankees division with an 87-63 record fixture.
+- Deterministic Basic Stats parser smoke confirms sport-appropriate team-leader categories can be normalized and selected from a leaders response.
+- Basic Stats is conditional: the overview receives a working card only after usable leader data is returned; failure leaves no dead button.
+- My Teams live-awareness checks one scoreboard per represented league and adds/removes a small `LIVE` pill without changing team-card navigation.
+- Live-score overlay now reads the league scoreboard source, refreshes every 30 seconds while live, and stops automatic polling when the event is no longer in progress.
+- MLB standings fallback failure returns to the existing ESPN-normalized standings rather than breaking the page.
+- Existing grouped rosters, schedules, record/Last/Next game, low Back control, Retry, local team customization, and PWA behavior remain wired.
+- PWA cache is bumped to `scoreboard-v6-basic-stats-live-awareness` and includes all Stage 6 assets.
 
-Environment note: Chromium is installed in this runtime, but the headless browser process is blocked/hangs under the host's sandbox/system-service restrictions, so the Stage 5 browser-backed interaction pass is classified **environment blocked**, not failed. Production sports-provider DNS/network is also blocked here. The deployed GitHub Pages site therefore remains the final live interaction/provider smoke target.
+Environment note: this runtime has previously blocked browser-backed navigation/outbound provider tests. Production live-provider verification therefore remains a deployed GitHub Pages smoke on the user's phone. Deterministic local tests contain fixtures only; production source contains no mocked sports results.
