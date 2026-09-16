@@ -29,17 +29,14 @@
 </head>
 <body>
   <main class="app" aria-labelledby="page-title">
-    <header>
-      <div class="header-identity">
-        <img class="app-brand-mark" src="./assets/icon.svg" alt="Bills Scoreboard Sports Page" width="60" height="60" />
-        <div class="title-block">
-          <p class="brand">Bills Scoreboard</p>
-          <h1 id="page-title">MY TEAMS</h1>
+    <header class="scoreboard-header">
+      <img class="app-brand-banner" src="./assets/scoreboard-header.webp" alt="Bills Scoreboard Sports Page" width="720" height="405" />
+      <div class="header-title-row">
+        <h1 id="page-title">MY TEAMS</h1>
+        <div class="header-actions">
+          <div class="count" id="team-count" aria-live="polite"></div>
+          <button class="button" id="edit-toggle" type="button" aria-pressed="false">Edit</button>
         </div>
-      </div>
-      <div class="header-actions">
-        <div class="count" id="team-count" aria-live="polite"></div>
-        <button class="button" id="edit-toggle" type="button" aria-pressed="false">Edit</button>
       </div>
     </header>
 

@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b4-knicks';
+const CACHE = 'scoreboard-v11b5-wide-header';
 const ASSETS = [
   './',
   './index.html',
@@ -34,6 +34,7 @@ const ASSETS = [
   './swipe-repair-v11.js',
   './manifest.webmanifest',
   './assets/icon.svg',
+  './assets/scoreboard-header.webp',
   './assets/giants.webp',
   './assets/yankees.webp',
   './assets/mets.webp',
