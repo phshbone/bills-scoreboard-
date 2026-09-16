@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v6-basic-stats-live-awareness';
+const CACHE = 'scoreboard-v7-full-stats-score-rail';
 const ASSETS = [
   './',
   './index.html',
@@ -9,6 +9,8 @@ const ASSETS = [
   './live-score-v6.css',
   './basic-stats-v6.css',
   './live-awareness-v6.css',
+  './full-stats-v7.css',
+  './home-score-rail-v7.css',
   './team-data-v5.js',
   './standings-repair-v6.js',
   './team-page-v5.js',
@@ -16,7 +18,9 @@ const ASSETS = [
   './live-score-v6.js',
   './app.js',
   './basic-stats-v6.js',
+  './full-stats-v7.js',
   './live-awareness-v6.js',
+  './home-score-rail-v7.js',
   './manifest.webmanifest',
   './assets/icon.svg',
   './assets/giants.webp',
