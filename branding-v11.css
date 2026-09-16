@@ -1,0 +1,32 @@
+.header-identity {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  min-width: 0;
+}
+
+.app-brand-mark {
+  width: clamp(46px, 12vw, 60px);
+  height: auto;
+  aspect-ratio: 1;
+  flex: 0 0 auto;
+  display: block;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.28), inset 0 0 0 1px rgba(255,255,255,.08);
+}
+
+.header-identity .brand {
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 380px) {
+  .header-identity { gap: 8px; }
+  .app-brand-mark { width: 42px; border-radius: 10px; }
+  .header-identity .brand { font-size: .72rem; }
+}
+
+@media (min-width: 760px) {
+  .header-identity { gap: 14px; }
+  .app-brand-mark { width: 68px; border-radius: 15px; }
+}
