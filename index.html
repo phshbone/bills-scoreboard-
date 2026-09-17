@@ -26,6 +26,7 @@
   <link rel="stylesheet" href="./home-score-overlay-v9.css" />
   <link rel="stylesheet" href="./mlb-depth-chart-v9.css" />
   <link rel="stylesheet" href="./global-standings-v10.css" />
+  <link rel="stylesheet" href="./desktop-nav-v11.css" />
 </head>
 <body>
   <main class="app" aria-labelledby="page-title">
@@ -33,6 +34,10 @@
       <img class="app-brand-banner" src="./assets/scoreboard-header.webp?v=11b6" alt="Bills Scoreboard Sports Page" width="720" height="405" />
       <div class="header-title-row">
         <h1 id="page-title">MY TEAMS</h1>
+        <nav class="desktop-top-nav" id="desktop-top-nav" aria-label="Scoreboard sections">
+          <button class="desktop-nav-button" type="button" data-screen="teams" aria-current="page">My Teams</button>
+          <button class="desktop-nav-button" type="button" data-screen="standings">Standings</button>
+        </nav>
         <div class="header-actions">
           <div class="count" id="team-count" aria-live="polite"></div>
           <button class="button" id="edit-toggle" type="button" aria-pressed="false">Edit</button>
@@ -129,6 +134,7 @@
   <script src="./live-awareness-v6.js" defer></script>
   <script src="./home-score-rail-v8.js" defer></script>
   <script src="./global-standings-v10.js" defer></script>
+  <script src="./desktop-nav-v11.js" defer></script>
   <script src="./swipe-repair-v11.js" defer></script>
 </body>
 </html>
