@@ -196,3 +196,13 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - If no current team-tagged stories are returned, the News view shows a real empty state rather than fabricated content.
 - A team-news fetch failure produces a working Retry control inside the News view and does not affect the rest of the team page.
 - Back from Team News returns to that team's overview; the next Back continues to preserve the original My Teams or Standings context.
+
+
+## Stage 11B11 lock — MLB live-state fallback (2026-09-17)
+- ESPN remains the primary live-score provider for all leagues.
+- A demonstrated MLB gap exists when ESPN's scoreboard feed remains `pre` or otherwise fails to expose a game that is already in progress.
+- For MLB only, the app may fall back to the public MLB StatsAPI schedule/linescore feed when ESPN does not return an in-progress game.
+- The MLB fallback is used consistently by the live-score overlay, team-page live-state freshness, and My Teams LIVE awareness so those surfaces cannot disagree solely because ESPN's MLB state is stale.
+- If ESPN already returns an in-progress game, ESPN remains authoritative and the MLB fallback is not called.
+- The MLB fallback is cached briefly in-visit to avoid duplicate current-day schedule requests when multiple selected MLB teams are playing in the same game.
+- If the MLB fallback fails, the existing ESPN path remains usable; failure of the fallback must not break non-MLB live scoring.

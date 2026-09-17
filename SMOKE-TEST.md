@@ -126,3 +126,22 @@ Validated before merge with live provider inspection, JavaScript compilation che
 - Service-worker cache namespace is bumped to `scoreboard-v11b10-team-news`; network-first `cache: no-store` shell behavior remains intact.
 
 Overall pre-merge classification: **PASS WITH LIVE VISUAL VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B11 smoke — MLB live-state provider fallback
+Validated before merge with a current live-game provider comparison, JavaScript compilation checks, and deterministic live-state fixtures.
+
+### Executed evidence
+- During the Phillies–Mets game on 2026-09-17, ESPN's MLB scoreboard payload still reported the matchup as scheduled/pre while independent current game sources reported it in progress. This is treated as a demonstrated provider gap rather than a UI-only failure.
+- `live-score-v11.js`, `live-panel-freshness-v11.js`, `live-awareness-v6.js`, and `sw.js` compile successfully.
+- Deterministic live-score fixture: **PASS**.
+- When ESPN reports `pre` and MLB StatsAPI reports a live Mets–Phillies game, the normalized live result switches to MLB StatsAPI and returns the current score, inning/outs detail, and batting side.
+- When ESPN itself reports `in`, ESPN remains primary and the MLB fallback is not called.
+- Deterministic My Teams live-awareness fixture: **PASS**.
+- With an empty/stale ESPN live payload, the MLB fallback publishes `scoreboard:live-state`, adds the LIVE pill, updates the plaque accessibility label, and supplies the live score object.
+- Deterministic team-page freshness fixture: **PASS**.
+- The existing Live Now panel updates its stale detail through the same normalized provider-fallback path.
+- The MLB daily schedule fallback is cached for 15 seconds in-visit so multiple selected MLB teams do not cause duplicate immediate fallback requests.
+- Service-worker cache namespace is bumped to `scoreboard-v11b11-mlb-live-fallback`.
+
+Overall pre-merge classification: **PASS WITH REAL-DEVICE LIVE VERIFICATION RECOMMENDED**.

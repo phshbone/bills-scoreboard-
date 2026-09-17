@@ -110,12 +110,19 @@
       await Promise.all([...groups.values()].map(async group => {
         try {
           const payload = await fetchJson(scoreboardUrl(group.team));
-          group.teams.forEach(team => {
-            const game = liveGame(payload, team);
-            if (!game) return;
+          await Promise.all(group.teams.map(async team => {
+            let game = liveGame(payload, team);
+            if (!game && (team?.league === 'MLB' || team?.sport === 'baseball') && window.ScoreboardLiveFeed?.fetchCurrentGame) {
+              try {
+                game = await window.ScoreboardLiveFeed.fetchCurrentGame(team, payload);
+              } catch {
+                game = null;
+              }
+            }
+            if (!game || game.state !== 'in') return;
             nextIds.add(team.id);
             nextGames.set(team.id, game);
-          });
+          }));
         } catch {
           // A failed league check leaves that league without a pill until the next successful refresh.
         }
