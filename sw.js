@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b8h-grooved-stencil-strip';
+const CACHE = 'scoreboard-v11b8i-approved-section-strip';
 const ASSETS = [
   './',
   './index.html',

@@ -1,4 +1,4 @@
-/* Grooved steel companion plaque for the full-width scoreboard banner. */
+/* Approved darker-blue steel section plaque matching the accepted mockup. */
 .scoreboard-header {
   width: 100%;
   grid-template-columns: minmax(0, 1fr);
@@ -14,26 +14,27 @@
   min-height: 50px;
   align-items: center;
   gap: 10px;
-  padding: 2px 10px 2px 12px;
+  padding: 2px 12px 2px 14px;
   overflow: hidden;
-  border: 1px solid rgba(146, 163, 184, .26);
+  border: 1px solid rgba(168, 186, 210, .25);
   border-radius: 10px;
-  background-color: #0b1118;
+  background-color: #11243a;
   background-image:
-    linear-gradient(180deg, rgba(255,255,255,.06) 0%, transparent 22%, transparent 78%, rgba(0,0,0,.22) 100%),
-    repeating-linear-gradient(135deg, rgba(203, 217, 234, .18) 0 2px, rgba(72, 84, 100, .30) 2px 5px, transparent 5px 18px),
-    repeating-linear-gradient(135deg, transparent 0 17px, rgba(239, 244, 250, .16) 17px 20px, rgba(32, 43, 57, .92) 20px 25px, transparent 25px 44px),
-    linear-gradient(180deg, #1a2431 0%, #101720 52%, #090f16 100%);
-  background-size: auto, 18px 18px, 44px 24px, auto;
-  background-position: 0 0, 0 0, 0 0, 0 0;
+    radial-gradient(circle at 9px 9px, rgba(210,221,232,.78) 0 1.5px, rgba(78,94,112,.95) 2px 3.2px, rgba(2,7,12,.85) 3.3px 4.2px, transparent 4.4px),
+    radial-gradient(circle at calc(100% - 9px) 9px, rgba(210,221,232,.78) 0 1.5px, rgba(78,94,112,.95) 2px 3.2px, rgba(2,7,12,.85) 3.3px 4.2px, transparent 4.4px),
+    radial-gradient(circle at 9px calc(100% - 9px), rgba(210,221,232,.68) 0 1.4px, rgba(78,94,112,.92) 2px 3.1px, rgba(2,7,12,.82) 3.2px 4.1px, transparent 4.3px),
+    radial-gradient(circle at calc(100% - 9px) calc(100% - 9px), rgba(210,221,232,.68) 0 1.4px, rgba(78,94,112,.92) 2px 3.1px, rgba(2,7,12,.82) 3.2px 4.1px, transparent 4.3px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='24' viewBox='0 0 38 24'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M5 17L15 7M24 18L34 8' stroke='%23040a11' stroke-opacity='.48' stroke-width='4'/%3E%3Cpath d='M4 16L14 6M23 17L33 7' stroke='%238ea5bf' stroke-opacity='.30' stroke-width='3'/%3E%3Cpath d='M4 15L14 5M23 16L33 6' stroke='%23d7e4f1' stroke-opacity='.10' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(255,255,255,.055) 0%, rgba(255,255,255,.02) 22%, transparent 40%, rgba(0,0,0,.13) 100%),
+    linear-gradient(180deg, #203a58 0%, #17324f 30%, #112943 62%, #0d2035 100%);
+  background-size: auto, auto, auto, auto, 38px 24px, auto, auto;
+  background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
   box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.03),
     inset 0 1px 0 rgba(255,255,255,.08),
-    inset 0 -1px 0 rgba(0,0,0,.64),
-    0 3px 10px rgba(0,0,0,.20);
+    inset 0 -1px 0 rgba(0,0,0,.56),
+    0 3px 9px rgba(0,0,0,.18);
 }
 
-/* Light grime / overspray texture, so the strip feels sprayed onto steel rather than polished UI. */
 .header-title-row::before,
 .header-title-row::after {
   content: "";
@@ -42,23 +43,19 @@
   pointer-events: none;
 }
 
+/* Very light paint dust and weathering; keep the words dominant. */
 .header-title-row::before {
-  opacity: .32;
+  opacity: .14;
   background:
-    radial-gradient(circle at 12% 28%, rgba(240, 244, 248, .10) 0 1px, transparent 1.4px),
-    radial-gradient(circle at 31% 64%, rgba(225, 232, 239, .07) 0 1px, transparent 1.35px),
-    radial-gradient(circle at 62% 34%, rgba(0, 0, 0, .17) 0 1px, transparent 1.4px),
-    radial-gradient(circle at 82% 58%, rgba(229, 235, 241, .08) 0 1px, transparent 1.4px);
-  background-size: 33px 27px, 29px 21px, 35px 26px, 31px 24px;
-  mix-blend-mode: screen;
+    radial-gradient(circle at 11% 30%, rgba(244,247,249,.18) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 39% 66%, rgba(244,247,249,.11) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 77% 36%, rgba(0,0,0,.25) 0 1px, transparent 1.5px);
+  background-size: 41px 31px, 47px 37px, 43px 33px;
 }
 
 .header-title-row::after {
-  opacity: .38;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.03), transparent 34%, rgba(0,0,0,.16) 100%),
-    radial-gradient(circle at 18% 50%, rgba(0,0,0,.12) 0 12%, transparent 16%),
-    radial-gradient(circle at 76% 48%, rgba(255,255,255,.04) 0 10%, transparent 15%);
+  opacity: .10;
+  background: linear-gradient(100deg, transparent 0 23%, rgba(255,255,255,.10) 24%, transparent 25% 67%, rgba(0,0,0,.16) 68%, transparent 69% 100%);
 }
 
 .header-title-row > * {
@@ -68,49 +65,53 @@
 
 .header-title-row h1 {
   min-width: 0;
-  margin-right: auto;
-  font-size: clamp(1.04rem, 2.6vw, 1.3rem);
+  margin: 0 auto 0 0;
+  font-family: "Fakt Slab Stencil Pro Medium", "Stencil Std", "Arial Black", Impact, Haettenschweiler, sans-serif;
+  font-size: clamp(1.28rem, 3.4vw, 1.58rem);
+  font-weight: 800;
   line-height: 1;
+  letter-spacing: .075em;
+  text-transform: uppercase;
   white-space: nowrap;
+  color: #eceee8;
+  text-shadow: none;
 }
 
-.header-title-row h1,
 .header-title-row #edit-toggle,
 .header-title-row .desktop-top-nav .desktop-nav-button {
-  color: #ecebe4;
-  font-family: "Fakt Slab Stencil Pro Medium", "DIN Condensed Bold", "Arial Black", Impact, Haettenschweiler, "Arial Narrow Bold", ui-sans-serif, sans-serif;
-  font-weight: 900;
-  letter-spacing: .08em;
+  font-family: "Fakt Slab Stencil Pro Medium", "Stencil Std", "Arial Black", Impact, Haettenschweiler, sans-serif;
+  font-size: clamp(1.12rem, 2.9vw, 1.3rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: .075em;
   text-transform: uppercase;
-  text-shadow:
-    0 1px 1px rgba(0,0,0,.88),
-    0 0 6px rgba(236, 236, 228, .10);
+  color: #e9ebe5;
+  text-shadow: none;
 }
 
+/* Faded white paint: readable first, lightly chipped and uneven second. */
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
   .header-title-row h1,
   .header-title-row #edit-toggle,
   .header-title-row .desktop-top-nav .desktop-nav-button {
     color: transparent;
     background-image:
-      radial-gradient(circle at 18% 34%, rgba(60, 61, 58, .34) 0 1px, transparent 1.45px),
-      radial-gradient(circle at 73% 62%, rgba(255,255,255,.42) 0 .8px, transparent 1.3px),
-      repeating-linear-gradient(135deg, transparent 0 7px, rgba(36, 41, 47, .20) 7px 9px, rgba(255,255,255,.05) 9px 10px, transparent 10px 18px),
-      repeating-linear-gradient(90deg, transparent 0 13px, rgba(71, 72, 68, .14) 13px 14px, transparent 14px 29px),
-      linear-gradient(180deg, rgba(252, 250, 244, .99) 0%, rgba(239, 236, 227, .98) 48%, rgba(219, 215, 205, .96) 100%);
+      radial-gradient(circle at 13% 29%, rgba(64,72,79,.52) 0 1.3px, transparent 1.8px),
+      radial-gradient(circle at 62% 61%, rgba(74,82,89,.38) 0 1.1px, transparent 1.6px),
+      radial-gradient(circle at 84% 34%, rgba(255,255,255,.30) 0 .7px, transparent 1.1px),
+      linear-gradient(180deg, rgba(247,248,243,.97) 0%, rgba(232,234,227,.95) 58%, rgba(211,215,208,.93) 100%);
+    background-size: 27px 21px, 33px 25px, 31px 23px, auto;
     background-repeat: repeat;
-    background-size: 24px 18px, 30px 24px, 18px 18px, 29px 29px, auto;
     -webkit-background-clip: text;
     background-clip: text;
-    -webkit-text-stroke: .28px rgba(245, 243, 236, .55);
-    text-shadow:
-      0 0 .9px rgba(255,255,255,.16),
-      0 1px 1px rgba(0,0,0,.88),
-      0 0 8px rgba(238, 237, 231, .10);
+    -webkit-text-stroke: 0;
+    -webkit-mask-image: radial-gradient(circle at 7px 8px, transparent 0 1.05px, #000 1.55px);
+    -webkit-mask-size: 23px 19px;
+    mask-image: radial-gradient(circle at 7px 8px, transparent 0 1.05px, #000 1.55px);
+    mask-size: 23px 19px;
   }
 }
 
-/* Keep the live team count available to assistive technology without adding a second visual line. */
 .header-title-row .count {
   position: absolute;
   width: 1px;
@@ -128,10 +129,10 @@
 .header-title-row #edit-toggle,
 .header-title-row .desktop-top-nav .desktop-nav-button {
   min-height: 44px;
-  padding: 0 9px;
+  padding: 0 10px;
   border: 0;
   border-radius: 4px;
-  background: transparent;
+  background-color: transparent;
   box-shadow: none;
   cursor: pointer;
 }
@@ -139,8 +140,8 @@
 .header-title-row #edit-toggle:hover,
 .header-title-row .desktop-top-nav .desktop-nav-button:hover,
 .header-title-row .desktop-top-nav .desktop-nav-button[aria-current="page"] {
-  background: rgba(255,255,255,.03);
-  box-shadow: inset 0 0 0 1px rgba(235, 239, 231, .08);
+  background-color: rgba(255,255,255,.025);
+  filter: brightness(1.05);
 }
 
 .header-title-row #edit-toggle:active,
@@ -150,7 +151,7 @@
 
 .header-title-row #edit-toggle:focus-visible,
 .header-title-row .desktop-top-nav .desktop-nav-button:focus-visible {
-  outline: 2px dashed rgba(238, 240, 231, .88);
+  outline: 2px dashed rgba(240, 242, 236, .90);
   outline-offset: 0;
 }
 
@@ -162,14 +163,20 @@
 
   .header-title-row {
     min-height: 50px;
-    gap: 6px;
-    padding: 2px 8px 2px 12px;
+    gap: 8px;
+    padding: 2px 9px 2px 13px;
   }
 
   .header-title-row h1 {
-    font-size: clamp(1rem, 4.7vw, 1.15rem);
+    font-size: clamp(1.3rem, 6.35vw, 1.58rem);
+    letter-spacing: .075em;
   }
 
   .header-title-row .header-actions { gap: 0; }
-  .header-title-row #edit-toggle { min-width: 54px; padding: 0 5px; }
+
+  .header-title-row #edit-toggle {
+    min-width: 58px;
+    padding: 0 6px;
+    font-size: clamp(1.06rem, 5vw, 1.22rem);
+  }
 }
