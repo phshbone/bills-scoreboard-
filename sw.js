@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b8g-spray-painted-strip';
+const CACHE = 'scoreboard-v11b8h-grooved-stencil-strip';
 const ASSETS = [
   './',
   './index.html',
