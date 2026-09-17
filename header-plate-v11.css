@@ -1,7 +1,10 @@
 /* Thin dark-metal companion plaque for the full-width scoreboard banner. */
 .scoreboard-header {
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr);
+  justify-content: stretch;
   gap: 3px;
-  margin: 10px 2px 10px;
+  margin: 10px 0 10px;
   padding: 0;
   border-bottom: 0;
 }
@@ -105,7 +108,7 @@
 @media (max-width: 560px) {
   .scoreboard-header {
     gap: 2px;
-    margin-bottom: 9px;
+    margin-bottom: 8px;
   }
 
   .header-title-row {
