@@ -27,60 +27,132 @@ jobs:
       - name: Install Pillow
         run: python -m pip install --disable-pip-version-check pillow
 
-      - name: Normalize and verify WebP assets
+      - name: Rebuild and verify image assets
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
           from pathlib import Path
-          from PIL import Image
+          from PIL import Image, ImageOps, ImageDraw, ImageFont
+          import base64
           import hashlib
+          import io
+          import re
+          import struct
+          import urllib.request
 
-          targets = [
-              Path('assets/scoreboard-header.webp'),
-              Path('assets/knicks.webp'),
-          ]
+          ASSETS = Path('assets')
+          HEADER = ASSETS / 'scoreboard-header.webp'
+          KNICKS = ASSETS / 'knicks.webp'
 
-          for path in targets:
-              original = path.read_bytes()
-              if original[:4] != b'RIFF' or original[8:12] != b'WEBP':
-                  raise SystemExit(f'{path}: invalid source WebP signature')
+          def open_scoreboard_icon():
+              svg = (ASSETS / 'icon.svg').read_text(encoding='utf-8')
+              match = re.search(r'href="data:image/webp;base64,([^"]+)"', svg)
+              if not match:
+                  raise SystemExit('assets/icon.svg: embedded Scoreboard artwork not found')
+              raw = base64.b64decode(match.group(1))
+              image = Image.open(io.BytesIO(raw))
+              image.load()
+              return image.convert('RGB')
 
-              with Image.open(path) as img:
-                  img.load()
-                  size = img.size
-                  mode = img.mode
-                  fmt = img.format
-                  normalized = img.convert('RGBA' if 'A' in img.getbands() else 'RGB')
+          def save_webp(image, path, *, quality=92):
+              image.save(path, format='WEBP', quality=quality, method=6)
 
-              temp = path.with_suffix('.normalized.webp')
-              normalized.save(temp, format='WEBP', lossless=True, method=6, exact=True)
-
-              repaired = temp.read_bytes()
-              if repaired[:4] != b'RIFF' or repaired[8:12] != b'WEBP':
-                  raise SystemExit(f'{path}: repaired WebP signature check failed')
-
-              with Image.open(temp) as check:
+          def verify_webp(path, expected_size):
+              raw = path.read_bytes()
+              if raw[:4] != b'RIFF' or raw[8:12] != b'WEBP':
+                  raise SystemExit(f'{path}: invalid RIFF/WEBP signature')
+              declared = struct.unpack('<I', raw[4:8])[0] + 8
+              if declared != len(raw):
+                  raise SystemExit(f'{path}: RIFF length mismatch declared={declared} actual={len(raw)}')
+              with Image.open(path) as check:
                   check.load()
-                  if check.size != size:
-                      raise SystemExit(f'{path}: dimensions changed from {size} to {check.size}')
-                  check.verify()
+                  if check.size != expected_size:
+                      raise SystemExit(f'{path}: dimensions={check.size}, expected={expected_size}')
+              digest = hashlib.sha256(raw).hexdigest()
+              print(f'{path}: PASS dimensions={expected_size[0]}x{expected_size[1]} bytes={len(raw)} sha256={digest}')
 
-              temp.replace(path)
-              print(f'{path}: source format={fmt} mode={mode} dimensions={size[0]}x{size[1]}')
-              print(f'{path}: repaired bytes={len(repaired)} sha256={hashlib.sha256(repaired).hexdigest()} signature=RIFF/WEBP')
+          # Rebuild the approved wide header from the intact square Scoreboard artwork.
+          # Stage 11B6's damaged WebP metadata says the intended raster was 1000x563.
+          icon = open_scoreboard_icon()
+          header = ImageOps.fit(icon, (1000, 563), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
+          save_webp(header, HEADER, quality=94)
+
+          # Rebuild a Knicks plaque at the same 360x203 dimensions as the working team plaques.
+          w, h = 360, 203
+          plaque = Image.new('RGB', (w, h), '#08152d')
+          draw = ImageDraw.Draw(plaque)
+          top = (15, 45, 86)
+          bottom = (4, 15, 38)
+          for y in range(h):
+              t = y / max(1, h - 1)
+              c = tuple(round(top[i] * (1 - t) + bottom[i] * t) for i in range(3))
+              draw.line((0, y, w, y), fill=c)
+
+          # Knicks blue/orange framing, kept inside the image so existing CSS remains untouched.
+          draw.polygon([(0, 0), (150, 0), (112, h), (0, h)], fill='#006BB6')
+          draw.polygon([(0, h - 24), (w, h - 57), (w, h), (0, h)], fill='#F58426')
+          draw.rectangle((8, 8, w - 9, h - 9), outline=(255, 255, 255), width=2)
+
+          logo = None
+          try:
+              req = urllib.request.Request(
+                  'https://a.espncdn.com/i/teamlogos/nba/500/ny.png',
+                  headers={'User-Agent': 'Mozilla/5.0'}
+              )
+              with urllib.request.urlopen(req, timeout=20) as response:
+                  logo = Image.open(io.BytesIO(response.read())).convert('RGBA')
+                  logo.load()
+          except Exception as exc:
+              print(f'Knicks logo download unavailable; using text fallback: {exc}')
+
+          if logo is not None:
+              logo.thumbnail((126, 126), Image.Resampling.LANCZOS)
+              lx = 20 + (118 - logo.width) // 2
+              ly = 22 + (130 - logo.height) // 2
+              plaque.paste(logo, (lx, ly), logo)
+          else:
+              draw.ellipse((30, 35, 118, 123), fill='#F58426', outline='white', width=3)
+              try:
+                  ny_font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 34)
+              except OSError:
+                  ny_font = ImageFont.load_default()
+              bbox = draw.textbbox((0, 0), 'NY', font=ny_font)
+              tx = 74 - (bbox[2] - bbox[0]) / 2
+              ty = 79 - (bbox[3] - bbox[1]) / 2
+              draw.text((tx, ty), 'NY', font=ny_font, fill='white')
+
+          try:
+              small = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 22)
+              large = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 35)
+          except OSError:
+              small = large = ImageFont.load_default()
+
+          def centered_text(text, y, font, fill):
+              left, top_y, right, bottom_y = draw.textbbox((0, 0), text, font=font)
+              text_w = right - left
+              x = 241 - text_w / 2
+              draw.text((x, y), text, font=font, fill=fill)
+
+          centered_text('NEW YORK', 48, small, '#FFFFFF')
+          centered_text('KNICKS', 78, large, '#FFFFFF')
+          centered_text('BASKETBALL', 126, small, '#F5A45B')
+          save_webp(plaque, KNICKS, quality=94)
+
+          verify_webp(HEADER, (1000, 563))
+          verify_webp(KNICKS, (360, 203))
           PY
 
       - name: Commit repaired binaries
         shell: bash
         run: |
           set -euo pipefail
-          if git diff --quiet -- assets/scoreboard-header.webp assets/knicks.webp; then
-            echo 'No binary changes produced.'
-            exit 0
-          fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add assets/scoreboard-header.webp assets/knicks.webp
-          git commit -m 'Stage 11B7: normalize header and Knicks WebP binaries'
+          if git diff --cached --quiet; then
+            echo 'No binary changes produced.'
+            exit 0
+          fi
+          git commit -m 'Stage 11B7: replace corrupt header and Knicks image binaries'
           git push origin HEAD:scoreboard-v11b7-image-integrity
