@@ -50,7 +50,10 @@
       if (!game || game.state !== 'in' || !game.detail) return;
 
       const sub = panel.querySelector('.data-sub');
-      if (sub) sub.textContent = withFreshDetail(sub.textContent, game.detail);
+      if (sub) {
+        const nextText = withFreshDetail(sub.textContent, game.detail);
+        if (sub.textContent !== nextText) sub.textContent = nextText;
+      }
       panel.dataset.liveStateUpdatedAt = String(Date.now());
     } catch {
       // Keep the existing team-page snapshot if the direct live refresh fails.
