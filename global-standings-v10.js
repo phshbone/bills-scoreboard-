@@ -3,6 +3,7 @@
 
   const pageTitle = document.getElementById('page-title');
   const headerActions = document.querySelector('.app > header .header-actions');
+  const newsScreen = document.getElementById('sports-news-screen');
   const myTeamsScreen = document.getElementById('my-teams-screen');
   const standingsScreen = document.getElementById('standings-screen');
   const standingsTabs = document.getElementById('standings-league-tabs');
@@ -10,12 +11,12 @@
   const standingsStatus = document.getElementById('global-standings-status');
   const standingsRetry = document.getElementById('global-standings-retry');
   const teamGrid = document.getElementById('team-grid');
-  if (!pageTitle || !headerActions || !myTeamsScreen || !standingsScreen || !standingsTabs || !standingsContent || !standingsStatus || !standingsRetry || !teamGrid) return;
+  if (!pageTitle || !headerActions || !newsScreen || !myTeamsScreen || !standingsScreen || !standingsTabs || !standingsContent || !standingsStatus || !standingsRetry || !teamGrid) return;
 
   let currentScreen = 'teams';
   let currentLeague = '';
   let loadToken = 0;
-  const scrollByScreen = { teams: 0, standings: 0 };
+  const scrollByScreen = { news: 0, teams: 0, standings: 0 };
   let touchStart = null;
 
   const el = (tag, className = '', text = '') => {
@@ -294,18 +295,28 @@
   }
 
   function showScreen(screen) {
-    const next = screen === 'standings' ? 'standings' : 'teams';
-    if (next === currentScreen && ((next === 'teams' && !myTeamsScreen.hidden) || (next === 'standings' && !standingsScreen.hidden))) return;
+    const next = screen === 'news' ? 'news' : screen === 'standings' ? 'standings' : 'teams';
+    const alreadyVisible =
+      (next === 'news' && !newsScreen.hidden) ||
+      (next === 'teams' && !myTeamsScreen.hidden) ||
+      (next === 'standings' && !standingsScreen.hidden);
+    if (next === currentScreen && alreadyVisible) return;
 
     scrollByScreen[currentScreen] = window.scrollY;
     currentScreen = next;
+    const news = currentScreen === 'news';
+    const teams = currentScreen === 'teams';
     const standings = currentScreen === 'standings';
-    myTeamsScreen.hidden = standings;
-    standingsScreen.hidden = !standings;
-    headerActions.hidden = standings;
-    pageTitle.textContent = standings ? 'STANDINGS' : 'MY TEAMS';
-    document.title = standings ? 'scoreboard · standings' : 'scoreboard · my teams';
 
+    newsScreen.hidden = !news;
+    myTeamsScreen.hidden = !teams;
+    standingsScreen.hidden = !standings;
+    headerActions.hidden = !teams;
+
+    pageTitle.textContent = news ? 'SPORTS NEWS' : standings ? 'STANDINGS' : 'MY TEAMS';
+    document.title = news ? 'scoreboard · sports news' : standings ? 'scoreboard · standings' : 'scoreboard · my teams';
+
+    if (news) window.ScoreboardNews?.activate?.();
     if (standings) {
       renderTabs();
       loadCurrentLeague(false);
@@ -316,8 +327,10 @@
 
   function topLevelBlocked(target) {
     if (document.body.classList.contains('editing') || document.body.classList.contains('modal-open')) return true;
-    if (!document.getElementById('data-modal')?.hidden) return true;
-    if (!document.getElementById('depth-chart-overlay')?.hidden) return true;
+    const teamPage = document.getElementById('data-modal');
+    if (teamPage && !teamPage.hidden) return true;
+    const depthChart = document.getElementById('depth-chart-overlay');
+    if (depthChart && !depthChart.hidden) return true;
     let node = target instanceof Element ? target : null;
     while (node && node !== document.body) {
       if (node.matches('input, textarea, select, [contenteditable="true"], .standings-league-tabs')) return true;
@@ -355,8 +368,9 @@
     if (elapsed > 1000 || Math.abs(dx) < 72 || Math.abs(dx) < Math.abs(dy) * 1.35) return;
 
     if (currentScreen === 'teams' && dx < 0) showScreen('standings');
+    else if (currentScreen === 'teams' && dx > 0) showScreen('news');
     else if (currentScreen === 'standings' && dx > 0) showScreen('teams');
-    // Right-swipe from My Teams is intentionally reserved for the future Sports News screen.
+    else if (currentScreen === 'news' && dx < 0) showScreen('teams');
   }
 
   standingsRetry.addEventListener('click', () => loadCurrentLeague(true));
@@ -371,8 +385,13 @@
     if (currentLeague !== previous || !standingsContent.children.length) loadCurrentLeague(false);
   }).observe(teamGrid, { childList: true });
 
-  window.ScoreboardTopLevel = Object.freeze({ show: showScreen, current: () => currentScreen });
+  window.ScoreboardTopLevel = Object.freeze({
+    show: showScreen,
+    current: () => currentScreen,
+    supportsNews: true
+  });
   currentScreen = 'teams';
+  newsScreen.hidden = true;
   myTeamsScreen.hidden = false;
   standingsScreen.hidden = true;
   headerActions.hidden = false;
