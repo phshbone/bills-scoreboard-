@@ -163,3 +163,12 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - When a game becomes live, the current live score/state supersedes both NEXT and FINAL.
 - When the game becomes final, that result becomes the newest FINAL and remains until the following game enters its six-hour window.
 - If a team has no completed game yet, its earliest future scheduled game may appear as NEXT even when it is more than six hours away so the plaque does not remain blank.
+
+
+## Stage 11B8L lock — Standings team identity and navigation (2026-09-17)
+- Selected My Teams rows in Global Standings are direct navigation targets for their existing team pages.
+- The whole selected row is tappable/clickable and keyboard-operable; non-selected league rows remain informational only.
+- Opening a team from Standings preserves the active league and standings scroll position. Back returns focus to the originating standings row when it still exists.
+- Selected standings rows retain the subtle shared highlight and add restrained team identity: a small provider-supplied team logo when available plus a narrow team-color accent.
+- If a standings provider omits a usable logo, a compact abbreviation badge is used instead; missing logo artwork must not break navigation.
+- Team-page visual redesign remains deferred to the later cosmetic pass.

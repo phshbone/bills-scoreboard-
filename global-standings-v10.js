@@ -44,14 +44,23 @@
     return groups.keys().next().value || '';
   }
 
-  function currentTeamKeys(teams) {
-    const keys = new Set();
-    teams.forEach(team => keys.add(String(team.provider?.team || '').toLowerCase()));
-    return keys;
+  function matchingTeam(row, teams) {
+    const rowId = String(row?.id || '').toLowerCase();
+    const rowAbbr = String(row?.abbreviation || '').toLowerCase();
+    return teams.find(team => {
+      const key = String(team.provider?.team || '').toLowerCase();
+      return key === rowId || key === rowAbbr;
+    }) || null;
   }
 
-  function rowMatches(row, teamKeys) {
-    return teamKeys.has(String(row?.id || '').toLowerCase()) || teamKeys.has(String(row?.abbreviation || '').toLowerCase());
+  function teamLogo(entry) {
+    const logos = Array.isArray(entry?.team?.logos) ? entry.team.logos : [];
+    return logos.find(item => item?.href)?.href || '';
+  }
+
+  function openStandingTeam(team, row) {
+    if (!team || !window.ScoreboardLive?.open) return;
+    window.ScoreboardLive.open(team, false, row);
   }
 
   function groupLabel(group) {
@@ -164,16 +173,44 @@
     ['Team', 'Record', metric.label].forEach(label => head.appendChild(el('th', '', label)));
     thead.appendChild(head);
     const tbody = document.createElement('tbody');
-    const keys = currentTeamKeys(teams);
 
     (group.entries || []).forEach(entry => {
       const row = window.ScoreboardData.standingRow(entry);
-      const mine = rowMatches(row, keys);
+      const team = matchingTeam(row, teams);
+      const mine = Boolean(team);
       const tr = document.createElement('tr');
-      if (mine) tr.className = 'my-team-standing';
+
+      if (mine) {
+        tr.className = 'my-team-standing';
+        tr.dataset.teamId = team.id;
+        tr.tabIndex = 0;
+        tr.setAttribute('role', 'button');
+        tr.setAttribute('aria-label', `Open ${team.name} team page`);
+        tr.addEventListener('click', () => openStandingTeam(team, tr));
+        tr.addEventListener('keydown', event => {
+          if (event.key !== 'Enter' && event.key !== ' ') return;
+          event.preventDefault();
+          openStandingTeam(team, tr);
+        });
+      }
 
       const nameCell = el('td', 'global-team-name');
       const nameLine = el('div', 'global-team-name-line');
+      if (mine) {
+        const logo = teamLogo(entry);
+        if (logo) {
+          const img = document.createElement('img');
+          img.className = 'global-team-logo';
+          img.src = logo;
+          img.alt = '';
+          img.loading = 'lazy';
+          img.decoding = 'async';
+          img.setAttribute('aria-hidden', 'true');
+          nameLine.appendChild(img);
+        } else {
+          nameLine.appendChild(el('span', 'global-team-logo-fallback', row.abbreviation || team.name.slice(0, 2).toUpperCase()));
+        }
+      }
       nameLine.appendChild(document.createTextNode(row.name || 'Team'));
       if (mine) nameLine.appendChild(el('span', 'my-team-mark', 'MY TEAM'));
       nameCell.appendChild(nameLine);

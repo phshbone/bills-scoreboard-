@@ -20,6 +20,7 @@
   let snapshot = null;
   let view = 'overview';
   let boardScrollY = 0;
+  let returnFocusTarget = null;
 
   function el(tag, className = '', text = '') {
     const node = document.createElement(tag);
@@ -248,11 +249,15 @@
     }
   }
 
-  async function openTeam(team, force = false) {
+  async function openTeam(team, force = false, returnTarget = null) {
     if (!team) return;
+    const openingNewContext = modal.hidden || currentTeam?.id !== team.id;
     currentTeam = team;
     view = 'overview';
-    boardScrollY = window.scrollY;
+    if (openingNewContext) {
+      boardScrollY = window.scrollY;
+      returnFocusTarget = returnTarget instanceof HTMLElement ? returnTarget : null;
+    }
     modal.dataset.teamId = team.id;
     kicker.textContent = team.league;
     title.textContent = team.name;
@@ -276,13 +281,16 @@
   function close() {
     if (view !== 'overview') return showOverview();
     const id = currentTeam?.id;
+    const focusTarget = returnFocusTarget;
     modal.hidden = true;
     delete modal.dataset.teamId;
     currentTeam = null;
     snapshot = null;
+    returnFocusTarget = null;
     document.body.classList.remove('modal-open');
     window.scrollTo({ top: boardScrollY });
-    if (id) document.querySelector(`#team-grid [data-team-id="${id}"]`)?.focus();
+    if (focusTarget?.isConnected) focusTarget.focus();
+    else if (id) document.querySelector(`#team-grid [data-team-id="${id}"]`)?.focus();
   }
 
   back.addEventListener('click', close);

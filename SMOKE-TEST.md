@@ -65,3 +65,19 @@ Validated before merge with executed syntax checks, a deterministic Playwright f
 The browser runtime works for deterministic in-memory fixtures, but this host still does not reliably permit browser outbound navigation to the deployed GitHub Pages app/live sports endpoints. Final deployed-provider and real iPhone gesture feel remain a real-device smoke.
 
 Overall pre-merge classification: **PASS WITH LIVE VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B8L smoke — Standings team links and identity
+Validated before merge with JavaScript compilation checks and deterministic in-memory DOM fixtures.
+
+### Executed evidence
+- `global-standings-v10.js`, `team-page-v8.js`, and `sw.js` compile successfully.
+- A selected Phillies standings row is rendered with `my-team-standing`, `data-team-id="phillies"`, keyboard focus, button semantics, and an accessible team-page label.
+- Provider-supplied logo rendering is used when present; a compact abbreviation fallback remains available when logo data is absent.
+- Clicking the selected row opens the existing Phillies team page; Enter keyboard activation does the same.
+- A non-selected league row remains informational and receives no team-page click handler.
+- Team-page return-context fixture preserves the originating standings scroll position and restores focus to the exact standings row on Back.
+- The service-worker cache namespace is bumped so the changed standings/team-page JavaScript and CSS are not paired with an older cached shell.
+- Team-color accents are present for all current library teams without changing the underlying standings data or provider mapping.
+
+Overall pre-merge classification: **PASS**.
