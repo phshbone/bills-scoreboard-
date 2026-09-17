@@ -16,26 +16,23 @@
   gap: 10px;
   padding: 2px 12px 2px 14px;
   overflow: hidden;
-  border: 1px solid rgba(168, 186, 210, .24);
+  border: 1px solid rgba(168, 186, 210, .25);
   border-radius: 10px;
-  background-color: #112338;
+  background-color: #11243a;
   background-image:
-    linear-gradient(180deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,.03) 17%, transparent 32%, transparent 68%, rgba(0,0,0,.18) 100%),
-    repeating-linear-gradient(135deg,
-      rgba(190, 212, 238, .42) 0 2px,
-      rgba(88, 110, 136, .18) 2px 12px,
-      transparent 12px 42px),
-    repeating-linear-gradient(135deg,
-      transparent 0 12px,
-      rgba(11, 24, 39, .88) 12px 24px,
-      transparent 24px 42px),
-    linear-gradient(180deg, #203754 0%, #17314d 24%, #122844 56%, #0d1f34 100%);
-  background-size: auto, 44px 24px, 44px 24px, auto;
-  background-position: 0 0, 0 0, 0 0, 0 0;
+    radial-gradient(circle at 9px 9px, rgba(210,221,232,.78) 0 1.5px, rgba(78,94,112,.95) 2px 3.2px, rgba(2,7,12,.85) 3.3px 4.2px, transparent 4.4px),
+    radial-gradient(circle at calc(100% - 9px) 9px, rgba(210,221,232,.78) 0 1.5px, rgba(78,94,112,.95) 2px 3.2px, rgba(2,7,12,.85) 3.3px 4.2px, transparent 4.4px),
+    radial-gradient(circle at 9px calc(100% - 9px), rgba(210,221,232,.68) 0 1.4px, rgba(78,94,112,.92) 2px 3.1px, rgba(2,7,12,.82) 3.2px 4.1px, transparent 4.3px),
+    radial-gradient(circle at calc(100% - 9px) calc(100% - 9px), rgba(210,221,232,.68) 0 1.4px, rgba(78,94,112,.92) 2px 3.1px, rgba(2,7,12,.82) 3.2px 4.1px, transparent 4.3px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='24' viewBox='0 0 38 24'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M5 17L15 7M24 18L34 8' stroke='%23040a11' stroke-opacity='.48' stroke-width='4'/%3E%3Cpath d='M4 16L14 6M23 17L33 7' stroke='%238ea5bf' stroke-opacity='.30' stroke-width='3'/%3E%3Cpath d='M4 15L14 5M23 16L33 6' stroke='%23d7e4f1' stroke-opacity='.10' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(255,255,255,.055) 0%, rgba(255,255,255,.02) 22%, transparent 40%, rgba(0,0,0,.13) 100%),
+    linear-gradient(180deg, #203a58 0%, #17324f 30%, #112943 62%, #0d2035 100%);
+  background-size: auto, auto, auto, auto, 38px 24px, auto, auto;
+  background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.08),
-    inset 0 -1px 0 rgba(0,0,0,.55),
-    0 3px 10px rgba(0,0,0,.18);
+    inset 0 -1px 0 rgba(0,0,0,.56),
+    0 3px 9px rgba(0,0,0,.18);
 }
 
 .header-title-row::before,
@@ -46,23 +43,19 @@
   pointer-events: none;
 }
 
-/* subtle grime / overspray so the plaque stays readable */
+/* Very light paint dust and weathering; keep the words dominant. */
 .header-title-row::before {
-  opacity: .18;
+  opacity: .14;
   background:
-    radial-gradient(circle at 12% 28%, rgba(240,244,248,.14) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 34% 68%, rgba(240,244,248,.10) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 76% 32%, rgba(8,10,14,.22) 0 1px, transparent 1.7px);
-  background-size: 36px 30px, 42px 34px, 38px 30px;
+    radial-gradient(circle at 11% 30%, rgba(244,247,249,.18) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 39% 66%, rgba(244,247,249,.11) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 77% 36%, rgba(0,0,0,.25) 0 1px, transparent 1.5px);
+  background-size: 41px 31px, 47px 37px, 43px 33px;
 }
 
-/* faint groove/weathering overlay; much calmer than the previous version */
 .header-title-row::after {
-  opacity: .22;
-  background:
-    linear-gradient(135deg, transparent 0 38%, rgba(0,0,0,.28) 39% 41%, transparent 42% 100%),
-    linear-gradient(315deg, transparent 0 39%, rgba(255,255,255,.07) 40% 42%, transparent 43% 100%);
-  background-size: 44px 24px, 44px 24px;
+  opacity: .10;
+  background: linear-gradient(100deg, transparent 0 23%, rgba(255,255,255,.10) 24%, transparent 25% 67%, rgba(0,0,0,.16) 68%, transparent 69% 100%);
 }
 
 .header-title-row > * {
@@ -72,45 +65,50 @@
 
 .header-title-row h1 {
   min-width: 0;
-  margin-right: auto;
-  font-family: "Fakt Slab Stencil Pro Medium", "Fakt Slab Stencil", "Stencil Std", Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-  font-size: clamp(1.22rem, 3.2vw, 1.5rem);
-  font-weight: 700;
+  margin: 0 auto 0 0;
+  font-family: "Fakt Slab Stencil Pro Medium", "Stencil Std", "Arial Black", Impact, Haettenschweiler, sans-serif;
+  font-size: clamp(1.28rem, 3.4vw, 1.58rem);
+  font-weight: 800;
   line-height: 1;
-  letter-spacing: .1em;
+  letter-spacing: .075em;
   text-transform: uppercase;
   white-space: nowrap;
-  color: #ecede6;
+  color: #eceee8;
   text-shadow: none;
 }
 
 .header-title-row #edit-toggle,
 .header-title-row .desktop-top-nav .desktop-nav-button {
-  font-family: "Fakt Slab Stencil Pro Medium", "Fakt Slab Stencil", "Stencil Std", Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-  font-size: clamp(1.08rem, 2.7vw, 1.24rem);
-  font-weight: 700;
-  letter-spacing: .1em;
+  font-family: "Fakt Slab Stencil Pro Medium", "Stencil Std", "Arial Black", Impact, Haettenschweiler, sans-serif;
+  font-size: clamp(1.12rem, 2.9vw, 1.3rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: .075em;
   text-transform: uppercase;
   color: #e9ebe5;
   text-shadow: none;
 }
 
-/* worn stencil paint without muddy borders */
+/* Faded white paint: readable first, lightly chipped and uneven second. */
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
   .header-title-row h1,
   .header-title-row #edit-toggle,
   .header-title-row .desktop-top-nav .desktop-nav-button {
     color: transparent;
     background-image:
-      linear-gradient(180deg, rgba(246,247,240,.95) 0%, rgba(226,229,222,.93) 55%, rgba(206,211,205,.90) 100%),
-      radial-gradient(circle at 14% 25%, rgba(255,255,255,.55) 0 1px, transparent 1.5px),
-      radial-gradient(circle at 70% 62%, rgba(154,159,154,.18) 0 1.2px, transparent 1.6px),
-      repeating-linear-gradient(135deg, rgba(255,255,255,.10) 0 16px, rgba(25,34,44,.16) 16px 18px, rgba(255,255,255,.08) 18px 36px);
-    background-size: auto, 30px 22px, 36px 26px, 44px 24px;
+      radial-gradient(circle at 13% 29%, rgba(64,72,79,.52) 0 1.3px, transparent 1.8px),
+      radial-gradient(circle at 62% 61%, rgba(74,82,89,.38) 0 1.1px, transparent 1.6px),
+      radial-gradient(circle at 84% 34%, rgba(255,255,255,.30) 0 .7px, transparent 1.1px),
+      linear-gradient(180deg, rgba(247,248,243,.97) 0%, rgba(232,234,227,.95) 58%, rgba(211,215,208,.93) 100%);
+    background-size: 27px 21px, 33px 25px, 31px 23px, auto;
     background-repeat: repeat;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-stroke: 0;
+    -webkit-mask-image: radial-gradient(circle at 7px 8px, transparent 0 1.05px, #000 1.55px);
+    -webkit-mask-size: 23px 19px;
+    mask-image: radial-gradient(circle at 7px 8px, transparent 0 1.05px, #000 1.55px);
+    mask-size: 23px 19px;
   }
 }
 
@@ -134,7 +132,7 @@
   padding: 0 10px;
   border: 0;
   border-radius: 4px;
-  background: transparent;
+  background-color: transparent;
   box-shadow: none;
   cursor: pointer;
 }
@@ -142,7 +140,7 @@
 .header-title-row #edit-toggle:hover,
 .header-title-row .desktop-top-nav .desktop-nav-button:hover,
 .header-title-row .desktop-top-nav .desktop-nav-button[aria-current="page"] {
-  background: rgba(255,255,255,.02);
+  background-color: rgba(255,255,255,.025);
   filter: brightness(1.05);
 }
 
@@ -170,8 +168,8 @@
   }
 
   .header-title-row h1 {
-    font-size: clamp(1.2rem, 6vw, 1.48rem);
-    letter-spacing: .095em;
+    font-size: clamp(1.3rem, 6.35vw, 1.58rem);
+    letter-spacing: .075em;
   }
 
   .header-title-row .header-actions { gap: 0; }
@@ -179,6 +177,6 @@
   .header-title-row #edit-toggle {
     min-width: 58px;
     padding: 0 6px;
-    font-size: clamp(1.02rem, 4.8vw, 1.18rem);
+    font-size: clamp(1.06rem, 5vw, 1.22rem);
   }
 }
