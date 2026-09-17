@@ -57,7 +57,8 @@
   }
 
   function articleLink(article) {
-    return article?.links?.web?.href || article?.links?.mobile?.href || '';
+    const href = article?.links?.web?.href || article?.links?.mobile?.href || '';
+    return String(href).replace(/^http:/i, 'https:');
   }
 
   function articleImage(article) {
