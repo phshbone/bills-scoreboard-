@@ -2,10 +2,19 @@
   'use strict';
 
   const SITE = 'https://site.api.espn.com/apis/site/v2/sports';
+  const MLB_SCHEDULE = 'https://statsapi.mlb.com/api/v1/schedule';
+  const MLB_CACHE_MS = 15000;
+  const MLB_TEAM_IDS = Object.freeze({
+    laa: 108, ari: 109, bal: 110, bos: 111, chc: 112, cin: 113, cle: 114, col: 115,
+    det: 116, hou: 117, kc: 118, lad: 119, wsh: 120, nym: 121, ath: 133, pit: 134,
+    sd: 135, sea: 136, sf: 137, stl: 138, tb: 139, tex: 140, tor: 141, min: 142,
+    phi: 143, atl: 144, cws: 145, mia: 146, nyy: 147, mil: 158
+  });
   const teamPage = document.getElementById('data-modal');
   const dataGrid = document.getElementById('data-grid');
   let refreshTimer = null;
   let activeTeam = null;
+  let mlbCache = { date: '', loadedAt: 0, payload: null };
 
   function el(tag, className = '', text = '') {
     const node = document.createElement(tag);
@@ -89,6 +98,119 @@
     const response = await fetch(scoreboardUrl(team), { headers: { Accept: 'application/json' }, cache: 'no-store' });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return response.json();
+  }
+
+  function localDateKey() {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  function mlbTeamId(team) {
+    const key = String(team?.provider?.team || '').toLowerCase();
+    return MLB_TEAM_IDS[key] || null;
+  }
+
+  function mlbState(game) {
+    const abstract = String(game?.status?.abstractGameState || '').toLowerCase();
+    if (abstract === 'live') return 'in';
+    if (abstract === 'final') return 'post';
+    return 'pre';
+  }
+
+  function mlbBattingSide(team, game, mineSide) {
+    if (mlbState(game) !== 'in') return '';
+    const state = String(game?.linescore?.inningState || '').toLowerCase();
+    if (state === 'top') return mineSide === 'away' ? 'mine' : 'other';
+    if (state === 'bottom') return mineSide === 'home' ? 'mine' : 'other';
+    return '';
+  }
+
+  function parseMlbGame(game, team) {
+    if (!game) return null;
+    const targetId = mlbTeamId(team);
+    if (!targetId) return null;
+
+    const away = game?.teams?.away || {};
+    const home = game?.teams?.home || {};
+    const awayId = Number(away?.team?.id);
+    const homeId = Number(home?.team?.id);
+    const mineSide = awayId === targetId ? 'away' : homeId === targetId ? 'home' : '';
+    if (!mineSide) return null;
+
+    const mine = mineSide === 'away' ? away : home;
+    const other = mineSide === 'away' ? home : away;
+    const state = mlbState(game);
+    const inningState = String(game?.linescore?.inningState || '').trim();
+    const inningOrdinal = String(game?.linescore?.currentInningOrdinal || '').trim();
+    const outs = Number(game?.linescore?.outs);
+    const detailParts = [];
+    if (state === 'in') {
+      if (inningState || inningOrdinal) detailParts.push([inningState, inningOrdinal].filter(Boolean).join(' '));
+      if (Number.isFinite(outs)) detailParts.push(`${outs} ${outs === 1 ? 'out' : 'outs'}`);
+    } else if (state === 'post') {
+      detailParts.push(String(game?.status?.detailedState || 'Final'));
+    } else {
+      detailParts.push(String(game?.status?.detailedState || 'Scheduled'));
+    }
+
+    return {
+      state,
+      detail: detailParts.filter(Boolean).join(' · '),
+      mineName: mine?.team?.name || team.name,
+      mineScore: String(mine?.score ?? '—'),
+      otherName: other?.team?.name || 'Opponent',
+      otherScore: String(other?.score ?? '—'),
+      battingSide: mlbBattingSide(team, game, mineSide),
+      source: 'MLB StatsAPI'
+    };
+  }
+
+  async function fetchMlbSchedule() {
+    const date = localDateKey();
+    if (mlbCache.payload && mlbCache.date === date && Date.now() - mlbCache.loadedAt < MLB_CACHE_MS) return mlbCache.payload;
+    const url = `${MLB_SCHEDULE}?sportId=1&date=${encodeURIComponent(date)}&hydrate=linescore,team`;
+    const response = await fetch(url, { headers: { Accept: 'application/json' }, cache: 'no-store' });
+    if (!response.ok) throw new Error(`MLB HTTP ${response.status}`);
+    const payload = await response.json();
+    mlbCache = { date, loadedAt: Date.now(), payload };
+    return payload;
+  }
+
+  function mlbGameForTeam(payload, team) {
+    const targetId = mlbTeamId(team);
+    if (!targetId) return null;
+    const games = (Array.isArray(payload?.dates) ? payload.dates : []).flatMap(date => Array.isArray(date?.games) ? date.games : []);
+    const matches = games.filter(game => {
+      const awayId = Number(game?.teams?.away?.team?.id);
+      const homeId = Number(game?.teams?.home?.team?.id);
+      return awayId === targetId || homeId === targetId;
+    });
+    return matches.find(game => mlbState(game) === 'in')
+      || matches.find(game => mlbState(game) === 'post')
+      || matches[0]
+      || null;
+  }
+
+  async function fetchCurrentGame(team, espnPayload = null) {
+    let primaryPayload = espnPayload;
+    if (!primaryPayload) primaryPayload = await fetchScoreboard(team);
+    const espnGame = parseEvent(eventForTeam(primaryPayload, team), team);
+    if (espnGame?.state === 'in') return espnGame;
+
+    if (team?.league === 'MLB' || team?.sport === 'baseball') {
+      try {
+        const mlbPayload = await fetchMlbSchedule();
+        const fallback = parseMlbGame(mlbGameForTeam(mlbPayload, team), team);
+        if (fallback?.state === 'in') return fallback;
+      } catch {
+        // ESPN remains usable if the MLB live fallback is unavailable.
+      }
+    }
+
+    return espnGame;
   }
 
   function ensureOverlay() {
@@ -177,9 +299,7 @@
   async function refreshScore() {
     if (!activeTeam) return;
     try {
-      const payload = await fetchScoreboard(activeTeam);
-      const event = eventForTeam(payload, activeTeam);
-      const game = parseEvent(event, activeTeam);
+      const game = await fetchCurrentGame(activeTeam);
       renderGame(game);
       if (game?.state !== 'in') stopTimer();
     } catch (error) {
@@ -248,5 +368,12 @@
     }
   });
 
-  window.ScoreboardLiveFeed = Object.freeze({ scoreboardUrl, eventState, containsTeam, parseEvent, fetchScoreboard });
+  window.ScoreboardLiveFeed = Object.freeze({
+    scoreboardUrl,
+    eventState,
+    containsTeam,
+    parseEvent,
+    fetchScoreboard,
+    fetchCurrentGame
+  });
 })();
