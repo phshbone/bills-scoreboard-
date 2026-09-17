@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b8k-score-state-window';
+const CACHE = 'scoreboard-v11b8l-standings-team-links';
 const ASSETS = [
   './',
   './index.html',
