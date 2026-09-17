@@ -172,3 +172,16 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Selected standings rows retain the subtle shared highlight and add restrained team identity: a small provider-supplied team logo when available plus a narrow team-color accent.
 - If a standings provider omits a usable logo, a compact abbreviation badge is used instead; missing logo artwork must not break navigation.
 - Team-page visual redesign remains deferred to the later cosmetic pass.
+
+
+## Stage 11B9 lock — Sports News foundation (2026-09-17)
+- Sports News is now a complete top-level screen in the spatial order `Sports News ← My Teams → Standings`.
+- On phone, swipe right from My Teams opens Sports News; swipe left from Sports News returns to My Teams. Existing My Teams ↔ Standings swipe remains unchanged.
+- Desktop navigation exposes News, My Teams, and Standings, with matching left/right keyboard navigation when focus is not inside an interactive control.
+- The feed aggregates current ESPN public news from the distinct leagues represented by My Teams rather than hard-coding a separate portal menu.
+- Stories are deduplicated and sorted newest first. The first release caps the rendered aggregate to 40 current stories.
+- Stories associated with a selected My Teams club are visibly tagged using provider-supplied article categories.
+- Each story is a real outbound article link. No placeholder story viewer or dead article control is introduced.
+- A partial provider failure leaves successful league stories usable and reports partial freshness; Retry appears only when all requested league news feeds fail.
+- The news feed refreshes when its My Teams composition changes or when its in-visit snapshot is older than five minutes.
+- Team-context story presentation and team-page-specific News remain later increments; this stage establishes the working broad/global Sports News screen first.

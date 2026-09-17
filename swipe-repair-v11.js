@@ -7,9 +7,10 @@
   let start = null;
 
   function repairNeeded() {
-    // Stage 10.1's original guard treats a missing optional depth-chart overlay
-    // as if it were open. Once that overlay exists, the original swipe handler
-    // is safe again and this compatibility listener stands down.
+    // Stage 11B9 repairs the original top-level swipe guard and owns the complete
+    // News ← My Teams → Standings gesture map. Keep this compatibility listener
+    // active only on older shells that do not advertise News support.
+    if (topLevel.supportsNews === true) return false;
     return !document.getElementById('depth-chart-overlay');
   }
 

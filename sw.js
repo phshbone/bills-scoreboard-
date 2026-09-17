@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b8l-standings-team-links';
+const CACHE = 'scoreboard-v11b9-sports-news';
 const ASSETS = [
   './',
   './index.html',
@@ -17,6 +17,7 @@ const ASSETS = [
   './home-score-overlay-v9.css',
   './mlb-depth-chart-v9.css',
   './global-standings-v10.css',
+  './sports-news-v11.css',
   './desktop-nav-v11.css',
   './header-plate-v11.css',
   './team-data-v8.js',
@@ -33,6 +34,7 @@ const ASSETS = [
   './mlb-depth-chart-v9.js',
   './live-awareness-v6.js',
   './home-score-rail-v8.js',
+  './sports-news-v11.js',
   './global-standings-v10.js',
   './desktop-nav-v11.js',
   './swipe-repair-v11.js',

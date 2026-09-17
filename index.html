@@ -26,6 +26,7 @@
   <link rel="stylesheet" href="./home-score-overlay-v9.css" />
   <link rel="stylesheet" href="./mlb-depth-chart-v9.css" />
   <link rel="stylesheet" href="./global-standings-v10.css" />
+  <link rel="stylesheet" href="./sports-news-v11.css" />
   <link rel="stylesheet" href="./desktop-nav-v11.css" />
   <link rel="stylesheet" href="./header-plate-v11.css" />
 </head>
@@ -36,6 +37,7 @@
       <div class="header-title-row">
         <h1 id="page-title">MY TEAMS</h1>
         <nav class="desktop-top-nav" id="desktop-top-nav" aria-label="Scoreboard sections">
+          <button class="desktop-nav-button" type="button" data-screen="news">News</button>
           <button class="desktop-nav-button" type="button" data-screen="teams" aria-current="page">My Teams</button>
           <button class="desktop-nav-button" type="button" data-screen="standings">Standings</button>
         </nav>
@@ -45,6 +47,14 @@
         </div>
       </div>
     </header>
+
+    <section class="app-screen sports-news-screen" id="sports-news-screen" hidden aria-label="Sports News">
+      <div class="sports-news-status" id="sports-news-status" aria-live="polite"></div>
+      <div class="sports-news-content" id="sports-news-content"></div>
+      <div class="sports-news-actions">
+        <button class="button" id="sports-news-retry" type="button" hidden>Retry</button>
+      </div>
+    </section>
 
     <section class="app-screen" id="my-teams-screen" aria-label="My Teams">
       <section class="edit-toolbar" aria-label="Edit My Teams controls">
@@ -134,6 +144,7 @@
   <script src="./mlb-depth-chart-v9.js" defer></script>
   <script src="./live-awareness-v6.js" defer></script>
   <script src="./home-score-rail-v8.js" defer></script>
+  <script src="./sports-news-v11.js" defer></script>
   <script src="./global-standings-v10.js" defer></script>
   <script src="./desktop-nav-v11.js" defer></script>
   <script src="./swipe-repair-v11.js" defer></script>
