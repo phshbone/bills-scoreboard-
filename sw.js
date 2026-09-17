@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b8i-approved-section-strip';
+const CACHE = 'scoreboard-v11b8k-score-state-window';
 const ASSETS = [
   './',
   './index.html',
