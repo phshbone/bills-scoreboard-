@@ -105,3 +105,24 @@ Validated before merge with live provider checks, JavaScript compilation checks,
 The local deterministic runtime does not substitute for final real-iPhone gesture feel or deployed GitHub Pages rendering. The live provider shape itself was independently verified against current ESPN public JSON.
 
 Overall pre-merge classification: **PASS WITH LIVE VISUAL VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B10 standard smoke — Team News + five-iteration checkpoint
+Validated before merge with live provider inspection, JavaScript compilation checks, deterministic team-news fixtures, and regression wiring checks across the current shell.
+
+### Executed evidence
+- Core JavaScript compiles successfully: `app.js`, `team-data-v8.js`, `team-page-v8.js`, `live-awareness-v6.js`, `live-score-v11.js`, `home-score-rail-v8.js`, `global-standings-v10.js`, `sports-news-v11.js`, `desktop-nav-v11.js`, `swipe-repair-v11.js`, and `sw.js`.
+- Current ESPN NFL/MLB news JSON still exposes team-category metadata containing stable team IDs/abbreviations, which the Scoreboard team-news filter uses rather than headline text matching.
+- Deterministic team-news provider fixture: **PASS**.
+- A Phillies feed filters out unrelated Mets stories, caps output at 20 team-tagged stories, normalizes article links to HTTPS, and reuses the five-minute in-visit cache without a second fetch.
+- Deterministic team-page fixture: **PASS**.
+- The team overview exposes a working News action; opening it renders shared Sports News cards; Back returns to the team overview; the next Back preserves the original standings/My Teams origin scroll and focus.
+- Team News includes working empty/error states and a Retry path; the rest of the team page remains usable if the news request fails.
+- Regression wiring confirms all 12 current team-library entries remain present.
+- Home score timing remains `LIVE → NEXT within six hours → latest FINAL`.
+- Live awareness still publishes `scoreboard:live-state` on its 60-second polling cycle.
+- Highlighted Global Standings rows remain linked to their team pages and the complete News-capable top-level shell remains enabled.
+- Global Sports News still aggregates via `Promise.allSettled` and retains the 40-story cap.
+- Service-worker cache namespace is bumped to `scoreboard-v11b10-team-news`; network-first `cache: no-store` shell behavior remains intact.
+
+Overall pre-merge classification: **PASS WITH LIVE VISUAL VERIFICATION RECOMMENDED**.
