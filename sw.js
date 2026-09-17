@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b11-mlb-live-fallback';
+const CACHE = 'scoreboard-v11b12-team-news-feed-repair';
 const ASSETS = [
   './',
   './index.html',
