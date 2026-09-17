@@ -2,6 +2,7 @@
   'use strict';
 
   const SITE = 'https://site.api.espn.com/apis/site/v2/sports';
+  const NEXT_WINDOW_MS = 6 * 60 * 60 * 1000;
   const grid = document.getElementById('team-grid');
   if (!grid) return;
 
@@ -66,15 +67,24 @@
     };
   }
 
-  function findRecent(payload, team) {
+  function findRecent(payload, team, now = Date.now()) {
     const events = Array.isArray(payload?.events) ? payload.events : [];
     const parsed = events.map(event => parseEvent(event, team)).filter(Boolean);
-    const completed = parsed.filter(game => game.state === 'post').sort((a, b) => b.date - a.date);
-    if (completed.length) return { kind: 'final', game: completed[0] };
+
     const upcoming = parsed
-      .filter(game => game.state === 'pre' && Number.isFinite(game.date) && game.date >= Date.now() - 6 * 60 * 60 * 1000)
+      .filter(game => game.state === 'pre' && Number.isFinite(game.date) && game.date >= now && game.date - now <= NEXT_WINDOW_MS)
       .sort((a, b) => a.date - b.date);
-    return upcoming.length ? { kind: 'next', game: upcoming[0] } : null;
+    if (upcoming.length) return { kind: 'next', game: upcoming[0] };
+
+    const completed = parsed
+      .filter(game => game.state === 'post' && Number.isFinite(game.date) && game.date <= now)
+      .sort((a, b) => b.date - a.date);
+    if (completed.length) return { kind: 'final', game: completed[0] };
+
+    const future = parsed
+      .filter(game => game.state === 'pre' && Number.isFinite(game.date) && game.date >= now)
+      .sort((a, b) => a.date - b.date);
+    return future.length ? { kind: 'next', game: future[0] } : null;
   }
 
   function railText(team) {
