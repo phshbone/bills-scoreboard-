@@ -8,7 +8,12 @@
   const buttons = [...nav.querySelectorAll('[data-screen]')];
 
   function currentScreen() {
-    return pageTitle.textContent.trim().toUpperCase() === 'STANDINGS' ? 'standings' : 'teams';
+    const apiCurrent = window.ScoreboardTopLevel?.current?.();
+    if (apiCurrent === 'news' || apiCurrent === 'teams' || apiCurrent === 'standings') return apiCurrent;
+    const title = pageTitle.textContent.trim().toUpperCase();
+    if (title === 'SPORTS NEWS') return 'news';
+    if (title === 'STANDINGS') return 'standings';
+    return 'teams';
   }
 
   function updateState() {
@@ -39,12 +44,18 @@
     if (teamPage && !teamPage.hidden) return;
 
     const current = currentScreen();
-    if (event.key === 'ArrowLeft' && current === 'teams') {
-      event.preventDefault();
-      show('standings');
-    } else if (event.key === 'ArrowRight' && current === 'standings') {
+    if (event.key === 'ArrowLeft' && current === 'standings') {
       event.preventDefault();
       show('teams');
+    } else if (event.key === 'ArrowLeft' && current === 'teams') {
+      event.preventDefault();
+      show('news');
+    } else if (event.key === 'ArrowRight' && current === 'news') {
+      event.preventDefault();
+      show('teams');
+    } else if (event.key === 'ArrowRight' && current === 'teams') {
+      event.preventDefault();
+      show('standings');
     }
   });
 
