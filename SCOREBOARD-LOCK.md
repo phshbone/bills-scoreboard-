@@ -154,3 +154,12 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - MLB secondary fields may include GB, last 10, home, away, run differential, and streak; analogous provider-returned fields are used for NFL, NHL, WNBA, and NCAA.
 - Missing secondary values stay absent rather than being fabricated.
 - Sports News remains unexposed until functional; Stage 10.1 establishes its future swipe direction but no dead destination.
+
+
+## Stage 11B8K lock — Home score timing repair (2026-09-17)
+- Home plaque state priority is `LIVE → NEXT within six hours → latest FINAL`.
+- A scheduled game takes over the plaque beginning six hours before its listed start time.
+- Before that six-hour window, the latest completed result remains visible.
+- When a game becomes live, the current live score/state supersedes both NEXT and FINAL.
+- When the game becomes final, that result becomes the newest FINAL and remains until the following game enters its six-hour window.
+- If a team has no completed game yet, its earliest future scheduled game may appear as NEXT even when it is more than six hours away so the plaque does not remain blank.
