@@ -1,0 +1,64 @@
+name: Stage 11B8 visual smoke
+
+on:
+  push:
+    branches:
+      - scoreboard-v11b8-visual-family
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Pillow
+        run: python -m pip install --quiet pillow
+      - name: Verify visual assets
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+
+          expected = {
+              'assets/scoreboard-header.webp': (800, 267),
+              'assets/knicks.webp': (600, 338),
+              'assets/eagles.webp': (600, 338),
+              'assets/phillies.webp': (600, 338),
+              'assets/flyers.webp': (600, 338),
+              'assets/sixers.webp': (600, 338),
+          }
+          for path, dims in expected.items():
+              data = Path(path).read_bytes()
+              assert data[:4] == b'RIFF', f'{path}: missing RIFF'
+              assert data[8:12] == b'WEBP', f'{path}: missing WEBP'
+              declared = int.from_bytes(data[4:8], 'little') + 8
+              assert declared == len(data), f'{path}: RIFF length {declared} != {len(data)}'
+              with Image.open(path) as im:
+                  im.load()
+                  assert im.size == dims, f'{path}: {im.size} != {dims}'
+              print(f'PASS {path} {dims} bytes={len(data)}')
+          PY
+      - name: Verify header wiring
+        run: |
+          grep -F 'scoreboard-header.webp?v=11b8' index.html
+          grep -F 'width="800" height="267"' index.html
+          grep -F 'aspect-ratio: 3 / 1' branding-v11.css
+      - name: JavaScript syntax
+        run: |
+          for file in *.js; do
+            node --check "$file"
+          done
+      - name: Local HTTP smoke
+        run: |
+          python -m http.server 8765 >/tmp/scoreboard-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid || true' EXIT
+          sleep 1
+          curl --fail --silent --show-error http://127.0.0.1:8765/ >/dev/null
+          for file in scoreboard-header knicks eagles phillies flyers sixers; do
+            curl --fail --silent --show-error "http://127.0.0.1:8765/assets/${file}.webp" >/dev/null
+          done
+          echo 'PASS local HTTP asset loading'
