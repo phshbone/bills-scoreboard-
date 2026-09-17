@@ -1,0 +1,84 @@
+name: Stage 11B7 asset smoke
+
+on:
+  push:
+    branches:
+      - scoreboard-v11b7-image-integrity
+    paths:
+      - .github/workflows/v11b7-asset-smoke.yml
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repair branch
+        uses: actions/checkout@v4
+        with:
+          ref: scoreboard-v11b7-image-integrity
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Pillow
+        run: python -m pip install --disable-pip-version-check pillow
+
+      - name: Verify repaired assets and wiring
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import struct
+
+          checks = {
+              Path('assets/scoreboard-header.webp'): (1000, 563),
+              Path('assets/knicks.webp'): (360, 203),
+          }
+          for path, expected in checks.items():
+              raw = path.read_bytes()
+              assert raw[:4] == b'RIFF' and raw[8:12] == b'WEBP', f'{path}: bad signature'
+              assert struct.unpack('<I', raw[4:8])[0] + 8 == len(raw), f'{path}: truncated RIFF payload'
+              with Image.open(path) as image:
+                  image.load()
+                  assert image.size == expected, f'{path}: {image.size} != {expected}'
+              print(f'PASS {path} {expected[0]}x{expected[1]} bytes={len(raw)}')
+
+          html = Path('index.html').read_text(encoding='utf-8')
+          assert './assets/scoreboard-header.webp?v=11b6' in html, 'header asset reference missing'
+          print('PASS index header reference')
+
+          app = Path('app.js').read_text(encoding='utf-8')
+          lowered = app.lower()
+          assert 'knicks' in lowered, 'Knicks team wiring missing'
+          print('PASS Knicks app wiring present')
+          PY
+
+      - name: JavaScript syntax smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            node --check "$file"
+          done < <(find . -maxdepth 1 -type f -name '*.js' -print0)
+          echo 'PASS top-level JavaScript syntax'
+
+      - name: Local HTTP asset smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m http.server 8123 >/tmp/scoreboard-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid 2>/dev/null || true' EXIT
+          sleep 1
+          curl --fail --silent --show-error http://127.0.0.1:8123/index.html >/dev/null
+          curl --fail --silent --show-error http://127.0.0.1:8123/assets/scoreboard-header.webp -o /tmp/header.webp
+          curl --fail --silent --show-error http://127.0.0.1:8123/assets/knicks.webp -o /tmp/knicks.webp
+          test -s /tmp/header.webp
+          test -s /tmp/knicks.webp
+          echo 'PASS local HTTP shell and repaired assets'
