@@ -1,4 +1,4 @@
-/* Thin raw-metal companion strip for the full-width scoreboard banner. */
+/* Grooved steel companion plaque for the full-width scoreboard banner. */
 .scoreboard-header {
   width: 100%;
   grid-template-columns: minmax(0, 1fr);
@@ -11,42 +11,54 @@
 
 .header-title-row {
   position: relative;
-  min-height: 48px;
+  min-height: 50px;
   align-items: center;
   gap: 10px;
   padding: 2px 10px 2px 12px;
   overflow: hidden;
-  border: 1px solid rgba(132, 151, 174, .24);
-  border-radius: 9px;
-  background-color: #0b1119;
+  border: 1px solid rgba(146, 163, 184, .26);
+  border-radius: 10px;
+  background-color: #0b1118;
   background-image:
-    linear-gradient(135deg, transparent 0 39%, rgba(184, 202, 224, .12) 40% 45%, rgba(5, 9, 14, .5) 46% 52%, transparent 53% 100%),
-    linear-gradient(315deg, transparent 0 39%, rgba(180, 198, 219, .09) 40% 45%, rgba(4, 8, 13, .48) 46% 52%, transparent 53% 100%),
-    radial-gradient(circle at 18% 30%, rgba(255,255,255,.028) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 73% 66%, rgba(0,0,0,.22) 0 1px, transparent 1.5px),
-    linear-gradient(180deg, #17212d 0%, #0d151f 54%, #080d14 100%);
-  background-size: 24px 16px, 24px 16px, 13px 13px, 17px 17px, auto;
-  background-position: 0 0, 12px 8px, 0 0, 4px 6px, 0 0;
+    linear-gradient(180deg, rgba(255,255,255,.06) 0%, transparent 22%, transparent 78%, rgba(0,0,0,.22) 100%),
+    repeating-linear-gradient(135deg, rgba(203, 217, 234, .18) 0 2px, rgba(72, 84, 100, .30) 2px 5px, transparent 5px 18px),
+    repeating-linear-gradient(135deg, transparent 0 17px, rgba(239, 244, 250, .16) 17px 20px, rgba(32, 43, 57, .92) 20px 25px, transparent 25px 44px),
+    linear-gradient(180deg, #1a2431 0%, #101720 52%, #090f16 100%);
+  background-size: auto, 18px 18px, 44px 24px, auto;
+  background-position: 0 0, 0 0, 0 0, 0 0;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .055),
-    inset 0 -1px 0 rgba(0, 0, 0, .62),
-    0 3px 10px rgba(0, 0, 0, .2);
+    inset 0 0 0 1px rgba(255,255,255,.03),
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -1px 0 rgba(0,0,0,.64),
+    0 3px 10px rgba(0,0,0,.20);
 }
 
-/* Faint overspray/grime over the steel, without introducing a glossy UI panel. */
+/* Light grime / overspray texture, so the strip feels sprayed onto steel rather than polished UI. */
+.header-title-row::before,
 .header-title-row::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
+}
+
+.header-title-row::before {
   opacity: .32;
   background:
-    radial-gradient(circle at 8% 22%, rgba(225, 232, 239, .12) 0 1px, transparent 1.4px),
-    radial-gradient(circle at 35% 68%, rgba(225, 232, 239, .09) 0 1px, transparent 1.4px),
-    radial-gradient(circle at 82% 40%, rgba(225, 232, 239, .08) 0 1px, transparent 1.4px),
-    radial-gradient(circle at 58% 15%, rgba(0, 0, 0, .25) 0 1px, transparent 1.5px);
-  background-size: 31px 27px, 37px 29px, 43px 35px, 29px 33px;
+    radial-gradient(circle at 12% 28%, rgba(240, 244, 248, .10) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 31% 64%, rgba(225, 232, 239, .07) 0 1px, transparent 1.35px),
+    radial-gradient(circle at 62% 34%, rgba(0, 0, 0, .17) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 82% 58%, rgba(229, 235, 241, .08) 0 1px, transparent 1.4px);
+  background-size: 33px 27px, 29px 21px, 35px 26px, 31px 24px;
   mix-blend-mode: screen;
+}
+
+.header-title-row::after {
+  opacity: .38;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.03), transparent 34%, rgba(0,0,0,.16) 100%),
+    radial-gradient(circle at 18% 50%, rgba(0,0,0,.12) 0 12%, transparent 16%),
+    radial-gradient(circle at 76% 48%, rgba(255,255,255,.04) 0 10%, transparent 15%);
 }
 
 .header-title-row > * {
@@ -54,29 +66,47 @@
   z-index: 1;
 }
 
-.header-title-row h1,
-.header-title-row #edit-toggle,
-.header-title-row .desktop-top-nav .desktop-nav-button {
-  color: #eceee9;
-  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", "Arial Black", ui-sans-serif, sans-serif;
-  font-weight: 900;
-  letter-spacing: .085em;
-  text-transform: uppercase;
-  -webkit-text-stroke: .25px rgba(245, 246, 241, .55);
-  text-shadow:
-    0 0 .6px rgba(255,255,255,.9),
-    0 0 1.8px rgba(231, 235, 229, .24),
-    1px 0 rgba(255,255,255,.08),
-    -1px 0 rgba(255,255,255,.05),
-    0 1px 1px rgba(0,0,0,.9);
-}
-
 .header-title-row h1 {
   min-width: 0;
   margin-right: auto;
-  font-size: clamp(1.04rem, 2.6vw, 1.32rem);
+  font-size: clamp(1.04rem, 2.6vw, 1.3rem);
   line-height: 1;
   white-space: nowrap;
+}
+
+.header-title-row h1,
+.header-title-row #edit-toggle,
+.header-title-row .desktop-top-nav .desktop-nav-button {
+  color: #ecebe4;
+  font-family: "Arial Black", Impact, Haettenschweiler, "Arial Narrow Bold", ui-sans-serif, sans-serif;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  text-shadow:
+    0 1px 1px rgba(0,0,0,.88),
+    0 0 6px rgba(236, 236, 228, .10);
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .header-title-row h1,
+  .header-title-row #edit-toggle,
+  .header-title-row .desktop-top-nav .desktop-nav-button {
+    color: transparent;
+    background-image:
+      linear-gradient(180deg, rgba(248, 246, 239, .98) 0%, rgba(231, 227, 217, .95) 46%, rgba(209, 204, 193, .92) 100%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.12) 0 9px, rgba(255,255,255,0) 9px 15px, rgba(98,98,98,.11) 15px 17px, rgba(255,255,255,0) 17px 28px),
+      radial-gradient(circle at 18% 34%, rgba(255,255,255,.58) 0 1px, transparent 1.3px),
+      radial-gradient(circle at 73% 62%, rgba(80,80,80,.20) 0 1px, transparent 1.4px);
+    background-repeat: repeat;
+    background-size: auto, auto, 24px 18px, 30px 24px;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-stroke: .28px rgba(245, 243, 236, .55);
+    text-shadow:
+      0 0 .9px rgba(255,255,255,.16),
+      0 1px 1px rgba(0,0,0,.88),
+      0 0 8px rgba(238, 237, 231, .10);
+  }
 }
 
 /* Keep the live team count available to assistive technology without adding a second visual line. */
@@ -108,17 +138,18 @@
 .header-title-row #edit-toggle:hover,
 .header-title-row .desktop-top-nav .desktop-nav-button:hover,
 .header-title-row .desktop-top-nav .desktop-nav-button[aria-current="page"] {
-  background: transparent;
-  color: #fff;
-  text-shadow:
-    0 0 .8px rgba(255,255,255,.95),
-    0 0 2.4px rgba(239, 241, 235, .35),
-    0 1px 1px rgba(0,0,0,.9);
+  background: rgba(255,255,255,.03);
+  box-shadow: inset 0 0 0 1px rgba(235, 239, 231, .08);
+}
+
+.header-title-row #edit-toggle:active,
+.header-title-row .desktop-top-nav .desktop-nav-button:active {
+  transform: translateY(1px);
 }
 
 .header-title-row #edit-toggle:focus-visible,
 .header-title-row .desktop-top-nav .desktop-nav-button:focus-visible {
-  outline: 2px dashed rgba(233, 237, 229, .88);
+  outline: 2px dashed rgba(238, 240, 231, .88);
   outline-offset: 0;
 }
 
@@ -129,13 +160,13 @@
   }
 
   .header-title-row {
-    min-height: 48px;
+    min-height: 50px;
     gap: 6px;
     padding: 2px 8px 2px 12px;
   }
 
   .header-title-row h1 {
-    font-size: clamp(1rem, 4.7vw, 1.16rem);
+    font-size: clamp(1rem, 4.7vw, 1.15rem);
   }
 
   .header-title-row .header-actions { gap: 0; }
