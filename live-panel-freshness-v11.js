@@ -44,9 +44,9 @@
 
     syncing = true;
     try {
-      const payload = await feed.fetchScoreboard(team);
-      const event = liveEvent(payload, team);
-      const game = feed.parseEvent(event, team);
+      const game = typeof feed.fetchCurrentGame === 'function'
+        ? await feed.fetchCurrentGame(team)
+        : feed.parseEvent(liveEvent(await feed.fetchScoreboard(team), team), team);
       if (!game || game.state !== 'in' || !game.detail) return;
 
       const sub = panel.querySelector('.data-sub');
