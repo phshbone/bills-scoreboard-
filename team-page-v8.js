@@ -199,7 +199,8 @@
     detailContent.replaceChildren(loading);
 
     try {
-      const stories = await window.ScoreboardNews.teamStories(team, force);
+      const providerTeamId = snapshot?.raw?.teamPayload?.team?.id || team.provider?.team || '';
+      const stories = await window.ScoreboardNews.teamStories(team, force, providerTeamId);
       if (view !== 'news' || currentTeam?.id !== teamId) return;
 
       if (!stories.length) {
