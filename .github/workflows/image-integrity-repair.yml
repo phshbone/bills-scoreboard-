@@ -1,0 +1,86 @@
+name: Image integrity repair
+
+on:
+  push:
+    branches:
+      - scoreboard-v11b7-image-integrity
+    paths:
+      - .github/workflows/image-integrity-repair.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repair branch
+        uses: actions/checkout@v4
+        with:
+          ref: scoreboard-v11b7-image-integrity
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Pillow
+        run: python -m pip install --disable-pip-version-check pillow
+
+      - name: Normalize and verify WebP assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import hashlib
+
+          targets = [
+              Path('assets/scoreboard-header.webp'),
+              Path('assets/knicks.webp'),
+          ]
+
+          for path in targets:
+              original = path.read_bytes()
+              if original[:4] != b'RIFF' or original[8:12] != b'WEBP':
+                  raise SystemExit(f'{path}: invalid source WebP signature')
+
+              with Image.open(path) as img:
+                  img.load()
+                  size = img.size
+                  mode = img.mode
+                  fmt = img.format
+                  normalized = img.convert('RGBA' if 'A' in img.getbands() else 'RGB')
+
+              temp = path.with_suffix('.normalized.webp')
+              normalized.save(temp, format='WEBP', lossless=True, method=6, exact=True)
+
+              repaired = temp.read_bytes()
+              if repaired[:4] != b'RIFF' or repaired[8:12] != b'WEBP':
+                  raise SystemExit(f'{path}: repaired WebP signature check failed')
+
+              with Image.open(temp) as check:
+                  check.load()
+                  if check.size != size:
+                      raise SystemExit(f'{path}: dimensions changed from {size} to {check.size}')
+                  check.verify()
+
+              temp.replace(path)
+              print(f'{path}: source format={fmt} mode={mode} dimensions={size[0]}x{size[1]}')
+              print(f'{path}: repaired bytes={len(repaired)} sha256={hashlib.sha256(repaired).hexdigest()} signature=RIFF/WEBP')
+          PY
+
+      - name: Commit repaired binaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- assets/scoreboard-header.webp assets/knicks.webp; then
+            echo 'No binary changes produced.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/scoreboard-header.webp assets/knicks.webp
+          git commit -m 'Stage 11B7: normalize header and Knicks WebP binaries'
+          git push origin HEAD:scoreboard-v11b7-image-integrity
