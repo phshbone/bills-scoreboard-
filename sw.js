@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b5-wide-header';
+const CACHE = 'scoreboard-v11b6-cache-live-repair';
 const ASSETS = [
   './',
   './index.html',
@@ -25,6 +25,7 @@ const ASSETS = [
   './roster-groups-v8.js',
   './live-score-v11.js',
   './app.js',
+  './live-panel-freshness-v11.js',
   './basic-stats-v6.js',
   './full-stats-v7.js',
   './mlb-depth-chart-v9.js',
@@ -66,29 +67,29 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
   const request = event.request;
+  const url = new URL(request.url);
 
-  // Navigations are network-first so a fresh launch receives the newest app shell.
-  // Cached HTML remains the offline fallback.
-  if (request.mode === 'navigate') {
-    event.respondWith((async () => {
-      try {
-        const response = await fetch(request);
-        if (response && response.ok) {
-          const cache = await caches.open(CACHE);
-          await cache.put('./index.html', response.clone());
-        }
-        return response;
-      } catch {
-        return (await caches.match(request))
-          || (await caches.match('./index.html'))
-          || (await caches.match('./'));
+  // Sports-provider requests remain ordinary network requests. The service worker
+  // only owns this app's own shell/assets.
+  if (url.origin !== self.location.origin) return;
+
+  event.respondWith((async () => {
+    try {
+      // Network-first + no-store prevents a newly deployed HTML shell from being
+      // paired with stale CSS/JS/images from an older Scoreboard release.
+      const response = await fetch(request, { cache: 'no-store' });
+      if (response && response.ok) {
+        const cache = await caches.open(CACHE);
+        await cache.put(request, response.clone());
       }
-    })());
-    return;
-  }
-
-  // Versioned app assets remain cache-first for speed/offline use.
-  event.respondWith(
-    caches.match(request).then(cached => cached || fetch(request))
-  );
+      return response;
+    } catch {
+      const cached = await caches.match(request);
+      if (cached) return cached;
+      if (request.mode === 'navigate') {
+        return (await caches.match('./index.html')) || (await caches.match('./'));
+      }
+      throw new Error('Scoreboard asset unavailable offline.');
+    }
+  })());
 });
