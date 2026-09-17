@@ -81,3 +81,27 @@ Validated before merge with JavaScript compilation checks and deterministic in-m
 - Team-color accents are present for all current library teams without changing the underlying standings data or provider mapping.
 
 Overall pre-merge classification: **PASS**.
+
+
+## Stage 11B9 smoke — Sports News foundation
+Validated before merge with live provider checks, JavaScript compilation checks, and deterministic in-memory DOM/navigation fixtures.
+
+### Executed evidence
+- ESPN public news endpoints returned current JSON article feeds for MLB, NFL, NHL, WNBA, college football, and NBA.
+- `sports-news-v11.js`, `global-standings-v10.js`, `desktop-nav-v11.js`, `swipe-repair-v11.js`, and `sw.js` compile successfully.
+- Deterministic News-feed fixture: **PASS**.
+- Two league feeds merge into one newest-first list.
+- Team-category matching correctly tags Philadelphia Eagles NFL news to Eagles and Philadelphia Phillies MLB news to Phillies despite both providers using the `phi` abbreviation in separate leagues.
+- News story cards use real outbound links with safe `noopener noreferrer` behavior and HTTP ESPN links are normalized to HTTPS.
+- Partial provider failure leaves successful league stories visible and reports `1 of 2 leagues updated` without exposing Retry.
+- Total provider failure replaces the feed with an error state and exposes the working Retry control.
+- Deterministic phone navigation fixture: **PASS** for `News ← My Teams → Standings`.
+- Swipe right from My Teams opens News; swipe left from News returns to My Teams; My Teams ↔ Standings remains intact.
+- The legacy swipe compatibility listener stands down on the News-capable shell, avoiding duplicate navigation.
+- Header actions remain visible only on My Teams.
+- The service-worker cache namespace is bumped and includes the new News JavaScript and CSS.
+
+### Validation limitation
+The local deterministic runtime does not substitute for final real-iPhone gesture feel or deployed GitHub Pages rendering. The live provider shape itself was independently verified against current ESPN public JSON.
+
+Overall pre-merge classification: **PASS WITH LIVE VISUAL VERIFICATION RECOMMENDED**.
