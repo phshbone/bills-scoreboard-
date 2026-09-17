@@ -15,6 +15,7 @@
   let loading = false;
   let loadedAt = 0;
   let loadedSignature = '';
+  const teamStoryCache = new Map();
 
   const el = (tag, className = '', text = '') => {
     const node = document.createElement(tag);
@@ -110,6 +111,35 @@
     const payload = await fetchJson(newsUrl(config));
     const articles = Array.isArray(payload?.articles) ? payload.articles : [];
     return articles.map(article => normalizeArticle(article, config)).filter(Boolean);
+  }
+
+  function teamConfig(team) {
+    const p = team?.provider;
+    if (!team || !p?.sport || !p?.league || p?.team == null) return null;
+    return {
+      key: `${p.sport}/${p.league}`,
+      sport: p.sport,
+      league: p.league,
+      label: team.league || String(p.league).toUpperCase(),
+      teams: [team]
+    };
+  }
+
+  async function teamStories(team, force = false) {
+    const config = teamConfig(team);
+    if (!config) throw new Error('Team news configuration is unavailable.');
+
+    const cacheKey = `${team.id}:${config.key}:${String(team.provider.team)}`;
+    const cached = teamStoryCache.get(cacheKey);
+    if (!force && cached && Date.now() - cached.loadedAt < STALE_MS) return cached.stories;
+
+    const stories = (await fetchLeague(config))
+      .filter(story => story.relatedTeams.some(item => item.id === team.id))
+      .sort((a, b) => b.published - a.published)
+      .slice(0, 20);
+
+    teamStoryCache.set(cacheKey, { loadedAt: Date.now(), stories });
+    return stories;
   }
 
   function dedupeStories(stories) {
@@ -254,6 +284,8 @@
 
   window.ScoreboardNews = Object.freeze({
     activate,
-    refresh: () => activate(true)
+    refresh: () => activate(true),
+    teamStories,
+    storyCard
   });
 })();

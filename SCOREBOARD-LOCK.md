@@ -185,3 +185,14 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - A partial provider failure leaves successful league stories usable and reports partial freshness; Retry appears only when all requested league news feeds fail.
 - The news feed refreshes when its My Teams composition changes or when its in-visit snapshot is older than five minutes.
 - Team-context story presentation and team-page-specific News remain later increments; this stage establishes the working broad/global Sports News screen first.
+
+
+## Stage 11B10 lock — Team-specific News (2026-09-17)
+- Every team page exposes a functional News detail view using the same story-card visual language as Sports News.
+- Team News is lazy-loaded when opened rather than adding another required feed to the initial team-page data load.
+- Team stories are selected from the team's own league news feed using provider-supplied team-category metadata; headline text alone is not treated as proof that a story belongs to the team.
+- Team News snapshots are cached in-visit for five minutes and capped at 20 current stories per team.
+- Story cards retain image, headline, description, league/team tags, byline/age, premium marker when supplied, and the real outbound article link.
+- If no current team-tagged stories are returned, the News view shows a real empty state rather than fabricated content.
+- A team-news fetch failure produces a working Retry control inside the News view and does not affect the rest of the team page.
+- Back from Team News returns to that team's overview; the next Back continues to preserve the original My Teams or Standings context.

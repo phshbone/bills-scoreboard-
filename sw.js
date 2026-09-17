@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b9-sports-news';
+const CACHE = 'scoreboard-v11b10-team-news';
 const ASSETS = [
   './',
   './index.html',
