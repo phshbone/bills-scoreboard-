@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b8-desktop-nav';
+const CACHE = 'scoreboard-v11b8a-optional-art-on-demand';
 const ASSETS = [
   './',
   './index.html',
@@ -44,12 +44,7 @@ const ASSETS = [
   './assets/jets.webp',
   './assets/rangers.webp',
   './assets/army.webp',
-  './assets/fever.webp',
-  './assets/eagles.webp',
-  './assets/phillies.webp',
-  './assets/flyers.webp',
-  './assets/sixers.webp',
-  './assets/knicks.webp'
+  './assets/fever.webp'
 ];
 
 self.addEventListener('install', event => {
