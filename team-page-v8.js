@@ -71,6 +71,7 @@
     if (kind === 'standings') renderStandings();
     if (kind === 'schedule') renderSchedule();
     if (kind === 'roster') renderRoster();
+    if (kind === 'news') renderTeamNews();
     updateBackLabel();
     document.querySelector('.team-page-shell')?.scrollTo({ top: 0, behavior: 'instant' });
   }
@@ -185,6 +186,42 @@
     detailContent.appendChild(list);
   }
 
+  async function renderTeamNews(force = false) {
+    detailTitle.textContent = 'News';
+    const team = currentTeam;
+    const teamId = team?.id;
+    if (!team || !window.ScoreboardNews?.teamStories || !window.ScoreboardNews?.storyCard) {
+      detailContent.replaceChildren(el('div', 'sports-news-error', 'Team news is temporarily unavailable.'));
+      return;
+    }
+
+    const loading = el('div', 'sports-news-loading', `Loading ${team.name} news…`);
+    detailContent.replaceChildren(loading);
+
+    try {
+      const stories = await window.ScoreboardNews.teamStories(team, force);
+      if (view !== 'news' || currentTeam?.id !== teamId) return;
+
+      if (!stories.length) {
+        detailContent.replaceChildren(el('div', 'sports-news-empty', `No current ${team.name} stories were returned.`));
+        return;
+      }
+
+      const list = el('div', 'team-news-list sports-news-content');
+      stories.forEach(story => list.appendChild(window.ScoreboardNews.storyCard(story)));
+      detailContent.replaceChildren(list);
+    } catch (error) {
+      if (view !== 'news' || currentTeam?.id !== teamId) return;
+      const errorBox = el('div', 'sports-news-error', 'Team news is temporarily unavailable.');
+      const actions = el('div', 'sports-news-actions');
+      const button = el('button', 'button', 'Retry');
+      button.type = 'button';
+      button.addEventListener('click', () => renderTeamNews(true));
+      actions.appendChild(button);
+      detailContent.replaceChildren(errorBox, actions);
+    }
+  }
+
   function renderRoster() {
     detailTitle.textContent = 'Roster';
     if (!snapshot.roster.length) {
@@ -229,6 +266,10 @@
       action: snapshot.games ? () => openDetail('schedule') : null,
       actionLabel: snapshot.games ? `Open ${currentTeam.name} schedule` : '',
       error: !snapshot.games
+    }));
+    nodes.push(panel('News', 'Latest team stories', `Open current ${currentTeam.name} news.`, {
+      action: () => openDetail('news'),
+      actionLabel: `Open ${currentTeam.name} news`
     }));
     const rosterBox = panel('Roster', snapshot.roster.length ? `${snapshot.roster.length} players` : 'Unavailable', snapshot.roster.length ? 'Open the current roster.' : snapshot.errors.roster || '', {
       action: snapshot.roster.length ? () => openDetail('roster') : null,
