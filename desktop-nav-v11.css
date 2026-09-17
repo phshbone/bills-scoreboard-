@@ -1,0 +1,38 @@
+.desktop-top-nav {
+  display: none;
+}
+
+@media (min-width: 720px) and (pointer: fine) {
+  .desktop-top-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+  }
+
+  .desktop-top-nav .desktop-nav-button {
+    min-height: 44px;
+    padding: 9px 15px;
+    border: 1px solid rgba(155, 181, 214, .28);
+    border-radius: 12px;
+    background: rgba(10, 18, 31, .72);
+    color: var(--muted, #aab7ca);
+    font: inherit;
+    font-weight: 800;
+    letter-spacing: .02em;
+    cursor: pointer;
+  }
+
+  .desktop-top-nav .desktop-nav-button:hover,
+  .desktop-top-nav .desktop-nav-button:focus-visible {
+    border-color: rgba(176, 205, 238, .58);
+    color: #f4f7fb;
+    outline: none;
+  }
+
+  .desktop-top-nav .desktop-nav-button[aria-current="page"] {
+    background: linear-gradient(180deg, rgba(49, 69, 98, .9), rgba(27, 40, 60, .92));
+    border-color: rgba(176, 205, 238, .56);
+    color: #fff;
+  }
+}

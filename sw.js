@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b6-cache-live-repair';
+const CACHE = 'scoreboard-v11b8-desktop-nav';
 const ASSETS = [
   './',
   './index.html',
@@ -17,6 +17,7 @@ const ASSETS = [
   './home-score-overlay-v9.css',
   './mlb-depth-chart-v9.css',
   './global-standings-v10.css',
+  './desktop-nav-v11.css',
   './team-data-v8.js',
   './standings-repair-v6.js',
   './nfl-standings-v9.js',
@@ -32,6 +33,7 @@ const ASSETS = [
   './live-awareness-v6.js',
   './home-score-rail-v8.js',
   './global-standings-v10.js',
+  './desktop-nav-v11.js',
   './swipe-repair-v11.js',
   './manifest.webmanifest',
   './assets/icon.svg',
