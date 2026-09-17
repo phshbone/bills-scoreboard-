@@ -145,3 +145,21 @@ Validated before merge with a current live-game provider comparison, JavaScript 
 - Service-worker cache namespace is bumped to `scoreboard-v11b11-mlb-live-fallback`.
 
 Overall pre-merge classification: **PASS WITH REAL-DEVICE LIVE VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B12 smoke — Team News feed repair
+Validated before merge with provider-path review, JavaScript compilation checks, and deterministic team-news/team-page fixtures.
+
+### Executed evidence
+- `sports-news-v11.js`, `team-page-v8.js`, and `sw.js` compile successfully.
+- ESPN endpoint documentation confirms dedicated team-news resources and team-filtered News requests are available in the Site API; the previous implementation relied only on filtering the limited league-wide top-news slice.
+- Deterministic team-news fixture: **PASS**.
+- The team resource path is attempted first with the canonical numeric ESPN team ID.
+- If that path fails, the documented `news?team=<id>` path is attempted.
+- A successful team-scoped response is rendered even when its articles omit team-category metadata because the request itself is already team-scoped.
+- If both team-scoped paths fail, the prior league-wide category-filter path remains as a final fallback.
+- Deterministic team-page fixture: **PASS**.
+- A Phillies team page with canonical ESPN team ID `22` passes `22` into the team-news loader, opens the News detail view, and renders returned story cards.
+- The service-worker cache namespace is bumped to `scoreboard-v11b12-team-news-feed-repair`.
+
+Overall pre-merge classification: **PASS WITH REAL-DEVICE TEAM-NEWS VERIFICATION RECOMMENDED**.

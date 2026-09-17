@@ -125,21 +125,52 @@
     };
   }
 
-  async function teamStories(team, force = false) {
+  async function teamStories(team, force = false, providerTeamId = '') {
     const config = teamConfig(team);
     if (!config) throw new Error('Team news configuration is unavailable.');
 
-    const cacheKey = `${team.id}:${config.key}:${String(team.provider.team)}`;
+    const teamKey = String(providerTeamId || team.provider.team || '').trim();
+    if (!teamKey) throw new Error('Team news identifier is unavailable.');
+
+    const cacheKey = `${team.id}:${config.key}:${teamKey}`;
     const cached = teamStoryCache.get(cacheKey);
     if (!force && cached && Date.now() - cached.loadedAt < STALE_MS) return cached.stories;
 
-    const stories = (await fetchLeague(config))
-      .filter(story => story.relatedTeams.some(item => item.id === team.id))
-      .sort((a, b) => b.published - a.published)
-      .slice(0, 20);
+    const scopedUrls = [
+      `${SITE}/${config.sport}/${config.league}/teams/${encodeURIComponent(teamKey)}/news`,
+      `${SITE}/${config.sport}/${config.league}/news?team=${encodeURIComponent(teamKey)}`
+    ];
 
-    teamStoryCache.set(cacheKey, { loadedAt: Date.now(), stories });
-    return stories;
+    let scopedError = null;
+    for (const url of scopedUrls) {
+      try {
+        const payload = await fetchJson(url);
+        const articles = Array.isArray(payload?.articles) ? payload.articles : [];
+        const stories = articles
+          .map(article => normalizeArticle(article, config))
+          .filter(Boolean)
+          .map(story => ({ ...story, relatedTeams: [team] }))
+          .sort((a, b) => b.published - a.published)
+          .slice(0, 20);
+
+        teamStoryCache.set(cacheKey, { loadedAt: Date.now(), stories });
+        return stories;
+      } catch (error) {
+        scopedError = error;
+      }
+    }
+
+    try {
+      const fallback = (await fetchLeague(config))
+        .filter(story => story.relatedTeams.some(item => item.id === team.id))
+        .sort((a, b) => b.published - a.published)
+        .slice(0, 20);
+
+      teamStoryCache.set(cacheKey, { loadedAt: Date.now(), stories: fallback });
+      return fallback;
+    } catch (fallbackError) {
+      throw scopedError || fallbackError;
+    }
   }
 
   function dedupeStories(stories) {

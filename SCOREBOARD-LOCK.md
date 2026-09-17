@@ -206,3 +206,12 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - If ESPN already returns an in-progress game, ESPN remains authoritative and the MLB fallback is not called.
 - The MLB fallback is cached briefly in-visit to avoid duplicate current-day schedule requests when multiple selected MLB teams are playing in the same game.
 - If the MLB fallback fails, the existing ESPN path remains usable; failure of the fallback must not break non-MLB live scoring.
+
+
+## Stage 11B12 lock — Team News feed repair (2026-09-17)
+- Team-page News must use a team-scoped provider request rather than depending solely on filtering the league-wide top-news slice.
+- The canonical ESPN numeric team ID from the already-loaded team payload is passed into the team-news request when available.
+- Team News tries the team resource first, then the documented team-filtered league News query, and only then falls back to the league-wide category filter.
+- A successful team-scoped response is treated as belonging to the requested team even when individual article category metadata is absent.
+- The team-scoped feed retains the existing five-minute in-visit cache, 20-story cap, shared story-card treatment, real empty state, and working Retry behavior.
+- Global Sports News remains unchanged and continues to aggregate league-wide feeds.
