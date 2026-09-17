@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b8a-optional-art-on-demand';
+const CACHE = 'scoreboard-v11b8b-final-header-knicks';
 const ASSETS = [
   './',
   './index.html',
