@@ -186,3 +186,67 @@
   .global-standings-group { height: 100%; }
   .global-standing-secondary { font-size: .76rem; }
 }
+
+
+/* Stage 11B8L: My Teams identity and direct navigation inside global standings. */
+.global-team-name-line {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.global-team-logo,
+.global-team-logo-fallback {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+}
+
+.global-team-logo {
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.35));
+}
+
+.global-team-logo-fallback {
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--team-accent, #9bb7d4) 68%, white 12%);
+  border-radius: 50%;
+  color: #f7f9fc;
+  background: color-mix(in srgb, var(--team-accent, #9bb7d4) 34%, #0a1019);
+  font-size: .53rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.global-standings-table tr.my-team-standing {
+  --team-accent: #9bb7d4;
+  cursor: pointer;
+  outline: none;
+}
+
+.global-standings-table tr.my-team-standing td:first-child {
+  box-shadow: inset 4px 0 0 var(--team-accent);
+}
+
+.global-standings-table tr.my-team-standing:hover td,
+.global-standings-table tr.my-team-standing:focus-visible td {
+  background: rgba(105,132,168,.28);
+}
+
+.global-standings-table tr.my-team-standing:focus-visible td:first-child {
+  box-shadow: inset 4px 0 0 var(--team-accent), inset 0 0 0 2px rgba(214,229,247,.55);
+}
+
+.global-standings-table tr.my-team-standing[data-team-id="giants"] { --team-accent: #0b5aa5; }
+.global-standings-table tr.my-team-standing[data-team-id="yankees"] { --team-accent: #c4ced4; }
+.global-standings-table tr.my-team-standing[data-team-id="mets"] { --team-accent: #ff5910; }
+.global-standings-table tr.my-team-standing[data-team-id="jets"] { --team-accent: #125740; }
+.global-standings-table tr.my-team-standing[data-team-id="rangers"] { --team-accent: #0038a8; }
+.global-standings-table tr.my-team-standing[data-team-id="army"] { --team-accent: #c9ad6a; }
+.global-standings-table tr.my-team-standing[data-team-id="fever"] { --team-accent: #e03a3e; }
+.global-standings-table tr.my-team-standing[data-team-id="eagles"] { --team-accent: #004c54; }
+.global-standings-table tr.my-team-standing[data-team-id="phillies"] { --team-accent: #e81828; }
+.global-standings-table tr.my-team-standing[data-team-id="flyers"] { --team-accent: #f74902; }
+.global-standings-table tr.my-team-standing[data-team-id="sixers"] { --team-accent: #006bb6; }
+.global-standings-table tr.my-team-standing[data-team-id="knicks"] { --team-accent: #f58426; }
