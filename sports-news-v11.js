@@ -337,7 +337,10 @@
     while (balanced.length < selected.length) {
       const candidates = [...queues.entries()]
         .filter(([, queue]) => queue.length)
-        .sort((a, b) => (b[1][0]?.published || 0) - (a[1][0]?.published || 0));
+        .sort((a, b) =>
+          (b[1].length - a[1].length)
+          || ((b[1][0]?.published || 0) - (a[1][0]?.published || 0))
+        );
 
       if (!candidates.length) break;
 
