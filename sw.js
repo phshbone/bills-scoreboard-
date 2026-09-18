@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b24-phillies-reference';
+const CACHE = 'scoreboard-v11b25-mlb-header-tune-mets';
 const ASSETS = [
   './',
   './index.html',
@@ -25,6 +25,7 @@ const ASSETS = [
   './team-theme-v16.css',
   './team-theme-v17.css',
   './team-theme-v18.css',
+  './team-theme-v19.css',
   './desktop-nav-v11.css',
   './header-plate-v11.css',
   './team-data-v8.js',
