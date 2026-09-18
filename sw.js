@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b17-news-layout-balance';
+const CACHE = 'scoreboard-v11b18-team-page-themes';
 const ASSETS = [
   './',
   './index.html',
@@ -18,6 +18,7 @@ const ASSETS = [
   './mlb-depth-chart-v9.css',
   './global-standings-v10.css',
   './sports-news-v11.css',
+  './team-theme-v12.css',
   './desktop-nav-v11.css',
   './header-plate-v11.css',
   './team-data-v8.js',
