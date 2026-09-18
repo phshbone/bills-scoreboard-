@@ -3,6 +3,8 @@
 
   const SITE = 'https://site.api.espn.com/apis/site/v2/sports';
   const STANDINGS = 'https://site.api.espn.com/apis/v2/sports';
+  const MLB_ROSTER = 'https://statsapi.mlb.com/api/v1/teams';
+  const MLB_TEAM_IDS = Object.freeze({ nyy: 147, nym: 121, phi: 143 });
   const teamCache = new Map();
   const standingsCache = new Map();
 
@@ -258,6 +260,65 @@
     return payload;
   }
 
+  function mlbTeamId(team) {
+    if (team?.provider?.league !== 'mlb') return null;
+    return MLB_TEAM_IDS[String(team?.provider?.team || '').toLowerCase()] || null;
+  }
+
+  function normalizeRosterName(value) {
+    return String(value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim();
+  }
+
+  function mlbRoster(payload) {
+    const items = Array.isArray(payload?.roster) ? payload.roster : [];
+    return items.map(item => ({
+      name: item?.person?.fullName || item?.person?.name || 'Unnamed player',
+      position: item?.position?.abbreviation || item?.position?.name || '',
+      jersey: item?.jerseyNumber || '',
+      id: item?.person?.id ? `mlb-${item.person.id}` : ''
+    })).filter(item => item.name !== 'Unnamed player');
+  }
+
+  async function loadMlbRoster(team) {
+    const id = mlbTeamId(team);
+    if (!id) return [];
+    const payload = await fetchJson(`${MLB_ROSTER}/${id}/roster?rosterType=active&hydrate=person`);
+    return mlbRoster(payload);
+  }
+
+  function mergeRosters(primary, supplemental) {
+    const merged = (Array.isArray(primary) ? primary : []).map(item => ({ ...item }));
+    const byName = new Map();
+    merged.forEach((item, index) => {
+      const key = normalizeRosterName(item.name);
+      if (key) byName.set(key, index);
+    });
+
+    (Array.isArray(supplemental) ? supplemental : []).forEach(item => {
+      const key = normalizeRosterName(item.name);
+      const index = key ? byName.get(key) : undefined;
+      if (index === undefined) {
+        merged.push({ ...item });
+        if (key) byName.set(key, merged.length - 1);
+        return;
+      }
+
+      const existing = merged[index];
+      const currentPosition = String(existing.position || '').toUpperCase();
+      const supplementalPosition = String(item.position || '').toUpperCase();
+      const genericPosition = currentPosition === 'IF' || currentPosition === 'INF' || currentPosition === 'OF';
+      if ((!currentPosition || genericPosition) && supplementalPosition) existing.position = item.position;
+      if (!existing.jersey && item.jersey) existing.jersey = item.jersey;
+    });
+
+    return merged;
+  }
+
   async function load(team, force = false) {
     if (!force && teamCache.has(team.id)) return teamCache.get(team.id);
     const urls = { team: endpoint(team), schedule: endpoint(team, 'schedule'), roster: endpoint(team, 'roster') };
@@ -281,13 +342,23 @@
     const providerTeamId = teamObj?.id || team.provider.team;
     const allStandingGroups = raw.standingsPayload ? standingGroups(raw.standingsPayload) : [];
     const rosterResult = raw.rosterPayload ? roster(raw.rosterPayload) : { players: [], meta: { candidates: 0, unique: 0, duplicatesConsolidated: 0 } };
+    let supplementalRoster = [];
+    if (team.provider?.league === 'mlb') {
+      try { supplementalRoster = await loadMlbRoster(team); }
+      catch { supplementalRoster = []; }
+    }
+    const mergedRoster = mergeRosters(rosterResult.players, supplementalRoster);
     const normalized = {
       raw,
       record: teamObj ? record(teamObj) : 'Unavailable',
       standingSummary: teamObj?.standingSummary || '',
       games: raw.schedulePayload ? games(raw.schedulePayload, providerTeamId, team.provider.team) : null,
-      roster: rosterResult.players,
-      rosterMeta: rosterResult.meta,
+      roster: mergedRoster,
+      rosterMeta: {
+        ...rosterResult.meta,
+        supplemental: supplementalRoster.length,
+        unique: mergedRoster.length
+      },
       standingGroup: raw.standingsPayload ? standingGroup(raw.standingsPayload, team) : null,
       standingGroups: allStandingGroups,
       errors: raw.errors
