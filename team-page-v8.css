@@ -60,7 +60,8 @@
   min-height: 100%;
   max-height: 100%;
   overflow-y: auto;
-  overscroll-behavior: contain;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -68,4 +69,19 @@
    This prevents Safari from exposing My Teams beneath the fixed team page. */
 body.team-page-open > .app {
   visibility: hidden;
+}
+
+
+/* Stage 11B30: stop iOS root/edge rubber-band while a team page is open. */
+html.team-page-open,
+body.team-page-open {
+  width: 100%;
+  height: 100%;
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+body.team-page-open {
+  position: fixed;
+  inset: 0;
 }
