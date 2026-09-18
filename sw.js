@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b31-footer-flush';
+const CACHE = 'scoreboard-v11b32-live-panel-state-bridge';
 const ASSETS = [
   './',
   './index.html',
