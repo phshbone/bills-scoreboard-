@@ -540,3 +540,17 @@ Validated as a CSS-only real-iPhone visual repair.
 - Service-worker cache namespace is scoreboard-v11b33-live-cue-footer-flush.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B34 smoke — authentic alternating footer metal
+Validated as a footer-texture-only production repair after real-iPhone visual review.
+
+### Executed evidence
+- New asset assets/score-metal-tread.svg contains tread rows in both opposing diagonal directions rather than the retired single-direction pattern.
+- The tile includes raised-lug dark shadow, steel body, highlight, surface grain, pits, and scratch marks to avoid the previous clean synthetic appearance.
+- team-theme-v20.css applies the new texture only to the team-page Back rail and preserves Stage 11B33 bottom:0 / padding-bottom:0 geometry.
+- Footer button styling and internal safe-area padding are unchanged.
+- sw.js precaches the new SVG and compiles successfully.
+- Service-worker cache namespace is scoreboard-v11b34-authentic-footer-metal.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.

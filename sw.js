@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b33-live-cue-footer-flush';
+const CACHE = 'scoreboard-v11b34-authentic-footer-metal';
 const ASSETS = [
   './',
   './index.html',
@@ -50,6 +50,7 @@ const ASSETS = [
   './swipe-repair-v11.js',
   './manifest.webmanifest',
   './assets/icon.svg',
+  './assets/score-metal-tread.svg',
   './assets/scoreboard-header.webp',
   './assets/giants.webp',
   './assets/yankees.webp',
