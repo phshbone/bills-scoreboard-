@@ -367,3 +367,15 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Team headers use the same slightly raised placement and centered artwork crop established by the MLB pages.
 - The semantic team title remains in the DOM but is visually hidden when the artwork already identifies the team; the small league kicker remains visible.
 - No team-page data, provider, navigation, roster-grouping, standings, News, live-state, or Back behavior changes.
+
+
+## Stage 11B27 lock — final inspection polish (2026-09-18)
+- Giants and Eagles keep the approved artwork-driven header layout; only the darkest artwork is lifted with a restrained light veil/center glow so the embedded logo/wordmark reads more clearly.
+- Jets and the other team headers remain unchanged unless a later real-device review identifies a specific readability problem.
+- Global Standings remains a dark Scoreboard screen. The highlight status copy is simplified to `<league> standings · <n> My Team(s) highlighted` and is slightly smaller/less bright so it does not compete with the tables.
+- Highlighted standings rows, team-color edge bars, logos/fallbacks, `MY TEAM` badges, row navigation, league tabs, and the dark table design remain unchanged.
+- MLB roster loading keeps ESPN as the primary provider and now supplements it with the MLB StatsAPI active roster for Yankees (147), Mets (121), and Phillies (143).
+- Supplemental MLB data is merged by normalized player name. Existing ESPN entries are retained; missing active players are added, and generic ESPN `IF/INF/OF` positions may be enriched to the MLB-specific position such as `2B` or `CF`.
+- If MLB StatsAPI roster loading fails, the page falls back to the existing ESPN roster without blocking the rest of the team page.
+- No fabricated roster entries are introduced.
+- Sports News source mix, deduplication, source balancing, team aliases, card layout, navigation, six-hour home-score timing, live-state behavior, and team-page navigation remain unchanged.

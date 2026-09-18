@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b26-remaining-team-themes';
+const CACHE = 'scoreboard-v11b27-final-inspection';
 const ASSETS = [
   './',
   './index.html',
