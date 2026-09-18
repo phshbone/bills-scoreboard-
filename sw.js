@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b13-team-news-empty-fallthrough';
+const CACHE = 'scoreboard-v11b14-standings-logos-swipe-hint';
 const ASSETS = [
   './',
   './index.html',
