@@ -823,3 +823,21 @@
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
+
+
+/* Stage 11B34: authentic alternating tread for the fixed team-page Back rail.
+   Use a dedicated weathered steel tile instead of the earlier one-direction
+   synthetic tread so the footer reads as the same material language as the art. */
+.team-page[data-team-id] .team-page-bottom-nav {
+  background-color: #11243a;
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,.055) 0%, rgba(255,255,255,.018) 24%, transparent 42%, rgba(0,0,0,.16) 100%),
+    url("./assets/score-metal-tread.svg") !important;
+  background-size: auto, 96px 72px !important;
+  background-position: 0 0, 0 0 !important;
+  background-repeat: no-repeat, repeat !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.09),
+    inset 0 -1px 0 rgba(0,0,0,.62),
+    0 -5px 14px rgba(0,0,0,.17);
+}
