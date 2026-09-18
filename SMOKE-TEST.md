@@ -522,3 +522,21 @@ Triggered by a real-use regression report: My Teams could display LIVE while the
 - Service-worker cache namespace is scoreboard-v11b32-live-panel-state-bridge.
 
 Overall pre-merge classification: **PASS WITH LIVE/REAL-DEVICE VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B33 smoke — darker live cue + authoritative footer flush
+Validated as a CSS-only real-iPhone visual repair.
+
+### Recon finding
+- The remaining bottom strip survived Stage 11B31 because selectors such as .team-page[data-team-id="mets"] .team-page-bottom-nav and the mobile team-theme selectors had greater specificity than the generic Stage 11B31 override.
+- The live prompt remained the original pale #b9e7c5, which had poor visual weight on the new light team canvases.
+
+### Executed evidence
+- live-score-v6.css keeps the existing Tap for live score pseudo-element and changes only its green contrast treatment.
+- Final team-theme-v20.css selectors use .team-page[data-team-id] scope plus important bottom offset/padding locks, defeating the older per-team and mobile offsets without changing horizontal shell padding.
+- Back-rail bottom corner radii are removed so no themed shell background can show through at the two bottom corners.
+- Stage 11B30 iOS overscroll containment and Stage 11B32 live-state bridge remain untouched.
+- sw.js compiles successfully.
+- Service-worker cache namespace is scoreboard-v11b33-live-cue-footer-flush.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.
