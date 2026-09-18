@@ -404,3 +404,10 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Team-page vertical overscroll behavior is none, not contain, so browser overscroll affordance is not permitted at the team-page edges.
 - A touch-edge guard cancels only outward movement at the exact top/bottom of the internal team-page scroller as an iOS fallback. Normal vertical scrolling inside the team page remains native.
 - The existing artwork header, light team canvas, sticky Back rail, data rendering, detail navigation, and Back-to-My-Teams restoration behavior remain unchanged.
+
+
+## Stage 11B31 lock — flush team-page Back rail (2026-09-18)
+- Real-iPhone verification confirmed Stage 11B30 anchors the team page and prevents the prior rubber-band exposure.
+- The remaining dark strip below the metal Back rail came from the theme layer's deliberate 6px phone / 8px larger-screen sticky bottom offset plus shell bottom padding.
+- The team-page shell now has no bottom padding and the sticky Back rail uses bottom: 0, so the rail background reaches the viewport edge.
+- Existing Back button safe-area padding remains inside the rail; button placement, team themes, scrolling, and navigation behavior are otherwise unchanged.
