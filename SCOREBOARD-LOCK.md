@@ -215,3 +215,11 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - A successful team-scoped response is treated as belonging to the requested team even when individual article category metadata is absent.
 - The team-scoped feed retains the existing five-minute in-visit cache, 20-story cap, shared story-card treatment, real empty state, and working Retry behavior.
 - Global Sports News remains unchanged and continues to aggregate league-wide feeds.
+
+
+## Stage 11B13 lock — Team News empty-response fallthrough (2026-09-17)
+- Team News prefers the league News endpoint with the provider team filter because that endpoint is the documented team-news path for ESPN Site API feeds.
+- A successful HTTP response containing zero usable stories is not treated as a terminal success; Team News continues to the next scoped source.
+- The team-resource News endpoint remains a secondary scoped source, followed by the existing league-wide category-filter fallback.
+- Only a non-empty scoped story set is cached as a successful team-news result before the final fallback is attempted.
+- The existing team-page News UI, five-minute cache, 20-story cap, Retry behavior, and global Sports News feed remain otherwise unchanged.
