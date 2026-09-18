@@ -486,3 +486,17 @@ Validated before merge as a targeted follow-up to the failed Stage 11B29 real-iP
 - Service-worker cache namespace is scoreboard-v11b30-ios-overscroll-lock.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE REPRODUCTION CHECK REQUIRED**.
+
+
+## Stage 11B31 smoke — flush team-page Back rail
+Validated as a CSS-only follow-up to the successful Stage 11B30 anchoring repair.
+
+### Executed evidence
+- Universal final theme override sets team-page shell bottom padding to 0.
+- Universal final theme override sets team-page bottom navigation sticky offset to bottom: 0.
+- Existing internal Back-rail safe-area padding remains unchanged.
+- Stage 11B30 root scroll lock and iOS edge guard remain unchanged.
+- sw.js compiles successfully.
+- Service-worker cache namespace is scoreboard-v11b31-footer-flush.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.
