@@ -324,3 +324,16 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Header stays in normal document flow and retains a shallow hero-header footprint.
 - No content-card, roster, News, standings, navigation, provider, live-state, or Back behavior changes.
 - This pass remains Yankees-only before the same artwork-driven header system is generalized to other teams.
+
+
+## Stage 11B24 lock — Phillies artwork-driven robin’s-egg reference (2026-09-18)
+- Phillies now use the approved artwork-driven team-header system established on Yankees.
+- The wide Phillies plaque artwork is the visible team identity; the large semantic team title remains in the DOM but is visually hidden to avoid duplicate wording.
+- The small MLB kicker remains visible.
+- The interior is a very pale robin’s-egg/powder-blue field with subtle dusty red/burgundy vertical pinstripes.
+- Main text is dark navy/charcoal-blue; labels, active accents, roster position headings, badges, and roster-number medallions use softened/dusty Phillies red rather than bright saturated red.
+- Content panels use the same light embedded-card treatment with a slightly stronger 2px rim for separation.
+- Phillies roster numbers use circular dusty-burgundy medallions with light numbers.
+- Roster position headings and counts are explicitly readable on the light field.
+- The centered industrial Back rail is retained.
+- No team-page data, provider, navigation, roster grouping, standings, News, live-state, or Back behavior changes.
