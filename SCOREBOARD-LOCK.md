@@ -282,3 +282,14 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Phillies follow-up design is locked to a very pale robin’s-egg/powder-blue continuous field with subtle red/burgundy pinstripes, dark navy/charcoal text, Phillies-red accents, and supporting powder-blue tones.
 - Mets follow-up remains a soft off-white/light field with subtle blue pinstripes and restrained orange accents.
 - The reference layer is isolated in `team-theme-v13.css` so it can be judged on-device before being generalized to the remaining teams.
+
+
+## Stage 11B20 lock — Yankees header/card refinement (2026-09-18)
+- Visual-only refinement of the Stage 11B19 Yankees reference. Team-page behavior, providers, navigation, data loading, live state, standings, roster, schedule, News, and Back behavior remain unchanged.
+- The Yankees top header is no longer part of the pinstripe wallpaper. It is a compact Scoreboard-metal placard using the same approved dark-blue steel texture, bolt treatment, weathering, and layered gradient language as the main Scoreboard header.
+- Header content stays minimal: MLB kicker and New York Yankees title only. Standings/place information is not duplicated in the header.
+- A visible metal break separates the header placard from the light pinstripe content field below it.
+- Light content panels retain the continuous Yankees page treatment but receive a slightly stronger 2px navy rim, subtle inset highlight, and restrained shadow for clearer separation.
+- Yankees roster jersey-number badges switch from square/pinstriped badges to dark navy circular medallions with light numbers and a subtle inner rim.
+- The broader team-theme palette direction remains softened/dusty rather than highly saturated.
+- The refinement is isolated in `team-theme-v14.css` so it can be judged independently before being generalized to other teams.

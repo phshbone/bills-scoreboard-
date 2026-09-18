@@ -291,3 +291,19 @@ Validated before merge as a visual-only reference pass.
 - `sw.js` compiles successfully, precaches `team-theme-v13.css`, and uses cache namespace `scoreboard-v11b19-yankees-reference`.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION REQUIRED BEFORE GENERALIZING THE THEME**.
+
+
+## Stage 11B20 smoke — Yankees header/card refinement
+Validated before merge as a Yankees-only visual layer.
+
+### Executed evidence
+- `team-theme-v14.css` loads after `team-theme-v13.css` and is scoped only to `data-team-id="yankees"`.
+- The Yankees header no longer inherits the pinstripe field; it uses the approved Scoreboard steel texture with corner-bolt treatment, weathering overlays, and dark-blue layered metal gradient.
+- A 6–7px metal gap visually separates the metal header from the light pinstripe content field.
+- Header content remains the existing MLB kicker + team name; no standings/rank field was added.
+- Overview cards, schedule/roster rows, standings container, status, and team News cards use a 2px navy rim with restrained inset/outer definition.
+- Yankees roster number badge is circular, dark navy, and light-numbered; the existing roster DOM is unchanged.
+- No team-page JavaScript, provider, navigation, or data files changed.
+- `sw.js` compiles successfully, precaches `team-theme-v14.css`, and uses cache namespace `scoreboard-v11b20-yankees-refinement`.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.

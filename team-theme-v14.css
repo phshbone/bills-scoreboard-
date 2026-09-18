@@ -1,0 +1,123 @@
+/* Stage 11B20: Yankees reference refinement — metal header break, stronger rims, circular roster badge. */
+
+.team-page[data-team-id="yankees"] .team-page-header {
+  top: 8px;
+  position: sticky;
+  overflow: hidden;
+  margin: 0 0 7px;
+  border: 1px solid rgba(168,186,210,.28);
+  border-radius: 10px;
+  color: #eef1ed;
+  background-color: #11243a;
+  background-image:
+    radial-gradient(circle at 9px 9px, rgba(210,221,232,.78) 0 1.5px, rgba(78,94,112,.95) 2px 3.2px, rgba(2,7,12,.85) 3.3px 4.2px, transparent 4.4px),
+    radial-gradient(circle at calc(100% - 9px) 9px, rgba(210,221,232,.78) 0 1.5px, rgba(78,94,112,.95) 2px 3.2px, rgba(2,7,12,.85) 3.3px 4.2px, transparent 4.4px),
+    radial-gradient(circle at 9px calc(100% - 9px), rgba(210,221,232,.68) 0 1.4px, rgba(78,94,112,.92) 2px 3.1px, rgba(2,7,12,.82) 3.2px 4.1px, transparent 4.3px),
+    radial-gradient(circle at calc(100% - 9px) calc(100% - 9px), rgba(210,221,232,.68) 0 1.4px, rgba(78,94,112,.92) 2px 3.1px, rgba(2,7,12,.82) 3.2px 4.1px, transparent 4.3px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='24' viewBox='0 0 38 24'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M5 17L15 7M24 18L34 8' stroke='%23040a11' stroke-opacity='.48' stroke-width='4'/%3E%3Cpath d='M4 16L14 6M23 17L33 7' stroke='%238ea5bf' stroke-opacity='.30' stroke-width='3'/%3E%3Cpath d='M4 15L14 5M23 16L33 6' stroke='%23d7e4f1' stroke-opacity='.10' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(255,255,255,.055) 0%, rgba(255,255,255,.02) 22%, transparent 40%, rgba(0,0,0,.13) 100%),
+    linear-gradient(180deg, #203a58 0%, #17324f 30%, #112943 62%, #0d2035 100%);
+  background-size: auto, auto, auto, auto, 38px 24px, auto, auto;
+  background-position: 0 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -1px 0 rgba(0,0,0,.56),
+    0 5px 14px rgba(0,0,0,.20);
+}
+
+.team-page[data-team-id="yankees"] .team-page-header::before,
+.team-page[data-team-id="yankees"] .team-page-header::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.team-page[data-team-id="yankees"] .team-page-header::before {
+  opacity: .13;
+  background:
+    radial-gradient(circle at 11% 30%, rgba(244,247,249,.18) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 39% 66%, rgba(244,247,249,.11) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 77% 36%, rgba(0,0,0,.25) 0 1px, transparent 1.5px);
+  background-size: 41px 31px, 47px 37px, 43px 33px;
+}
+
+.team-page[data-team-id="yankees"] .team-page-header::after {
+  opacity: .10;
+  background: linear-gradient(100deg, transparent 0 23%, rgba(255,255,255,.10) 24%, transparent 25% 67%, rgba(0,0,0,.16) 68%, transparent 69% 100%);
+}
+
+.team-page[data-team-id="yankees"] .team-page-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+.team-page[data-team-id="yankees"] .team-page-heading .brand {
+  color: rgba(224,230,235,.70);
+  letter-spacing: .20em;
+}
+
+.team-page[data-team-id="yankees"] .team-page-header h2 {
+  color: #eceee8;
+  font-family: "Fakt Slab Stencil Pro Medium", "Stencil Std", "Arial Black", Impact, Haettenschweiler, sans-serif;
+  font-weight: 800;
+  letter-spacing: .035em;
+  text-shadow: 0 2px 7px rgba(0,0,0,.30);
+}
+
+.team-page[data-team-id="yankees"] .team-page-content {
+  border-top: 1px solid rgba(12,35,64,.18);
+  border-radius: 8px 8px 0 0;
+}
+
+/* Slightly stronger embedded-panel rims without making the light page boxy. */
+.team-page[data-team-id="yankees"] .data-status-line,
+.team-page[data-team-id="yankees"] .data-panel,
+.team-page[data-team-id="yankees"] .game-row,
+.team-page[data-team-id="yankees"] .roster-row,
+.team-page[data-team-id="yankees"] .standings-wrap,
+.team-page[data-team-id="yankees"] .detail-empty,
+.team-page[data-team-id="yankees"] .roster-completeness-note,
+.team-page[data-team-id="yankees"] .sports-news-card {
+  border-width: 2px;
+  border-color: rgba(12,35,64,.30);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.78),
+    inset 0 0 0 1px rgba(12,35,64,.035),
+    0 3px 9px rgba(16,35,61,.075);
+}
+
+/* Yankees roster numbers: simple dark circular medallion against the pinstripe field. */
+.team-page[data-team-id="yankees"] .jersey-badge {
+  --jersey-fill: radial-gradient(circle at 34% 28%, #284b72 0%, #17365c 48%, #0c2340 100%);
+  --jersey-ink: #f5f3eb;
+  --jersey-border: rgba(12,35,64,.66);
+  flex-basis: 54px;
+  width: 54px;
+  height: 54px;
+  border-width: 2px;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.20),
+    inset 0 -6px 12px rgba(0,0,0,.16),
+    0 3px 8px rgba(12,35,64,.18);
+}
+
+.team-page[data-team-id="yankees"] .jersey-badge::after {
+  inset: 5px;
+  border-color: rgba(255,255,255,.16);
+  border-radius: 50%;
+}
+
+@media (max-width: 560px) {
+  .team-page[data-team-id="yankees"] .team-page-header {
+    top: 6px;
+    margin-bottom: 6px;
+  }
+
+  .team-page[data-team-id="yankees"] .jersey-badge {
+    flex-basis: 52px;
+    width: 52px;
+    height: 52px;
+  }
+}
