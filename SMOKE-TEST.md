@@ -242,3 +242,20 @@ Validated before merge with official feed discovery, JavaScript compilation, det
 The build environment cannot directly exercise browser CORS against every live RSS publisher. Secondary sources are therefore intentionally optional and failure-isolated; final real-iPhone verification should confirm which external feeds are currently returning through the JSON bridge.
 
 Overall pre-merge classification: **PASS WITH REAL-DEVICE MULTI-SOURCE VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B17 smoke — News card layout + source balance
+Validated before merge with JavaScript compilation and deterministic publisher-mix/card-layout fixtures.
+
+### Executed evidence
+- `sports-news-v11.js` and `sw.js` compile successfully.
+- Deterministic source-mix fixture: **PASS**.
+- Input mix of 30 Yahoo, 6 ESPN, 4 CBS, and 4 FOX stories produces 26 balanced cards: 12 Yahoo, 6 ESPN, 4 CBS, and 4 FOX.
+- No balanced run exceeds two consecutive stories from one publisher.
+- The global balance occurs after duplicate suppression; team-specific News remains on the existing relevance-first path.
+- Deterministic imageless-card fixture: **PASS**.
+- A story with no image receives the `no-image` card class and uses a full-width text layout.
+- A story whose image errors removes the broken image and switches to the same `no-image` layout.
+- Service-worker cache namespace is bumped to `scoreboard-v11b17-news-layout-balance`.
+
+Overall pre-merge classification: **PASS WITH REAL-DEVICE VISUAL VERIFICATION RECOMMENDED**.
