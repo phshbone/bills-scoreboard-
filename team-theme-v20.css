@@ -808,3 +808,18 @@
 .team-page .team-page-bottom-nav {
   bottom: 0;
 }
+
+
+/* Stage 11B33: final high-specificity footer flush.
+   Earlier team-specific theme rules set padding/bottom offsets with stronger
+   selectors than Stage 11B31's generic override. Keep the rail hard-flush. */
+.team-page[data-team-id] .team-page-shell {
+  padding-bottom: 0 !important;
+}
+
+.team-page[data-team-id] .team-page-bottom-nav {
+  bottom: 0 !important;
+  margin-bottom: 0 !important;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}

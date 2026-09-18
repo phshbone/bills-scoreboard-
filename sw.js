@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b32-live-panel-state-bridge';
+const CACHE = 'scoreboard-v11b33-live-cue-footer-flush';
 const ASSETS = [
   './',
   './index.html',

@@ -421,3 +421,11 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Direct refresh updates both the live score line and game-state detail.
 - A dynamically promoted live panel is removed if the direct feed no longer reports an in-progress game.
 - ESPN remains the primary live source and the existing MLB StatsAPI live fallback remains unchanged.
+
+
+## Stage 11B33 lock — darker live cue + authoritative footer flush (2026-09-18)
+- The team-page live interaction remains the same existing tappable Live now panel and live-score overlay.
+- The Tap for live score prompt uses a darker, higher-contrast green on light team cards; the matching trigger border/focus accents are darkened without changing interaction behavior.
+- Stage 11B31's footer intent is preserved, but its generic selectors were not strong enough to override older team-specific 6px/8px footer offsets and shell padding.
+- A final high-specificity team-page override now forces shell bottom padding and sticky Back-rail offset to zero across every team theme.
+- The Back rail's bottom corners are squared so the metal background visually owns the viewport edge; internal safe-area padding and button placement remain unchanged.
