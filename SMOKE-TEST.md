@@ -340,3 +340,17 @@ A delayed five-iteration checkpoint was run before merging the next visual pass.
 - `sw.js` compiles successfully, precaches `team-theme-v16.css`, and uses cache namespace `scoreboard-v11b22-yankees-metal-readability`.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B23 smoke — Yankees artwork-driven header cleanup
+Validated before merge as a Yankees-only visual pass.
+
+### Executed evidence
+- `team-theme-v17.css` loads after `team-theme-v16.css` and is scoped only to `data-team-id="yankees"`.
+- The visible large Yankees title is removed with a standard visually-hidden treatment while the semantic `h2` remains available to accessibility APIs.
+- The MLB kicker remains visible.
+- The header retains an explicit minimum height so removal of the visible title does not collapse the artwork-driven header.
+- No team-page JavaScript, provider, roster, standings, News, navigation, live-state, or Back logic changed.
+- `sw.js` compiles successfully, precaches `team-theme-v17.css`, and uses cache namespace `scoreboard-v11b23-yankees-art-header-cleanup`.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.
