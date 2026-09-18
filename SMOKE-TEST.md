@@ -441,3 +441,18 @@ Run before merge as the standard checkpoint following Stages 11B23–11B27.
 - Therefore the automated interactive live-browser portion is classified **ENVIRONMENT BLOCKED**, not an application failure. Deployment/static live verification and real-iPhone verification remain the live evidence path for this stage.
 
 Overall pre-merge classification: **PASS; INTERACTIVE LIVE BROWSER ENVIRONMENT BLOCKED**.
+
+
+## Stage 11B28 smoke — Giants/Jets header readability
+Validated before merge as a two-team visual-only pass.
+
+### Executed evidence
+- `team-theme-v20.css` keeps the Stage 11B28 override scoped only to `data-team-id="giants"` and `data-team-id="jets"`.
+- Both headers retain the approved `center 40%` artwork crop and normal scrolling layout.
+- Readability lift uses a light screen-blend layer plus `brightness(1.16)` and mild saturation; no team artwork asset is replaced.
+- Eagles and the remaining ten team headers are untouched by the Stage 11B28 override.
+- `sw.js` compiles successfully and uses cache namespace `scoreboard-v11b28-giants-jets-header-lift`.
+- No JavaScript/data/provider/navigation files changed in this stage.
+- Yankees roster behavior remains on the Stage 11B27 ESPN-primary + MLB active-roster supplementation path; no 40-man/depth-chart substitution was introduced.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.
