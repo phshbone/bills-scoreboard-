@@ -387,3 +387,12 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Eagles and all other team headers remain unchanged in this stage.
 - The Yankees MLB roster remains provider-truthful. The app continues to use ESPN primary plus MLB StatsAPI active-roster supplementation; it does not switch to a 40-man/depth-chart roster merely to manufacture missing position groups.
 - No standings, News, navigation, live-score, roster-grouping, or team-page interaction behavior changes.
+
+
+## Stage 11B29 lock — team-page isolation repair (2026-09-18)
+- Team pages remain fixed full-viewport dialogs and continue to scroll internally.
+- While a team page is open, the underlying My Teams app is removed from the paint tree with a dedicated `team-page-open` body state so iOS/Safari cannot expose team cards beneath the dialog.
+- The team-page overlay is opaque and isolated; backdrop blur is disabled for this dialog to avoid Safari compositing leakage.
+- The team-page shell is explicitly constrained to 100% of the dialog height with internal scrolling.
+- `[hidden]` remains authoritative with `display:none !important`.
+- Existing team-page header scrolling, sticky bottom Back rail, data rendering, navigation, and return-to-board scroll restoration remain unchanged.
