@@ -302,6 +302,67 @@
       .slice(0, limit);
   }
 
+  function balanceGlobalStories(stories, limit = MAX_STORIES) {
+    const sorted = [...stories]
+      .filter(Boolean)
+      .sort((a, b) => (b.published || 0) - (a.published || 0));
+
+    const sources = [...new Set(sorted.map(story => String(story.source || 'NEWS').toUpperCase()))];
+    if (sources.length <= 1) return sorted.slice(0, limit);
+
+    const maxPerSource = Math.max(8, Math.ceil(limit * 0.30));
+    const selected = [];
+    const counts = new Map();
+
+    sorted.forEach(story => {
+      if (selected.length >= limit) return;
+      const source = String(story.source || 'NEWS').toUpperCase();
+      const count = counts.get(source) || 0;
+      if (count >= maxPerSource) return;
+      selected.push(story);
+      counts.set(source, count + 1);
+    });
+
+    const queues = new Map();
+    selected.forEach(story => {
+      const source = String(story.source || 'NEWS').toUpperCase();
+      if (!queues.has(source)) queues.set(source, []);
+      queues.get(source).push(story);
+    });
+
+    const balanced = [];
+    let lastSource = '';
+    let runLength = 0;
+
+    while (balanced.length < selected.length) {
+      const candidates = [...queues.entries()]
+        .filter(([, queue]) => queue.length)
+        .sort((a, b) =>
+          (b[1].length - a[1].length)
+          || ((b[1][0]?.published || 0) - (a[1][0]?.published || 0))
+        );
+
+      if (!candidates.length) break;
+
+      let pick = candidates[0];
+      if (pick[0] === lastSource && runLength >= 2) {
+        const alternate = candidates.find(([source]) => source !== lastSource);
+        if (alternate) pick = alternate;
+        else break;
+      }
+
+      const [source, queue] = pick;
+      balanced.push(queue.shift());
+      if (source === lastSource) runLength += 1;
+      else {
+        lastSource = source;
+        runLength = 1;
+      }
+    }
+
+    return balanced.slice(0, limit);
+  }
+
   async function teamStories(team, force = false, providerTeamId = '') {
     const config = teamConfig(team);
     if (!config) throw new Error('Team news configuration is unavailable.');
@@ -343,7 +404,8 @@
 
   function storyCard(story) {
     const card = document.createElement('a');
-    card.className = `sports-news-card${story.relatedTeams.length ? ' my-team-news' : ''}`;
+    const hasImage = Boolean(story.image);
+    card.className = `sports-news-card${story.relatedTeams.length ? ' my-team-news' : ''}${hasImage ? '' : ' no-image'}`;
     card.href = story.href;
     card.target = '_blank';
     card.rel = 'noopener noreferrer';
@@ -356,6 +418,10 @@
       image.alt = '';
       image.loading = 'lazy';
       image.decoding = 'async';
+      image.addEventListener('error', () => {
+        image.remove();
+        card.classList.add('no-image');
+      }, { once: true });
       card.appendChild(image);
     }
 
@@ -448,7 +514,8 @@
       return;
     }
 
-    const merged = dedupeStories(stories, MAX_STORIES);
+    const deduped = dedupeStories(stories, MAX_STORIES * 3);
+    const merged = balanceGlobalStories(deduped, MAX_STORIES);
     renderStories(merged);
     loadedSignature = nextSignature;
     loadedAt = Date.now();
@@ -473,6 +540,7 @@
     refresh: () => activate(true),
     teamStories,
     storyCard,
-    dedupeStories
+    dedupeStories,
+    balanceGlobalStories
   });
 })();

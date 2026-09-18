@@ -246,3 +246,13 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Cross-publisher duplicate control preserves one representative story when headlines are identical or strongly overlapping for the same selected team within a 12-hour window, preferring ESPN, then FOX, CBS, and Yahoo as the retained card while preserving useful image/description metadata.
 - Secondary feeds are cached in-visit for five minutes. Publisher failures are isolated with `Promise.allSettled` so available sources continue rendering.
 - Global and team News retain real outbound article links, no local article scraping, and no fabricated story content.
+
+
+## Stage 11B17 lock — News card layout + source balance (2026-09-18)
+- News cards without a usable image render as full-width text cards rather than reserving an empty image column.
+- If an image URL exists but fails at render time, the broken image is removed and the same full-width text layout takes over.
+- Global Sports News applies source balancing only after duplicate suppression.
+- When multiple publishers are active, the global feed uses a soft per-source ceiling of 30% of the 40-story target, with a minimum allowance of eight stories per source.
+- The global ordering prevents more than two consecutive cards from the same publisher while alternative publishers still have stories available.
+- Source balancing may intentionally render fewer than 40 cards rather than refill the page with one disproportionately prolific publisher.
+- Individual team News remains relevance-first and is not source-balanced; team pages continue to show the most useful matching stories regardless of publisher distribution.

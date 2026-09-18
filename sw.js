@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b16-multisource-news';
+const CACHE = 'scoreboard-v11b17-news-layout-balance';
 const ASSETS = [
   './',
   './index.html',
