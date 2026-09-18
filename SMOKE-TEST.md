@@ -178,3 +178,20 @@ Validated before merge with endpoint-order review, JavaScript compilation checks
 - Service-worker cache namespace is bumped to `scoreboard-v11b13-team-news-empty-fallthrough`.
 
 Overall pre-merge classification: **PASS WITH REAL-DEVICE GIANTS NEWS VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B14 smoke — MLB standings marks + swipe discovery cue
+Validated before merge with JavaScript compilation checks, deterministic standings rendering, and top-level visibility-state fixtures.
+
+### Executed evidence
+- `global-standings-v10.js` and `sw.js` compile successfully.
+- Deterministic MLB standings fixture: **PASS**.
+- Yankees normalized MLB team ID `147` resolves to `https://www.mlbstatic.com/team-logos/team-cap-on-dark/147.svg`.
+- Mets normalized MLB team ID `121` resolves to `https://www.mlbstatic.com/team-logos/team-cap-on-dark/121.svg`.
+- If an official MLB mark fails to load, the row replaces it with the existing abbreviation fallback rather than leaving a broken image.
+- The same official MLB cap-mark fallback applies generically to selected MLB rows whose StatsAPI standings entries lack ESPN logo metadata.
+- Phone swipe cue markup is present as `‹ News · Swipe · Standings ›`, is pointer-transparent, and is hidden while editing.
+- Deterministic top-level fixture: **PASS**. The cue is visible on My Teams and hidden on Sports News and Standings; the existing screen transition API remains unchanged.
+- Service-worker cache namespace is bumped to `scoreboard-v11b14-standings-logos-swipe-hint`.
+
+Overall pre-merge classification: **PASS WITH REAL-DEVICE VISUAL VERIFICATION RECOMMENDED**.
