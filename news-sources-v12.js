@@ -146,8 +146,11 @@
       .filter(([, provider]) => provider.feeds[config.league])
       .map(async ([source, provider]) => fetchProvider(source, provider, config, force));
 
+    if (!jobs.length) return [];
     const results = await Promise.allSettled(jobs);
-    return results.flatMap(result => result.status === 'fulfilled' ? result.value : []);
+    const fulfilled = results.filter(result => result.status === 'fulfilled');
+    if (!fulfilled.length) throw new Error('Secondary news feeds did not respond.');
+    return fulfilled.flatMap(result => result.value || []);
   }
 
   window.ScoreboardNewsSources = Object.freeze({
