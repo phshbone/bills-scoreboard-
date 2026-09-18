@@ -256,3 +256,14 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - The global ordering prevents more than two consecutive cards from the same publisher while alternative publishers still have stories available.
 - Source balancing may intentionally render fewer than 40 cards rather than refill the page with one disproportionately prolific publisher.
 - Individual team News remains relevance-first and is not source-balanced; team pages continue to show the most useful matching stories regardless of publisher distribution.
+
+
+## Stage 11B18 lock — Team-page visual themes (2026-09-18)
+- Team-page information architecture, controls, provider logic, and Back behavior remain unchanged; this stage is visual-only.
+- The team-page shell keeps an industrial metal outer frame while the interior is themed per selected team.
+- All 12 current library teams receive reusable CSS theme variables for primary, secondary, accent, edge, and background pattern treatment.
+- Team identity is intentionally restrained: subtle pinstripes/diagonals/color washes rather than full-photo plaque artwork behind readable data.
+- Yankees use a faint pinstripe treatment; Phillies use powder-blue/red cues; Flyers use black/orange; Army uses black/gold; the remaining teams use their established primary/secondary identity colors.
+- Overview panels, schedule/roster rows, standings, team News cards, live badges, and the sticky bottom Back bar inherit the active team theme.
+- The page remains dark-first for readability. A future pass may add clean logo watermarks after suitable standalone logo assets are available; the existing ripped-metal homepage plaques are not reused as watermarks.
+- Team theme styling is isolated in `team-theme-v12.css` so it can be tuned or reverted independently of team-page behavior.

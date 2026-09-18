@@ -1,0 +1,256 @@
+/* Stage 11B18: team-specific visual system layered over the existing team-page structure. */
+.team-page {
+  --tp-primary: #24405f;
+  --tp-secondary: #111a26;
+  --tp-accent: #d7e4f1;
+  --tp-edge: rgba(186, 204, 225, .28);
+  --tp-panel: rgba(9, 15, 24, .88);
+  --tp-canvas: #08101a;
+  --tp-pattern: linear-gradient(135deg, rgba(255,255,255,.025) 25%, transparent 25% 50%, rgba(255,255,255,.025) 50% 75%, transparent 75%);
+}
+
+.team-page[data-team-id="giants"] {
+  --tp-primary: #0b2265;
+  --tp-secondary: #a71930;
+  --tp-accent: #f5f7fb;
+  --tp-edge: rgba(167, 25, 48, .55);
+  --tp-pattern:
+    linear-gradient(135deg, rgba(11,34,101,.16), transparent 38%),
+    linear-gradient(45deg, transparent 72%, rgba(167,25,48,.08) 72% 74%, transparent 74%);
+}
+
+.team-page[data-team-id="yankees"] {
+  --tp-primary: #0c2340;
+  --tp-secondary: #c4ced4;
+  --tp-accent: #eef1f3;
+  --tp-edge: rgba(196,206,212,.38);
+  --tp-pattern:
+    repeating-linear-gradient(90deg, transparent 0 18px, rgba(238,241,243,.055) 18px 19px),
+    linear-gradient(180deg, rgba(255,255,255,.018), transparent 45%);
+}
+
+.team-page[data-team-id="mets"] {
+  --tp-primary: #002d72;
+  --tp-secondary: #ff5910;
+  --tp-accent: #ff8b4a;
+  --tp-edge: rgba(255,89,16,.50);
+  --tp-pattern:
+    linear-gradient(145deg, rgba(0,45,114,.16), transparent 44%),
+    linear-gradient(45deg, transparent 74%, rgba(255,89,16,.07) 74% 76%, transparent 76%);
+}
+
+.team-page[data-team-id="jets"] {
+  --tp-primary: #125740;
+  --tp-secondary: #e7ece9;
+  --tp-accent: #dce9e2;
+  --tp-edge: rgba(69,145,111,.48);
+  --tp-pattern:
+    repeating-linear-gradient(135deg, rgba(18,87,64,.10) 0 10px, transparent 10px 24px);
+}
+
+.team-page[data-team-id="rangers"] {
+  --tp-primary: #0038a8;
+  --tp-secondary: #ce1126;
+  --tp-accent: #f1f4f8;
+  --tp-edge: rgba(206,17,38,.42);
+  --tp-pattern:
+    linear-gradient(135deg, rgba(0,56,168,.14), transparent 42%),
+    linear-gradient(45deg, transparent 76%, rgba(206,17,38,.07) 76% 78%, transparent 78%);
+}
+
+.team-page[data-team-id="army"] {
+  --tp-primary: #171717;
+  --tp-secondary: #c9ad6a;
+  --tp-accent: #dcc88e;
+  --tp-edge: rgba(201,173,106,.46);
+  --tp-pattern:
+    repeating-linear-gradient(135deg, rgba(201,173,106,.055) 0 2px, transparent 2px 18px);
+}
+
+.team-page[data-team-id="fever"] {
+  --tp-primary: #1d2d5c;
+  --tp-secondary: #e03a3e;
+  --tp-accent: #f2c04b;
+  --tp-edge: rgba(224,58,62,.45);
+  --tp-pattern:
+    linear-gradient(135deg, rgba(29,45,92,.17), transparent 45%),
+    linear-gradient(45deg, transparent 76%, rgba(242,192,75,.055) 76% 78%, transparent 78%);
+}
+
+.team-page[data-team-id="eagles"] {
+  --tp-primary: #004c54;
+  --tp-secondary: #a5acaf;
+  --tp-accent: #d8e2e4;
+  --tp-edge: rgba(0,118,128,.46);
+  --tp-pattern:
+    repeating-linear-gradient(135deg, rgba(0,76,84,.11) 0 10px, transparent 10px 23px);
+}
+
+.team-page[data-team-id="phillies"] {
+  --tp-primary: #6cb6e8;
+  --tp-secondary: #e81828;
+  --tp-accent: #f4f8fb;
+  --tp-edge: rgba(232,24,40,.48);
+  --tp-pattern:
+    repeating-linear-gradient(90deg, transparent 0 18px, rgba(232,24,40,.055) 18px 19px),
+    linear-gradient(180deg, rgba(108,182,232,.12), transparent 46%);
+}
+
+.team-page[data-team-id="flyers"] {
+  --tp-primary: #f74902;
+  --tp-secondary: #111111;
+  --tp-accent: #ffd7c4;
+  --tp-edge: rgba(247,73,2,.52);
+  --tp-pattern:
+    repeating-linear-gradient(135deg, rgba(247,73,2,.08) 0 9px, transparent 9px 22px);
+}
+
+.team-page[data-team-id="sixers"] {
+  --tp-primary: #006bb6;
+  --tp-secondary: #ed174c;
+  --tp-accent: #f3f7fb;
+  --tp-edge: rgba(237,23,76,.44);
+  --tp-pattern:
+    linear-gradient(135deg, rgba(0,107,182,.14), transparent 44%),
+    linear-gradient(45deg, transparent 76%, rgba(237,23,76,.065) 76% 78%, transparent 78%);
+}
+
+.team-page[data-team-id="knicks"] {
+  --tp-primary: #006bb6;
+  --tp-secondary: #f58426;
+  --tp-accent: #ffd2ad;
+  --tp-edge: rgba(245,132,38,.48);
+  --tp-pattern:
+    linear-gradient(135deg, rgba(0,107,182,.14), transparent 44%),
+    linear-gradient(45deg, transparent 76%, rgba(245,132,38,.065) 76% 78%, transparent 78%);
+}
+
+.team-page {
+  background:
+    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--tp-primary) 18%, transparent), transparent 42%),
+    rgba(2,5,9,.94);
+}
+
+.team-page-shell {
+  border-inline: 6px solid #273443;
+  background:
+    var(--tp-pattern),
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--tp-primary) 14%, #0a121d) 0%,
+      color-mix(in srgb, var(--tp-canvas) 94%, #000) 48%,
+      #05080d 100%);
+  box-shadow:
+    inset 2px 0 0 rgba(255,255,255,.08),
+    inset -2px 0 0 rgba(255,255,255,.05),
+    inset 7px 0 14px rgba(0,0,0,.34),
+    inset -7px 0 14px rgba(0,0,0,.34),
+    0 0 80px rgba(0,0,0,.50);
+}
+
+.team-page-header {
+  border-bottom-color: var(--tp-edge);
+  background:
+    linear-gradient(90deg,
+      color-mix(in srgb, var(--tp-secondary) 22%, transparent),
+      transparent 32% 68%,
+      color-mix(in srgb, var(--tp-primary) 18%, transparent)),
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--tp-primary) 36%, #101927) 0%,
+      color-mix(in srgb, var(--tp-primary) 20%, #101927) 70%,
+      rgba(10,16,25,.95) 100%);
+  box-shadow:
+    inset 0 -1px 0 rgba(255,255,255,.035),
+    0 8px 24px rgba(0,0,0,.28);
+}
+
+.team-page-heading .brand,
+.team-detail-view .brand,
+.team-page .data-label,
+.team-page .detail-group-title,
+.team-page .panel-link {
+  color: var(--tp-accent);
+}
+
+.team-page-header h2,
+.team-detail-view h3 {
+  text-shadow: 0 2px 12px rgba(0,0,0,.42);
+}
+
+.team-page-content {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.015), transparent 160px),
+    var(--tp-pattern);
+  background-size: auto, auto;
+}
+
+.team-page .data-status-line,
+.team-page .data-panel,
+.team-page .game-row,
+.team-page .roster-row,
+.team-page .standings-wrap,
+.team-page .detail-empty,
+.team-page .roster-completeness-note {
+  border-color: color-mix(in srgb, var(--tp-edge) 70%, rgba(173,193,220,.12));
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--tp-primary) 10%, rgba(14,22,34,.94)),
+      color-mix(in srgb, var(--tp-secondary) 5%, rgba(7,12,20,.94)));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.035),
+    0 7px 18px rgba(0,0,0,.10);
+}
+
+.team-page .action-panel:hover,
+.team-page .action-panel:focus-visible {
+  border-color: color-mix(in srgb, var(--tp-accent) 38%, var(--tp-edge));
+}
+
+.team-page .current-team-row {
+  background: color-mix(in srgb, var(--tp-primary) 18%, rgba(10,16,25,.85));
+  box-shadow: inset 4px 0 0 var(--tp-accent);
+}
+
+.team-page .standings-table th {
+  background: color-mix(in srgb, var(--tp-primary) 12%, #0d1521);
+}
+
+.team-page .data-badge,
+.team-page .live-pill {
+  border-color: color-mix(in srgb, var(--tp-accent) 36%, transparent);
+  color: color-mix(in srgb, var(--tp-accent) 84%, white);
+  background: color-mix(in srgb, var(--tp-primary) 24%, rgba(10,20,18,.65));
+}
+
+.team-page-bottom-nav {
+  border-top-color: var(--tp-edge);
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--tp-primary) 8%, rgba(8,13,21,.76)),
+      color-mix(in srgb, var(--tp-secondary) 6%, rgba(8,13,21,.985)) 36%);
+}
+
+.team-page-bottom-nav .button {
+  border-color: color-mix(in srgb, var(--tp-accent) 24%, rgba(173,193,220,.20));
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--tp-primary) 20%, #1a2635),
+      color-mix(in srgb, var(--tp-primary) 7%, #101823));
+}
+
+.team-page .sports-news-card {
+  border-color: color-mix(in srgb, var(--tp-edge) 72%, rgba(173,193,220,.12));
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--tp-primary) 10%, rgba(22,31,44,.96)),
+      rgba(8,13,21,.97));
+}
+
+@media (max-width: 560px) {
+  .team-page-shell {
+    border-inline-width: 4px;
+  }
+
+  .team-page-content {
+    padding-inline: 14px;
+  }
+}
