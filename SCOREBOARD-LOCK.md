@@ -429,3 +429,10 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Stage 11B31's footer intent is preserved, but its generic selectors were not strong enough to override older team-specific 6px/8px footer offsets and shell padding.
 - A final high-specificity team-page override now forces shell bottom padding and sticky Back-rail offset to zero across every team theme.
 - The Back rail's bottom corners are squared so the metal background visually owns the viewport edge; internal safe-area padding and button placement remain unchanged.
+
+
+## Stage 11B34 lock — authentic alternating footer metal (2026-09-18)
+- The Back rail keeps the Stage 11B33 flush viewport geometry, safe-area padding, button placement, and navigation behavior.
+- The previous CSS/data-URI tread is retired for the footer because it repeated only one diagonal direction and read as a synthetic approximation beside the team artwork.
+- The footer now uses a dedicated reusable steel texture asset with alternating opposing tread rows, raised-lug highlight/shadow treatment, dark blue steel depth, and restrained pits/scratches/grain.
+- The texture is visual only. No team-page layout, scrolling, live-score, provider, or navigation logic changes.
