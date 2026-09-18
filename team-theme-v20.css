@@ -777,3 +777,23 @@
     inset 0 -1px 0 rgba(0,0,0,.58),
     0 5px 15px rgba(0,0,0,.24);
 }
+
+
+/* Stage 11B28: stronger readability lift for the two darkest NFL artwork headers. */
+.team-page[data-team-id="giants"] .team-page-header,
+.team-page[data-team-id="jets"] .team-page-header {
+  background-color: #223446;
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,.15) 0%, rgba(255,255,255,.07) 100%),
+    var(--team-art-image);
+  background-size: auto, cover;
+  background-position: 0 0, center 40%;
+  background-repeat: no-repeat;
+  background-blend-mode: screen, normal;
+  filter: brightness(1.16) saturate(1.05);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.24),
+    inset 0 0 0 1px rgba(205,220,233,.12),
+    inset 0 -1px 0 rgba(0,0,0,.52),
+    0 5px 15px rgba(0,0,0,.22);
+}
