@@ -406,3 +406,38 @@ Validated before merge as a visual-only nine-team pass.
 - `sw.js` compiles successfully, precaches `team-theme-v20.css`, and uses cache namespace `scoreboard-v11b26-remaining-team-themes`.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B27 final inspection + five-iteration checkpoint
+Run before merge as the standard checkpoint following Stages 11B23–11B27.
+
+### Repository smoke
+- Core JavaScript compilation: **PASS** for `app.js`, `team-data-v8.js`, `team-page-v8.js`, `roster-groups-v8.js`, `live-score-v11.js`, `live-awareness-v6.js`, `home-score-rail-v8.js`, `sports-news-v11.js`, `news-sources-v12.js`, `global-standings-v10.js`, `desktop-nav-v11.js`, `swipe-repair-v11.js`, and `sw.js`.
+- All 12 team-library entries remain present and all 12 team IDs retain theme coverage.
+- Every local file referenced by `index.html` exists in the branch tree.
+- Every service-worker local asset reference exists in the branch tree.
+- Service-worker cache namespace is `scoreboard-v11b27-final-inspection`; same-origin network-first `cache: 'no-store'` behavior remains intact.
+- Six-hour home-score timing, `scoreboard:live-state`, top-level News/Standings navigation, team News, and swipe/desktop navigation wiring remain present.
+
+### Final visual polish checks
+- Giants/Eagles readability override is scoped only to those two team headers and does not change header geometry or page logic.
+- Global Standings retains the dark design, highlighted-row treatment, logos, edge bars, and `MY TEAM` badges.
+- Status line now reads `<league> standings · <n> My Team(s) highlighted` with reduced size/brightness.
+
+### MLB roster repair checks
+- `team-data-v8.js` now uses MLB StatsAPI active-roster supplementation for NYY 147, NYM 121, and PHI 143 while preserving ESPN as primary.
+- Deterministic merge fixture: **PASS**.
+- Generic ESPN `IF` was enriched to `2B`; generic `OF` was enriched to `CF`; existing specific positions remained unchanged; a missing active player was appended; matching players were not duplicated.
+- Existing baseball grouping already recognizes `2B / Second Baseman` and `CF / Center Fielder`, so the known Yankees gap was addressed at the provider/normalization layer rather than by inventing new UI groups.
+- MLB supplementation is failure-isolated; an unavailable StatsAPI roster leaves the existing ESPN roster usable.
+
+### Sports News verification
+- All 12 team aliases remain present.
+- ESPN primary plus FOX/CBS/Yahoo secondary-source configuration remains present.
+- Global cap 40, team cap 20, duplicate suppression, global source balancing, no-image card handling, and secondary-source `Promise.allSettled` failure isolation remain wired.
+
+### Live-smoke limitation
+- Chromium and Python Playwright are available in the execution environment, but navigation to the public GitHub Pages URL is currently blocked by the environment with `net::ERR_BLOCKED_BY_ADMINISTRATOR`.
+- Therefore the automated interactive live-browser portion is classified **ENVIRONMENT BLOCKED**, not an application failure. Deployment/static live verification and real-iPhone verification remain the live evidence path for this stage.
+
+Overall pre-merge classification: **PASS; INTERACTIVE LIVE BROWSER ENVIRONMENT BLOCKED**.
