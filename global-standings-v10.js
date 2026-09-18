@@ -298,7 +298,7 @@
       const fragment = document.createDocumentFragment();
       groupsToShow.forEach(group => fragment.appendChild(makeTable(group, teams, currentLeague)));
       standingsContent.replaceChildren(fragment);
-      setStatus(`${currentLeague} standings · ${teams.length} selected ${teams.length === 1 ? 'team' : 'teams'} highlighted`, 'ok');
+      setStatus(`${currentLeague} standings · ${teams.length} My ${teams.length === 1 ? 'Team' : 'Teams'} highlighted`, 'ok');
       standingsRetry.hidden = true;
     } catch (error) {
       if (token !== loadToken || currentScreen !== 'standings') return;
