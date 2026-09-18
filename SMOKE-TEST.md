@@ -206,3 +206,39 @@ Overall pre-merge classification: **PASS WITH REAL-DEVICE VISUAL VERIFICATION RE
 - Service-worker cache namespace is bumped to `scoreboard-v11b15-swipe-hint-visible`.
 
 Overall pre-merge classification: **PASS**.
+
+
+## Stage 11B15 checkpoint — five-iteration standard smoke
+Run on current `main` before beginning Stage 11B16.
+
+### Executed evidence
+- Core JavaScript compiles successfully: `app.js`, `team-data-v8.js`, `team-page-v8.js`, `live-score-v11.js`, `live-awareness-v6.js`, `home-score-rail-v8.js`, `global-standings-v10.js`, `sports-news-v11.js`, `desktop-nav-v11.js`, `swipe-repair-v11.js`, and `sw.js`.
+- All 12 current team-library entries remain present.
+- Home plaque score timing remains on the six-hour NEXT window.
+- MLB live fallback remains wired through `fetchCurrentGame`.
+- Global News retains the 40-story cap and team News remains exposed from the team page.
+- Global Standings retains the News-capable top-level navigation shell.
+- Service-worker cache namespace is current at `scoreboard-v11b15-swipe-hint-visible`.
+
+Overall checkpoint classification: **PASS**.
+
+
+## Stage 11B16 smoke — Multi-source Sports News
+Validated before merge with official feed discovery, JavaScript compilation, deterministic source-adapter fixtures, deterministic global/team News fixtures, and duplicate-control checks.
+
+### Executed evidence
+- FOX Sports currently publishes official RSS feeds for MLB, NFL, college football, NBA, NHL, and WNBA.
+- CBS Sports currently publishes official RSS feeds for MLB, NFL, college football, NBA, and NHL.
+- Yahoo Sports currently exposes a Sports syndication/feed directory for MLB, NFL, NBA, NHL, college football and related sports coverage.
+- rss2json documents browser-side JavaScript/AJAX conversion of RSS to JSON without requiring an API key for the base request.
+- `news-sources-v12.js`, `sports-news-v11.js`, and `sw.js` compile successfully.
+- Deterministic secondary-source adapter fixture: **PASS**. FOX and Yahoo stories survive while a simulated CBS failure is isolated; HTTPS normalization and HTML-to-text description cleanup pass.
+- Deterministic global News fixture: **PASS**. ESPN, FOX, CBS, and Yahoo cards render together with publisher badges, selected-team tags, and a four-source status summary.
+- Deterministic team News fixture: **PASS**. Giants News combines ESPN + matching FOX/CBS stories and excludes an unrelated Yahoo Jets story from the same NFL feed.
+- Deterministic cross-publisher duplicate fixture: **PASS**. Identical Giants headlines collapse to one card and retain ESPN as the representative source according to the locked priority.
+- The new secondary adapter is loaded before `sports-news-v11.js` and precached in the current service-worker release.
+
+### Validation limitation
+The build environment cannot directly exercise browser CORS against every live RSS publisher. Secondary sources are therefore intentionally optional and failure-isolated; final real-iPhone verification should confirm which external feeds are currently returning through the JSON bridge.
+
+Overall pre-merge classification: **PASS WITH REAL-DEVICE MULTI-SOURCE VERIFICATION RECOMMENDED**.
