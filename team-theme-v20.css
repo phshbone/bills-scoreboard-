@@ -797,3 +797,14 @@
     inset 0 -1px 0 rgba(0,0,0,.52),
     0 5px 15px rgba(0,0,0,.22);
 }
+
+
+/* Stage 11B31: finish the team-page frame flush against the viewport bottom.
+   Theme layers previously held the sticky Back rail 6–8px above the shell edge. */
+.team-page .team-page-shell {
+  padding-bottom: 0;
+}
+
+.team-page .team-page-bottom-nav {
+  bottom: 0;
+}
