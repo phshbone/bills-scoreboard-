@@ -411,3 +411,13 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - The remaining dark strip below the metal Back rail came from the theme layer's deliberate 6px phone / 8px larger-screen sticky bottom offset plus shell bottom padding.
 - The team-page shell now has no bottom padding and the sticky Back rail uses bottom: 0, so the rail background reaches the viewport edge.
 - Existing Back button safe-area padding remains inside the rail; button placement, team themes, scrolling, and navigation behavior are otherwise unchanged.
+
+
+## Stage 11B32 lock — live-panel state bridge (2026-09-18)
+- The direct league scoreboard remains the authoritative live-state check used by My Teams live awareness.
+- A team page must not require its slower team-schedule snapshot to have already created a Live now panel before the direct live feed can be opened.
+- When the direct scoreboard reports the current team as live and the team-page snapshot has no Live now panel, the live freshness layer creates the standard Live now panel dynamically.
+- The dynamically created panel uses the existing data-panel structure so live-score-v11.js automatically decorates it as the existing tappable live-score feed; no second live UI is introduced.
+- Direct refresh updates both the live score line and game-state detail.
+- A dynamically promoted live panel is removed if the direct feed no longer reports an in-progress game.
+- ESPN remains the primary live source and the existing MLB StatsAPI live fallback remains unchanged.
