@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b15-swipe-hint-visible';
+const CACHE = 'scoreboard-v11b16-multisource-news';
 const ASSETS = [
   './',
   './index.html',
@@ -34,6 +34,7 @@ const ASSETS = [
   './mlb-depth-chart-v9.js',
   './live-awareness-v6.js',
   './home-score-rail-v8.js',
+  './news-sources-v12.js',
   './sports-news-v11.js',
   './global-standings-v10.js',
   './desktop-nav-v11.js',
