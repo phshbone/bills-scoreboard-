@@ -275,3 +275,19 @@ Validated before merge with static theme coverage, runtime selector wiring, styl
 - No team-page JavaScript, provider adapter, navigation, or data-normalization code changed in this stage.
 
 Overall pre-merge classification: **PASS WITH REAL-DEVICE VISUAL VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B19 smoke — Yankees light-canvas reference
+Validated before merge as a visual-only reference pass.
+
+### Executed evidence
+- `team-theme-v13.css` is loaded after `team-theme-v12.css`, so the reference layer supersedes the Stage 11B18 Yankees skin without removing the older rollback layer.
+- Yankees selectors are scoped to `data-team-id="yankees"`; no other team receives the reference styling in this pass.
+- The outer shell reuses the approved Scoreboard dark-blue steel SVG/gradient texture rather than the simplified My Teams plate treatment.
+- Yankees header/content use the same off-white canvas and the same vertical pinstripe x-position, preserving a continuous-field effect across the page.
+- Existing overview panels, rows, standings, status, and team-News cards are overridden to light/translucent surfaces with dark text.
+- The bottom navigation is centered and rendered as a Scoreboard-metal rail.
+- Existing runtime `data-team-id` assignment is unchanged; no team-page JavaScript or provider files changed.
+- `sw.js` compiles successfully, precaches `team-theme-v13.css`, and uses cache namespace `scoreboard-v11b19-yankees-reference`.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION REQUIRED BEFORE GENERALIZING THE THEME**.

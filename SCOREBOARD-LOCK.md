@@ -267,3 +267,18 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Overview panels, schedule/roster rows, standings, team News cards, live badges, and the sticky bottom Back bar inherit the active team theme.
 - The page remains dark-first for readability. A future pass may add clean logo watermarks after suitable standalone logo assets are available; the existing ripped-metal homepage plaques are not reused as watermarks.
 - Team theme styling is isolated in `team-theme-v12.css` so it can be tuned or reverted independently of team-page behavior.
+
+
+## Stage 11B19 lock — Team-page light canvas reference (2026-09-18)
+- Stage 11B19 supersedes the Stage 11B18 dark team-page visual direction while preserving all existing team-page JavaScript, navigation, data providers, live state, News, schedule, roster, standings, and Back behavior.
+- The Yankees are the reference implementation before extending the system to the other teams.
+- The outer team-page chassis uses the same approved dark-blue industrial steel language as the Scoreboard section/header metal: the same 38×24 diagonal-groove SVG texture and layered steel gradient are reused rather than inventing a new My Teams-style plate.
+- The Yankees inner page is one continuous soft off-white field with faint navy vertical pinstripes.
+- Overview/detail sections remain logically separate but are visually embedded in the shared light surface using restrained translucent fills, thin navy rules, and minimal shadow instead of heavy dark floating cards.
+- Yankees page text flips to dark navy/slate for contrast; team labels and interactive accents use Yankees navy.
+- Team News, standings, roster, schedule, status, and live badges inherit the same light Yankees surface treatment.
+- The bottom team-page navigation is centered. The Back control sits on a narrow Scoreboard-metal rail and remains the only primary bottom action.
+- No watermark is added in the reference pass. Watermarks remain optional and require a clean standalone logo asset.
+- Phillies follow-up design is locked to a very pale robin’s-egg/powder-blue continuous field with subtle red/burgundy pinstripes, dark navy/charcoal text, Phillies-red accents, and supporting powder-blue tones.
+- Mets follow-up remains a soft off-white/light field with subtle blue pinstripes and restrained orange accents.
+- The reference layer is isolated in `team-theme-v13.css` so it can be judged on-device before being generalized to the remaining teams.
