@@ -310,7 +310,7 @@
     const sources = [...new Set(sorted.map(story => String(story.source || 'NEWS').toUpperCase()))];
     if (sources.length <= 1) return sorted.slice(0, limit);
 
-    const maxPerSource = Math.max(6, Math.ceil(limit * 0.40));
+    const maxPerSource = Math.max(8, Math.ceil(limit * 0.30));
     const selected = [];
     const counts = new Map();
 
@@ -345,6 +345,7 @@
       if (pick[0] === lastSource && runLength >= 2) {
         const alternate = candidates.find(([source]) => source !== lastSource);
         if (alternate) pick = alternate;
+        else break;
       }
 
       const [source, queue] = pick;
