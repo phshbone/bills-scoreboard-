@@ -41,11 +41,11 @@
 .global-standings-status {
   margin: 4px 2px 14px;
   color: #aeb9c7;
-  font-size: .92rem;
-  font-weight: 800;
+  font-size: .86rem;
+  font-weight: 760;
   line-height: 1.35;
 }
-.global-standings-status.ok { color: #b8d9c1; }
+.global-standings-status.ok { color: #a9c9b2; }
 .global-standings-status.bad { color: #edb4b4; }
 
 .global-standings-content {
