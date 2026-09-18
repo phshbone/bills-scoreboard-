@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b28-giants-jets-header-lift';
+const CACHE = 'scoreboard-v11b29-team-page-isolation';
 const ASSETS = [
   './',
   './index.html',

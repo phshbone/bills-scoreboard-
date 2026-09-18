@@ -37,3 +37,35 @@
     text-align: left;
   }
 }
+
+
+/* Stage 11B29: harden team-page isolation on iOS/Safari. */
+.team-page {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+  background: #05080d;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.team-page[hidden] {
+  display: none !important;
+}
+
+.team-page-shell {
+  height: 100%;
+  min-height: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* While the team dialog is open, keep the underlying board out of the paint tree.
+   This prevents Safari from exposing My Teams beneath the fixed team page. */
+body.team-page-open > .app {
+  visibility: hidden;
+}

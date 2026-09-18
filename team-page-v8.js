@@ -310,7 +310,7 @@
     statusDot.className = 'status-dot';
     statusText.textContent = 'Connecting to sports data…';
     modal.hidden = false;
-    document.body.classList.add('modal-open');
+    document.body.classList.add('modal-open', 'team-page-open');
     updateBackLabel();
     document.querySelector('.team-page-shell')?.scrollTo({ top: 0 });
     back.focus();
@@ -329,7 +329,7 @@
     currentTeam = null;
     snapshot = null;
     returnFocusTarget = null;
-    document.body.classList.remove('modal-open');
+    document.body.classList.remove('modal-open', 'team-page-open');
     window.scrollTo({ top: boardScrollY });
     if (focusTarget?.isConnected) focusTarget.focus();
     else if (id) document.querySelector(`#team-grid [data-team-id="${id}"]`)?.focus();

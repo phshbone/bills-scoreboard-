@@ -456,3 +456,18 @@ Validated before merge as a two-team visual-only pass.
 - Yankees roster behavior remains on the Stage 11B27 ESPN-primary + MLB active-roster supplementation path; no 40-man/depth-chart substitution was introduced.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B29 smoke — team-page isolation repair
+Validated before merge as a shared-shell regression repair.
+
+### Executed evidence
+- `team-page-v8.js` and `sw.js` compile successfully.
+- Opening a team page now adds both `modal-open` and `team-page-open`; closing removes both.
+- `team-page-v8.css` forces the dialog to full viewport height, isolates its paint layer, makes the overlay opaque, and constrains the shell to 100% height with internal scrolling.
+- The underlying `.app` is hidden only while `body.team-page-open` is active.
+- `.team-page[hidden]` explicitly uses `display:none !important`.
+- Existing Back-to-Team / Back-to-My-Teams logic and saved board scroll restoration remain intact.
+- Service-worker cache namespace is `scoreboard-v11b29-team-page-isolation`.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE REPRODUCTION CHECK RECOMMENDED**.
