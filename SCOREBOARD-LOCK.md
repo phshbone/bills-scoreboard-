@@ -223,3 +223,12 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - The team-resource News endpoint remains a secondary scoped source, followed by the existing league-wide category-filter fallback.
 - Only a non-empty scoped story set is cached as a successful team-news result before the final fallback is attempted.
 - The existing team-page News UI, five-minute cache, 20-story cap, Retry behavior, and global Sports News feed remain otherwise unchanged.
+
+
+## Stage 11B14 lock — Standings MLB marks + swipe discovery cue (2026-09-17)
+- When the MLB standings fallback lacks provider logo artwork, selected MLB rows use MLB's official `team-cap-on-dark/<teamId>.svg` mark before falling back to a text abbreviation.
+- This restores the interlocking NY cap marks for the Yankees and Mets while also giving the same official-logo fallback to other selected MLB clubs.
+- If an official remote mark fails to load, the existing compact abbreviation badge remains the safety fallback.
+- Phone My Teams shows one restrained, informational spatial cue directly below the section plate: `‹ News · Swipe · Standings ›`.
+- The swipe cue is not a control; it does not intercept taps or gestures and does not change the existing swipe thresholds or navigation behavior.
+- The cue is hidden on desktop, while editing, and whenever the active top-level screen is News or Standings.

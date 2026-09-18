@@ -3,6 +3,7 @@
 
   const pageTitle = document.getElementById('page-title');
   const headerActions = document.querySelector('.app > header .header-actions');
+  const swipeHint = document.getElementById('swipe-nav-hint');
   const newsScreen = document.getElementById('sports-news-screen');
   const myTeamsScreen = document.getElementById('my-teams-screen');
   const standingsScreen = document.getElementById('standings-screen');
@@ -11,7 +12,7 @@
   const standingsStatus = document.getElementById('global-standings-status');
   const standingsRetry = document.getElementById('global-standings-retry');
   const teamGrid = document.getElementById('team-grid');
-  if (!pageTitle || !headerActions || !newsScreen || !myTeamsScreen || !standingsScreen || !standingsTabs || !standingsContent || !standingsStatus || !standingsRetry || !teamGrid) return;
+  if (!pageTitle || !headerActions || !swipeHint || !newsScreen || !myTeamsScreen || !standingsScreen || !standingsTabs || !standingsContent || !standingsStatus || !standingsRetry || !teamGrid) return;
 
   let currentScreen = 'teams';
   let currentLeague = '';
@@ -54,9 +55,17 @@
     }) || null;
   }
 
-  function teamLogo(entry) {
+  function teamLogo(entry, row, league) {
     const logos = Array.isArray(entry?.team?.logos) ? entry.team.logos : [];
-    return logos.find(item => item?.href)?.href || '';
+    const providerLogo = logos.find(item => item?.href)?.href || '';
+    if (providerLogo) return providerLogo;
+
+    const mlbId = String(row?.id || '').trim();
+    if (league === 'MLB' && /^\d+$/.test(mlbId)) {
+      return `https://www.mlbstatic.com/team-logos/team-cap-on-dark/${encodeURIComponent(mlbId)}.svg`;
+    }
+
+    return '';
   }
 
   function openStandingTeam(team, row) {
@@ -198,15 +207,20 @@
       const nameCell = el('td', 'global-team-name');
       const nameLine = el('div', 'global-team-name-line');
       if (mine) {
-        const logo = teamLogo(entry);
+        const logo = teamLogo(entry, row, league);
         if (logo) {
           const img = document.createElement('img');
-          img.className = 'global-team-logo';
+          img.className = `global-team-logo${league === 'MLB' && logo.includes('mlbstatic.com/team-logos/') ? ' mlb-cap-logo' : ''}`;
           img.src = logo;
           img.alt = '';
           img.loading = 'lazy';
           img.decoding = 'async';
           img.setAttribute('aria-hidden', 'true');
+          img.addEventListener('error', () => {
+            if (!img.isConnected) return;
+            const fallback = el('span', 'global-team-logo-fallback', row.abbreviation || team.name.slice(0, 2).toUpperCase());
+            img.replaceWith(fallback);
+          }, { once: true });
           nameLine.appendChild(img);
         } else {
           nameLine.appendChild(el('span', 'global-team-logo-fallback', row.abbreviation || team.name.slice(0, 2).toUpperCase()));
@@ -312,6 +326,7 @@
     myTeamsScreen.hidden = !teams;
     standingsScreen.hidden = !standings;
     headerActions.hidden = !teams;
+    swipeHint.hidden = !teams;
 
     pageTitle.textContent = news ? 'SPORTS NEWS' : standings ? 'STANDINGS' : 'MY TEAMS';
     document.title = news ? 'scoreboard · sports news' : standings ? 'scoreboard · standings' : 'scoreboard · my teams';
@@ -395,4 +410,5 @@
   myTeamsScreen.hidden = false;
   standingsScreen.hidden = true;
   headerActions.hidden = false;
+  swipeHint.hidden = false;
 })();
