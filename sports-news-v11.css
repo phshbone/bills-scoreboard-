@@ -199,3 +199,23 @@
   color: #f8f3ff;
   background: rgba(70, 28, 104, .72);
 }
+
+
+/* Stage 11B17: imageless cards should use the full card width. */
+.sports-news-card.no-image {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.sports-news-card.no-image .sports-news-card-body {
+  padding-inline: 15px;
+}
+
+@media (max-width: 430px) {
+  .sports-news-card.no-image {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sports-news-card.no-image .sports-news-card-body {
+    padding: 12px 14px 11px;
+  }
+}
