@@ -337,3 +337,13 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Roster position headings and counts are explicitly readable on the light field.
 - The centered industrial Back rail is retained.
 - No team-page data, provider, navigation, roster grouping, standings, News, live-state, or Back behavior changes.
+
+
+## Stage 11B25 lock — MLB header tune + Mets reference (2026-09-18)
+- Yankees and Phillies artwork-driven headers move upward by 4px and shift their plaque crop from 36% to 40% so the embedded team-name artwork reads more centrally in the header band.
+- The header artwork may remain asymmetrical; the embedded team name is the alignment priority.
+- Mets now use the same approved artwork-driven header system as Yankees and Phillies.
+- The large semantic Mets team title remains in the DOM but is visually hidden; the small MLB kicker remains visible.
+- Mets interior uses a cool soft off-white field with faint dusty-blue pinstripes, dark navy/charcoal text, dusty orange accents, and circular dusty-blue roster-number medallions.
+- Mets content cards use restrained 2px rims, readable dark roster-position headings/counts, light themed News/standings/schedule surfaces, and the centered industrial Back rail.
+- No team-page data, provider, navigation, roster grouping, standings, News, live-state, or Back behavior changes.
