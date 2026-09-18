@@ -396,3 +396,11 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - The team-page shell is explicitly constrained to 100% of the dialog height with internal scrolling.
 - `[hidden]` remains authoritative with `display:none !important`.
 - Existing team-page header scrolling, sticky bottom Back rail, data rendering, navigation, and return-to-board scroll restoration remain unchanged.
+
+
+## Stage 11B30 lock — iOS team-page overscroll containment (2026-09-18)
+- Stage 11B29 correctly hides the underlying My Teams board, but real-iPhone verification showed the team-page scroller itself could still rubber-band upward at its lower edge.
+- While a team page is open, both the root element and body are scroll-locked; the body is fixed to the viewport and the saved My Teams scroll position is restored on close.
+- Team-page vertical overscroll behavior is none, not contain, so browser overscroll affordance is not permitted at the team-page edges.
+- A touch-edge guard cancels only outward movement at the exact top/bottom of the internal team-page scroller as an iOS fallback. Normal vertical scrolling inside the team page remains native.
+- The existing artwork header, light team canvas, sticky Back rail, data rendering, detail navigation, and Back-to-My-Teams restoration behavior remain unchanged.

@@ -471,3 +471,18 @@ Validated before merge as a shared-shell regression repair.
 - Service-worker cache namespace is `scoreboard-v11b29-team-page-isolation`.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE REPRODUCTION CHECK RECOMMENDED**.
+
+
+## Stage 11B30 smoke — iOS team-page overscroll containment
+Validated before merge as a targeted follow-up to the failed Stage 11B29 real-iPhone reproduction check.
+
+### Executed evidence
+- team-page-v8.js and sw.js compile successfully.
+- Opening a team page applies team-page-open to both html and body; closing removes both before restoring the saved board scroll position.
+- Root/body scrolling is locked while the team page is open.
+- The internal team-page scroller uses overscroll-behavior-y: none.
+- A passive-safe touch guard cancels only outward edge gestures at the exact top/bottom of the internal scroller, preventing iOS elastic drag while leaving ordinary vertical scrolling untouched.
+- Stage 11B29 underlying-board paint isolation remains in place.
+- Service-worker cache namespace is scoreboard-v11b30-ios-overscroll-lock.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE REPRODUCTION CHECK REQUIRED**.

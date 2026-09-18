@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b29-team-page-isolation';
+const CACHE = 'scoreboard-v11b30-ios-overscroll-lock';
 const ASSETS = [
   './',
   './index.html',
