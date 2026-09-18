@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b19-yankees-reference';
+const CACHE = 'scoreboard-v11b20-yankees-refinement';
 const ASSETS = [
   './',
   './index.html',
@@ -20,6 +20,7 @@ const ASSETS = [
   './sports-news-v11.css',
   './team-theme-v12.css',
   './team-theme-v13.css',
+  './team-theme-v14.css',
   './desktop-nav-v11.css',
   './header-plate-v11.css',
   './team-data-v8.js',
