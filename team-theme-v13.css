@@ -1,0 +1,217 @@
+/* Stage 11B19 reference: Yankees light pinstripe interior inside the approved Scoreboard steel frame. */
+.team-page[data-team-id="yankees"] {
+  --text: #10233d;
+  --muted: #526277;
+  --yankees-canvas: #f4f3ee;
+  --yankees-ink: #10233d;
+  --yankees-line: rgba(12,35,64,.14);
+  --yankees-rule: rgba(12,35,64,.22);
+  --yankees-panel: rgba(255,255,255,.46);
+  --score-metal-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='24' viewBox='0 0 38 24'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M5 17L15 7M24 18L34 8' stroke='%23040a11' stroke-opacity='.48' stroke-width='4'/%3E%3Cpath d='M4 16L14 6M23 17L33 7' stroke='%238ea5bf' stroke-opacity='.30' stroke-width='3'/%3E%3Cpath d='M4 15L14 5M23 16L33 6' stroke='%23d7e4f1' stroke-opacity='.10' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(255,255,255,.055) 0%, rgba(255,255,255,.02) 22%, transparent 40%, rgba(0,0,0,.13) 100%),
+    linear-gradient(180deg, #203a58 0%, #17324f 30%, #112943 62%, #0d2035 100%);
+  --yankees-pinstripe:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 23px,
+      var(--yankees-line) 23px 24px
+    );
+  background:
+    radial-gradient(circle at 50% 0%, rgba(32,58,88,.18), transparent 42%),
+    rgba(2,5,9,.94);
+}
+
+.team-page[data-team-id="yankees"] .team-page-shell {
+  box-sizing: border-box;
+  padding: 8px;
+  border: 0;
+  background-color: #11243a;
+  background-image: var(--score-metal-image);
+  background-size: 38px 24px, auto, auto;
+  background-position: 0 0, 0 0, 0 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -1px 0 rgba(0,0,0,.56),
+    inset 1px 0 0 rgba(255,255,255,.06),
+    inset -1px 0 0 rgba(0,0,0,.42),
+    0 0 80px rgba(0,0,0,.50);
+}
+
+.team-page[data-team-id="yankees"] .team-page-header,
+.team-page[data-team-id="yankees"] .team-page-content {
+  color: var(--yankees-ink);
+  background-color: var(--yankees-canvas);
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,.28), transparent 120px),
+    var(--yankees-pinstripe);
+  background-position: 0 0, 0 0;
+}
+
+.team-page[data-team-id="yankees"] .team-page-header {
+  top: 8px;
+  margin: 0;
+  border: 1px solid rgba(12,35,64,.18);
+  border-bottom-color: rgba(12,35,64,.24);
+  border-radius: 10px 10px 0 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.62),
+    0 5px 14px rgba(0,0,0,.12);
+}
+
+.team-page[data-team-id="yankees"] .team-page-content {
+  flex: 1 0 auto;
+  padding-top: 18px;
+  border-inline: 1px solid rgba(12,35,64,.16);
+}
+
+.team-page[data-team-id="yankees"] .team-page-heading .brand,
+.team-page[data-team-id="yankees"] .team-detail-view .brand,
+.team-page[data-team-id="yankees"] .data-label,
+.team-page[data-team-id="yankees"] .detail-group-title,
+.team-page[data-team-id="yankees"] .panel-link {
+  color: #17365c;
+}
+
+.team-page[data-team-id="yankees"] .team-page-header h2,
+.team-page[data-team-id="yankees"] .team-detail-view h3,
+.team-page[data-team-id="yankees"] .data-value,
+.team-page[data-team-id="yankees"] .game-row-main,
+.team-page[data-team-id="yankees"] .roster-name,
+.team-page[data-team-id="yankees"] .standings-table td {
+  color: var(--yankees-ink);
+  text-shadow: none;
+}
+
+.team-page[data-team-id="yankees"] .data-sub,
+.team-page[data-team-id="yankees"] .game-row-sub,
+.team-page[data-team-id="yankees"] .roster-meta,
+.team-page[data-team-id="yankees"] .roster-preview,
+.team-page[data-team-id="yankees"] .schedule-window-note,
+.team-page[data-team-id="yankees"] .roster-completeness-note,
+.team-page[data-team-id="yankees"] .sports-news-description,
+.team-page[data-team-id="yankees"] .sports-news-meta {
+  color: #4f6074;
+}
+
+.team-page[data-team-id="yankees"] .data-status-line,
+.team-page[data-team-id="yankees"] .data-panel,
+.team-page[data-team-id="yankees"] .game-row,
+.team-page[data-team-id="yankees"] .roster-row,
+.team-page[data-team-id="yankees"] .standings-wrap,
+.team-page[data-team-id="yankees"] .detail-empty,
+.team-page[data-team-id="yankees"] .roster-completeness-note,
+.team-page[data-team-id="yankees"] .sports-news-card {
+  color: var(--yankees-ink);
+  border-color: var(--yankees-rule);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.52), rgba(248,248,245,.28));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.66),
+    0 3px 9px rgba(16,35,61,.055);
+}
+
+.team-page[data-team-id="yankees"] .data-panel {
+  border-radius: 11px;
+}
+
+.team-page[data-team-id="yankees"] .action-panel:hover,
+.team-page[data-team-id="yankees"] .action-panel:focus-visible {
+  border-color: rgba(12,35,64,.46);
+  background: rgba(255,255,255,.66);
+}
+
+.team-page[data-team-id="yankees"] .detail-header {
+  border-bottom-color: rgba(12,35,64,.20);
+}
+
+.team-page[data-team-id="yankees"] .standings-table th {
+  color: #304965;
+  background: rgba(225,228,228,.78);
+  border-top-color: rgba(12,35,64,.15);
+}
+
+.team-page[data-team-id="yankees"] .standings-table td {
+  border-top-color: rgba(12,35,64,.12);
+}
+
+.team-page[data-team-id="yankees"] .current-team-row {
+  background: rgba(12,35,64,.085);
+  box-shadow: inset 4px 0 0 #17365c;
+}
+
+.team-page[data-team-id="yankees"] .data-badge,
+.team-page[data-team-id="yankees"] .live-pill {
+  color: #f7f9fc;
+  border-color: rgba(12,35,64,.38);
+  background: #17365c;
+}
+
+.team-page[data-team-id="yankees"] .jersey-badge {
+  --jersey-fill: repeating-linear-gradient(90deg, #f3f2ed 0 10px, #24334c 10px 11px);
+  --jersey-ink: #10233d;
+  --jersey-border: rgba(16,35,61,.32);
+}
+
+.team-page[data-team-id="yankees"] .sports-news-headline {
+  color: #10233d;
+}
+
+.team-page[data-team-id="yankees"] .sports-news-league,
+.team-page[data-team-id="yankees"] .sports-news-team-tag {
+  color: #f5f7fa;
+  background: #17365c;
+  border-color: rgba(12,35,64,.32);
+}
+
+.team-page[data-team-id="yankees"] .team-page-bottom-nav {
+  bottom: 8px;
+  justify-content: center;
+  margin: 0;
+  padding: 10px 16px max(10px, var(--safe-bottom));
+  border: 1px solid rgba(168,186,210,.25);
+  border-top-color: rgba(210,221,232,.24);
+  border-radius: 0 0 10px 10px;
+  background-color: #11243a;
+  background-image: var(--score-metal-image);
+  background-size: 38px 24px, auto, auto;
+  background-position: 0 0, 0 0, 0 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -1px 0 rgba(0,0,0,.56),
+    0 -5px 14px rgba(0,0,0,.14);
+}
+
+.team-page[data-team-id="yankees"] .team-page-bottom-nav .button {
+  width: min(72vw, 330px);
+  min-width: 0;
+  color: #f7f9fc;
+  border-color: rgba(210,221,232,.34);
+  background:
+    linear-gradient(180deg, #24415f 0%, #17324f 58%, #10243a 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.12),
+    0 4px 10px rgba(0,0,0,.24);
+}
+
+@media (max-width: 560px) {
+  .team-page[data-team-id="yankees"] .team-page-shell {
+    padding: 6px;
+  }
+
+  .team-page[data-team-id="yankees"] .team-page-header {
+    top: 6px;
+  }
+
+  .team-page[data-team-id="yankees"] .team-page-content {
+    padding-inline: 13px;
+  }
+
+  .team-page[data-team-id="yankees"] .team-page-bottom-nav {
+    bottom: 6px;
+  }
+
+  .team-page[data-team-id="yankees"] .team-page-bottom-nav .button {
+    width: min(78vw, 320px);
+  }
+}
