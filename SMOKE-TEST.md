@@ -389,3 +389,20 @@ Validated before merge as a visual-only MLB team-page pass.
 - `sw.js` compiles successfully, precaches `team-theme-v19.css`, and uses cache namespace `scoreboard-v11b25-mlb-header-tune-mets`.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B26 smoke — remaining team-page themes
+Validated before merge as a visual-only nine-team pass.
+
+### Executed evidence
+- `team-theme-v20.css` loads after `team-theme-v19.css`.
+- Explicit palette/art variables exist for Giants, Jets, Rangers, Army, Fever, Eagles, Flyers, 76ers, and Knicks.
+- Each of the nine headers references its existing team artwork asset and uses the approved raised artwork-header geometry.
+- The large semantic team title is visually hidden while the league kicker remains visible.
+- No body pinstripe or decorative pattern is introduced; each content field is a quiet light team-tinted surface.
+- All nine receive dark readable content text, light/translucent cards with restrained 2px rims, themed badges, explicit roster-position contrast, circular roster-number medallions, and the centered industrial Back rail.
+- MLB Yankees/Mets/Phillies selectors are not altered by this stylesheet.
+- No team-page JavaScript, provider, navigation, roster-grouping, standings, News, or live-state files changed.
+- `sw.js` compiles successfully, precaches `team-theme-v20.css`, and uses cache namespace `scoreboard-v11b26-remaining-team-themes`.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.
