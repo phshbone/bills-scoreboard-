@@ -193,6 +193,7 @@
 
 @media (max-width: 719px) {
   .swipe-nav-hint {
+    display: grid;
     min-height: 18px;
     padding: 1px 10px 0;
     align-items: center;
