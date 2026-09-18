@@ -379,3 +379,11 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - If MLB StatsAPI roster loading fails, the page falls back to the existing ESPN roster without blocking the rest of the team page.
 - No fabricated roster entries are introduced.
 - Sports News source mix, deduplication, source balancing, team aliases, card layout, navigation, six-hour home-score timing, live-state behavior, and team-page navigation remain unchanged.
+
+
+## Stage 11B28 lock — Giants/Jets header readability (2026-09-18)
+- Giants and Jets keep the approved artwork-driven header layout, crop, dimensions, scrolling behavior, and league kicker.
+- Only the two darkest NFL headers receive a stronger brightness/readability lift using a light screen blend plus a modest brightness/saturation adjustment.
+- Eagles and all other team headers remain unchanged in this stage.
+- The Yankees MLB roster remains provider-truthful. The app continues to use ESPN primary plus MLB StatsAPI active-roster supplementation; it does not switch to a 40-man/depth-chart roster merely to manufacture missing position groups.
+- No standings, News, navigation, live-score, roster-grouping, or team-page interaction behavior changes.
