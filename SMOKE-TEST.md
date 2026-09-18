@@ -354,3 +354,20 @@ Validated before merge as a Yankees-only visual pass.
 - `sw.js` compiles successfully, precaches `team-theme-v17.css`, and uses cache namespace `scoreboard-v11b23-yankees-art-header-cleanup`.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B24 smoke — Phillies artwork-driven robin’s-egg reference
+Validated before merge as a Phillies-only visual pass.
+
+### Executed evidence
+- `team-theme-v18.css` loads after `team-theme-v17.css` and is scoped only to `data-team-id="phillies"`.
+- The Phillies header and thin shell rails reference the existing `assets/phillies.webp` plaque artwork.
+- The semantic Phillies team title is visually hidden while the MLB kicker remains visible.
+- The content field uses a pale robin’s-egg base with one-pixel dusty red/burgundy vertical pinstripes.
+- Overview panels, rows, standings, status, and team-News cards use light/translucent surfaces with 2px restrained rims and dark readable text.
+- Phillies roster position headings/counts and circular roster-number medallions have explicit contrast on the light field.
+- The bottom Back rail is centered and retains the approved industrial treatment.
+- No team-page JavaScript, provider, navigation, roster-grouping, standings, News, or live-state files changed.
+- `sw.js` compiles successfully, precaches `team-theme-v18.css`, and uses cache namespace `scoreboard-v11b24-phillies-reference`.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.
