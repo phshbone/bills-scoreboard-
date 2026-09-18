@@ -259,3 +259,19 @@ Validated before merge with JavaScript compilation and deterministic publisher-m
 - Service-worker cache namespace is bumped to `scoreboard-v11b17-news-layout-balance`.
 
 Overall pre-merge classification: **PASS WITH REAL-DEVICE VISUAL VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B18 smoke — Team-page visual themes
+Validated before merge with static theme coverage, runtime selector wiring, stylesheet load-order, and service-worker checks.
+
+### Executed evidence
+- All 12 current team IDs have explicit theme selectors in `team-theme-v12.css`.
+- Existing runtime team-page code still assigns `data-team-id` to the modal before rendering, so the correct theme is selected without new JavaScript behavior.
+- The new stylesheet loads after the shared Sports News styling so team-page News cards can inherit the active team theme.
+- The outer team-page shell retains a dedicated metal border treatment while content panels remain readable dark surfaces.
+- Yankees pinstripe, Phillies powder-blue/red, Flyers orange/black, and Army black/gold theme markers are present as intended; all other current teams also have explicit color identities.
+- Overview cards, standings, roster/schedule rows, live badges, team News cards, and bottom navigation are covered by the theme layer.
+- `sw.js` compiles successfully, precaches `team-theme-v12.css`, and uses cache namespace `scoreboard-v11b18-team-page-themes`.
+- No team-page JavaScript, provider adapter, navigation, or data-normalization code changed in this stage.
+
+Overall pre-merge classification: **PASS WITH REAL-DEVICE VISUAL VERIFICATION RECOMMENDED**.
