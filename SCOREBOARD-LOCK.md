@@ -347,3 +347,23 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Mets interior uses a cool soft off-white field with faint dusty-blue pinstripes, dark navy/charcoal text, dusty orange accents, and circular dusty-blue roster-number medallions.
 - Mets content cards use restrained 2px rims, readable dark roster-position headings/counts, light themed News/standings/schedule surfaces, and the centered industrial Back rail.
 - No team-page data, provider, navigation, roster grouping, standings, News, live-state, or Back behavior changes.
+
+
+## Stage 11B26 lock — remaining team-page themes (2026-09-18)
+- Giants, Jets, Rangers, Army, Fever, Eagles, Flyers, 76ers, and Knicks now use the approved artwork-driven header/light-canvas team-page system.
+- No invented pinstripes or decorative body patterns are added for these teams.
+- Team identity comes primarily from the wide plaque artwork header plus restrained team-tinted light canvases and accents.
+- Background direction:
+  - Giants: pale cool blue-gray.
+  - Jets: pale sage/gray-green.
+  - Rangers: icy blue-white.
+  - Army: warm stone/parchment.
+  - Fever: warm cream/pale gold.
+  - Eagles: pale blue-green/gray.
+  - Flyers: warm off-white with a slight orange cast.
+  - 76ers: cool white with a faint powder-blue cast.
+  - Knicks: pale cool blue.
+- All nine use dark readable text, softened team-color labels/accents, circular roster-number medallions, restrained 2px card rims, readable roster-position headings/counts, and the centered industrial Back rail.
+- Team headers use the same slightly raised placement and centered artwork crop established by the MLB pages.
+- The semantic team title remains in the DOM but is visually hidden when the artwork already identifies the team; the small league kicker remains visible.
+- No team-page data, provider, navigation, roster-grouping, standings, News, live-state, or Back behavior changes.
