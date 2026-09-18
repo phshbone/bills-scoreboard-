@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b23-yankees-art-header-cleanup';
+const CACHE = 'scoreboard-v11b24-phillies-reference';
 const ASSETS = [
   './',
   './index.html',
@@ -24,6 +24,7 @@ const ASSETS = [
   './team-theme-v15.css',
   './team-theme-v16.css',
   './team-theme-v17.css',
+  './team-theme-v18.css',
   './desktop-nav-v11.css',
   './header-plate-v11.css',
   './team-data-v8.js',
