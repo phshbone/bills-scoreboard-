@@ -1,0 +1,70 @@
+/* Stage 11B22: Yankees real-art metal source + scroll/readability repair. */
+
+/* Use the existing Yankees plaque artwork as the material source for the narrow outer rails.
+   Only a thin slice is visible around the light content canvas, so this contributes real
+   rendered metal depth without turning the page into another hero card. */
+.team-page[data-team-id="yankees"] .team-page-shell {
+  background-color: #07111b;
+  background-image:
+    linear-gradient(rgba(3,8,14,.28), rgba(3,8,14,.42)),
+    url("./assets/yankees.webp");
+  background-size: auto, cover;
+  background-position: 0 0, center center;
+  background-repeat: no-repeat;
+}
+
+/* The team nameplate is part of normal document flow now: it scrolls away with the page
+   instead of floating over roster/schedule content. The actual Yankees plaque image supplies
+   the rich metal/lighting source; a restrained dark veil keeps the title readable. */
+.team-page[data-team-id="yankees"] .team-page-header {
+  position: relative;
+  top: auto;
+  z-index: 2;
+  margin: 0 0 7px;
+  background-color: #0b1624;
+  background-image:
+    linear-gradient(180deg, rgba(4,10,17,.42), rgba(3,8,14,.64)),
+    url("./assets/yankees.webp");
+  background-size: auto, cover;
+  background-position: 0 0, center 36%;
+  background-repeat: no-repeat;
+  border-color: rgba(157,176,196,.42);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    inset 0 -1px 0 rgba(0,0,0,.62),
+    0 5px 15px rgba(0,0,0,.24);
+}
+
+/* Retire the procedural weathering layers from the prior CSS-only metal approximation. */
+.team-page[data-team-id="yankees"] .team-page-header::before,
+.team-page[data-team-id="yankees"] .team-page-header::after {
+  content: none;
+}
+
+/* Position groups need strong contrast on the light pinstripe field. */
+.team-page[data-team-id="yankees"] .roster-position-heading {
+  color: #17365c;
+  border-bottom-color: rgba(12,35,64,.24);
+  text-shadow: none;
+}
+
+.team-page[data-team-id="yankees"] .roster-position-count {
+  color: #f5f3eb;
+  border-color: rgba(12,35,64,.52);
+  background: #17365c;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.12),
+    0 2px 5px rgba(12,35,64,.12);
+}
+
+/* Local light-theme control repair exposed by the real-device screenshot. */
+.team-page[data-team-id="yankees"] .retry-row .button {
+  color: #f5f3eb;
+}
+
+@media (max-width: 560px) {
+  .team-page[data-team-id="yankees"] .team-page-header {
+    top: auto;
+    margin-bottom: 6px;
+  }
+}
