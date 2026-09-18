@@ -314,3 +314,13 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Roster position counts use a navy circular badge with light text.
 - The Yankees Retry button gets explicit light text for contrast on its dark control background.
 - No team-page data, provider, navigation, roster grouping, standings, News, live-state, or Back behavior changes.
+
+
+## Stage 11B23 lock — Yankees artwork-driven header cleanup (2026-09-18)
+- The wide Yankees plaque-art header remains the visual team identity.
+- The large overlaid “New York Yankees” text is removed visually because the artwork already identifies the team.
+- The semantic team title remains in the DOM for accessibility and dialog labeling.
+- The small MLB kicker remains visible as the only UI text in the header.
+- Header stays in normal document flow and retains a shallow hero-header footprint.
+- No content-card, roster, News, standings, navigation, provider, live-state, or Back behavior changes.
+- This pass remains Yankees-only before the same artwork-driven header system is generalized to other teams.
