@@ -500,3 +500,25 @@ Validated as a CSS-only follow-up to the successful Stage 11B30 anchoring repair
 - Service-worker cache namespace is scoreboard-v11b31-footer-flush.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B32 smoke — live-panel state bridge
+Triggered by a real-use regression report: My Teams could display LIVE while the team page exposed no tappable live feed.
+
+### Recon finding
+- live-awareness-v6.js detects live games from the direct league scoreboard.
+- team-page-v8.js only creates Live now from the team schedule snapshot.
+- live-panel-freshness-v11.js previously returned immediately when no Live now panel already existed, so it could refresh an existing live panel but could not transition a pregame team page into a live-feed state.
+- live-score-v11.js and its overlay remained present and wired; the failure was the missing UI/state bridge, not deletion of the live provider or overlay.
+
+### Executed evidence
+- live-panel-freshness-v11.js compiles successfully.
+- When the direct feed returns state=in, the freshness layer now ensures a standard Live now panel exists even if the schedule snapshot did not create one.
+- The promoted panel uses data-label Live now plus existing data-panel classes, so live-score-v11.js MutationObserver can attach the existing Tap for live score interaction.
+- Direct refresh updates both displayed score and game detail.
+- A direct-only promoted panel is removed when the direct feed no longer reports a live game.
+- The observer now checks direct live state whenever the team-page data grid changes, instead of requiring an existing live panel before checking.
+- Existing ESPN primary and MLB StatsAPI fallback paths are unchanged.
+- Service-worker cache namespace is scoreboard-v11b32-live-panel-state-bridge.
+
+Overall pre-merge classification: **PASS WITH LIVE/REAL-DEVICE VERIFICATION RECOMMENDED**.
