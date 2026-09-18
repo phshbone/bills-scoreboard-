@@ -371,3 +371,21 @@ Validated before merge as a Phillies-only visual pass.
 - `sw.js` compiles successfully, precaches `team-theme-v18.css`, and uses cache namespace `scoreboard-v11b24-phillies-reference`.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B25 smoke — MLB header tune + Mets reference
+Validated before merge as a visual-only MLB team-page pass.
+
+### Executed evidence
+- `team-theme-v19.css` loads after `team-theme-v18.css`.
+- Yankees and Phillies header selectors only adjust top margin and artwork crop; no behavior or structure changes.
+- Both approved headers use `margin-top: -4px` and `background-position: center 40%` for the plaque artwork layer.
+- Mets selectors are scoped to `data-team-id="mets"`.
+- Mets header references `assets/mets.webp`, keeps the MLB kicker visible, and visually hides the duplicate semantic team title.
+- Mets content uses a cool light canvas, one-pixel dusty-blue vertical pinstripes, dark readable text, and softened orange/blue accents.
+- Mets roster position headings/counts and circular roster-number medallions have explicit contrast.
+- Team News, standings, schedule, status, and roster surfaces inherit the light Mets theme.
+- No team-page JavaScript, provider, navigation, roster-grouping, standings, News, or live-state files changed.
+- `sw.js` compiles successfully, precaches `team-theme-v19.css`, and uses cache namespace `scoreboard-v11b25-mlb-header-tune-mets`.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.
