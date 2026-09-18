@@ -307,3 +307,18 @@ Validated before merge as a Yankees-only visual layer.
 - `sw.js` compiles successfully, precaches `team-theme-v14.css`, and uses cache namespace `scoreboard-v11b20-yankees-refinement`.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B21 smoke — Yankees header typography refinement
+Validated before merge as a Yankees-only CSS typography pass.
+
+### Executed evidence
+- `team-theme-v15.css` loads after `team-theme-v14.css` and is scoped only to `data-team-id="yankees"`.
+- The team-name font no longer uses the Stage 11B20 stencil/Arial Black stack; it uses a narrower industrial sans-serif fallback stack.
+- Team-name color is aged off-white/light steel rather than pure white.
+- Text wear is limited to sparse sub-pixel radial marks plus a muted steel-toned gradient; no full spray-paint or heavy masking treatment is introduced.
+- The MLB kicker receives the same softened/narrower typography direction.
+- No HTML structure, team-page JavaScript, data/provider logic, navigation, roster, standings, News, or live-state behavior changed.
+- `sw.js` compiles successfully, precaches `team-theme-v15.css`, and uses cache namespace `scoreboard-v11b21-yankees-header-type`.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE TYPOGRAPHY VERIFICATION RECOMMENDED**.

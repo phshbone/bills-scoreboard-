@@ -293,3 +293,14 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Yankees roster jersey-number badges switch from square/pinstriped badges to dark navy circular medallions with light numbers and a subtle inner rim.
 - The broader team-theme palette direction remains softened/dusty rather than highly saturated.
 - The refinement is isolated in `team-theme-v14.css` so it can be judged independently before being generalized to other teams.
+
+
+## Stage 11B21 lock — Yankees header typography refinement (2026-09-18)
+- Visual-only typography pass on the Stage 11B20 Yankees metal header.
+- No mockup or generated visual asset is used; the implementation is applied directly in the app.
+- The metal header structure, frame, content field, cards, circular roster badge, bottom Back rail, and all team-page behavior remain unchanged.
+- The Yankees team name switches away from the blocky stencil/Arial Black treatment to a narrower industrial sans stack.
+- Header lettering shifts from bright white to aged off-white/light steel.
+- Distress is intentionally minimal: sparse tiny wear marks and a muted vertical steel-toned text gradient, preserving readability.
+- The lowercase MLB kicker is softened to a muted light-steel tone and uses the same narrower typography direction.
+- This refinement is isolated in `team-theme-v15.css`.

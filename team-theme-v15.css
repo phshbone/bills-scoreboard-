@@ -1,0 +1,50 @@
+/* Stage 11B21: Yankees team-header typography refinement only. */
+
+.team-page[data-team-id="yankees"] .team-page-heading .brand {
+  color: rgba(203,209,211,.62);
+  font-family: "Arial Narrow", "Aptos Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: lowercase;
+  text-shadow: 0 1px 2px rgba(0,0,0,.30);
+}
+
+.team-page[data-team-id="yankees"] .team-page-header h2 {
+  color: #d6d7d1;
+  font-family: "Arial Narrow", "Aptos Narrow", "Helvetica Neue Condensed", "Franklin Gothic Medium", Arial, sans-serif;
+  font-size: clamp(1.62rem, 5.4vw, 2.16rem);
+  font-stretch: condensed;
+  font-weight: 750;
+  line-height: .98;
+  letter-spacing: .005em;
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.04),
+    0 2px 5px rgba(0,0,0,.32);
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .team-page[data-team-id="yankees"] .team-page-header h2 {
+    color: transparent;
+    background-image:
+      radial-gradient(circle at 17% 32%, rgba(54,61,67,.42) 0 .75px, transparent 1.1px),
+      radial-gradient(circle at 71% 66%, rgba(255,255,255,.12) 0 .6px, transparent .95px),
+      linear-gradient(180deg, #e0e1dc 0%, #d3d5d0 52%, #bfc3c0 100%);
+    background-size: 31px 27px, 37px 29px, auto;
+    background-repeat: repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+@media (max-width: 560px) {
+  .team-page[data-team-id="yankees"] .team-page-heading .brand {
+    font-size: .70rem;
+    letter-spacing: .17em;
+  }
+
+  .team-page[data-team-id="yankees"] .team-page-header h2 {
+    font-size: clamp(1.58rem, 6.2vw, 1.94rem);
+  }
+}
