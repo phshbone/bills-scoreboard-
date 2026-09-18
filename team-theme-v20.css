@@ -1,0 +1,757 @@
+/* Stage 11B26: remaining nine team pages use the approved artwork-header/light-canvas system. */
+
+/* Per-team palette + artwork. Keep body fields quiet: no invented stripes/patterns. */
+.team-page[data-team-id="giants"] {
+  --team-art-image: url("./assets/giants.webp");
+  --team-canvas: #eef3f7;
+  --team-ink: #172d45;
+  --team-muted: #596b7b;
+  --team-accent: #8f3947;
+  --team-accent-dark: #6f2b36;
+  --team-medal: #24558a;
+  --team-medal-dark: #173b63;
+  --team-rule: rgba(53,76,98,.29);
+}
+
+.team-page[data-team-id="jets"] {
+  --team-art-image: url("./assets/jets.webp");
+  --team-canvas: #eef4f0;
+  --team-ink: #17352f;
+  --team-muted: #5b6f69;
+  --team-accent: #2f6651;
+  --team-accent-dark: #214b3c;
+  --team-medal: #2f6651;
+  --team-medal-dark: #173d31;
+  --team-rule: rgba(54,84,75,.29);
+}
+
+.team-page[data-team-id="rangers"] {
+  --team-art-image: url("./assets/rangers.webp");
+  --team-canvas: #f2f6f8;
+  --team-ink: #173455;
+  --team-muted: #586c7e;
+  --team-accent: #8d3040;
+  --team-accent-dark: #6d2431;
+  --team-medal: #2a5794;
+  --team-medal-dark: #1a3c6b;
+  --team-rule: rgba(53,77,104,.29);
+}
+
+.team-page[data-team-id="army"] {
+  --team-art-image: url("./assets/army.webp");
+  --team-canvas: #f2efe6;
+  --team-ink: #292821;
+  --team-muted: #6d695e;
+  --team-accent: #8b7540;
+  --team-accent-dark: #67572f;
+  --team-medal: #34342f;
+  --team-medal-dark: #1e1f1c;
+  --team-medal-ink: #e7d9aa;
+  --team-rule: rgba(79,75,62,.28);
+}
+
+.team-page[data-team-id="fever"] {
+  --team-art-image: url("./assets/fever.webp");
+  --team-canvas: #f7f2e5;
+  --team-ink: #1c2f52;
+  --team-muted: #687184;
+  --team-accent: #9a4148;
+  --team-accent-dark: #763139;
+  --team-medal: #263d69;
+  --team-medal-dark: #192b4e;
+  --team-rule: rgba(65,76,101,.28);
+}
+
+.team-page[data-team-id="eagles"] {
+  --team-art-image: url("./assets/eagles.webp");
+  --team-canvas: #edf4f3;
+  --team-ink: #18383b;
+  --team-muted: #5b7071;
+  --team-accent: #2e666c;
+  --team-accent-dark: #214c51;
+  --team-medal: #2e666c;
+  --team-medal-dark: #1e474b;
+  --team-rule: rgba(49,83,85,.29);
+}
+
+.team-page[data-team-id="flyers"] {
+  --team-art-image: url("./assets/flyers.webp");
+  --team-canvas: #f6f1ed;
+  --team-ink: #2b2928;
+  --team-muted: #716965;
+  --team-accent: #b45b2e;
+  --team-accent-dark: #894321;
+  --team-medal: #3b3937;
+  --team-medal-dark: #242322;
+  --team-rule: rgba(83,72,66,.28);
+}
+
+.team-page[data-team-id="sixers"] {
+  --team-art-image: url("./assets/sixers.webp");
+  --team-canvas: #f1f5f8;
+  --team-ink: #173552;
+  --team-muted: #5d6f7e;
+  --team-accent: #2f6490;
+  --team-accent-dark: #234c70;
+  --team-medal: #2f6490;
+  --team-medal-dark: #1d466b;
+  --team-rule: rgba(53,78,102,.29);
+}
+
+.team-page[data-team-id="knicks"] {
+  --team-art-image: url("./assets/knicks.webp");
+  --team-canvas: #edf3f7;
+  --team-ink: #193858;
+  --team-muted: #5b6e7e;
+  --team-accent: #b56534;
+  --team-accent-dark: #8a4b26;
+  --team-medal: #2e5f91;
+  --team-medal-dark: #1d4267;
+  --team-rule: rgba(54,77,101,.29);
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) {
+  --text: var(--team-ink);
+  --muted: var(--team-muted);
+  --score-metal-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='24' viewBox='0 0 38 24'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M5 17L15 7M24 18L34 8' stroke='%23040a11' stroke-opacity='.48' stroke-width='4'/%3E%3Cpath d='M4 16L14 6M23 17L33 7' stroke='%238ea5bf' stroke-opacity='.30' stroke-width='3'/%3E%3Cpath d='M4 15L14 5M23 16L33 6' stroke='%23d7e4f1' stroke-opacity='.10' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(255,255,255,.055) 0%, rgba(255,255,255,.02) 22%, transparent 40%, rgba(0,0,0,.13) 100%),
+    linear-gradient(180deg, #203a58 0%, #17324f 30%, #112943 62%, #0d2035 100%);
+  background:
+    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--team-medal) 14%, transparent), transparent 42%),
+    rgba(2,5,9,.94);
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .team-page-shell {
+  box-sizing: border-box;
+  padding: 8px;
+  border: 0;
+  background-color: #07111b;
+  background-image:
+    linear-gradient(rgba(3,8,14,.30), rgba(3,8,14,.46)),
+    var(--team-art-image);
+  background-size: auto, cover;
+  background-position: 0 0, center center;
+  background-repeat: no-repeat;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -1px 0 rgba(0,0,0,.56),
+    inset 1px 0 0 rgba(255,255,255,.06),
+    inset -1px 0 0 rgba(0,0,0,.42),
+    0 0 80px rgba(0,0,0,.50);
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .team-page-header {
+  position: relative;
+  top: auto;
+  z-index: 2;
+  overflow: hidden;
+  min-height: calc(var(--safe-top) + 92px);
+  align-items: flex-end;
+  margin: -4px 0 7px;
+  border: 1px solid rgba(165,185,197,.40);
+  border-radius: 10px;
+  color: #eef1ed;
+  background-color: #0b1624;
+  background-image:
+    linear-gradient(180deg, rgba(4,10,17,.34), rgba(3,8,14,.58)),
+    var(--team-art-image);
+  background-size: auto, cover;
+  background-position: 0 0, center 40%;
+  background-repeat: no-repeat;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    inset 0 -1px 0 rgba(0,0,0,.62),
+    0 5px 15px rgba(0,0,0,.24);
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .team-page-header::before,
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .team-page-header::after {
+  content: none;
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .team-page-header h2 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .team-page-heading .brand {
+  margin: 0;
+  color: rgba(222,227,228,.76);
+  font-family: "Arial Narrow", "Aptos Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: lowercase;
+  text-shadow:
+    0 1px 1px rgba(0,0,0,.45),
+    0 2px 4px rgba(0,0,0,.24);
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .team-page-content {
+  flex: 1 0 auto;
+  padding-top: 18px;
+  color: var(--team-ink);
+  border: 1px solid color-mix(in srgb, var(--team-rule) 70%, transparent);
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.30), transparent 120px),
+    var(--team-canvas);
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .team-detail-view .brand,
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .data-label,
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .detail-group-title,
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .panel-link {
+  color: var(--team-accent-dark);
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) :is(.team-detail-view h3,.data-value,.game-row-main,.roster-name,.standings-table td,.sports-news-headline) {
+  color: var(--team-ink);
+  text-shadow: none;
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) :is(.data-sub,.game-row-sub,.roster-meta,.roster-preview,.schedule-window-note,.roster-completeness-note,.sports-news-description,.sports-news-meta) {
+  color: var(--team-muted);
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) :is(.data-status-line,.data-panel,.game-row,.roster-row,.standings-wrap,.detail-empty,.roster-completeness-note,.sports-news-card) {
+  color: var(--team-ink);
+  border-width: 2px;
+  border-color: var(--team-rule);
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,.56),
+      color-mix(in srgb, var(--team-canvas) 84%, white 16%));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.78),
+    inset 0 0 0 1px color-mix(in srgb, var(--team-rule) 12%, transparent),
+    0 3px 9px rgba(28,52,75,.07);
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .data-panel {
+  border-radius: 11px;
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .action-panel:is(:hover,:focus-visible) {
+  border-color: color-mix(in srgb, var(--team-accent) 52%, var(--team-rule));
+  background: rgba(255,255,255,.66);
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .detail-header {
+  border-bottom-color: color-mix(in srgb, var(--team-accent) 28%, transparent);
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .standings-table th {
+  color: color-mix(in srgb, var(--team-ink) 78%, white);
+  background: color-mix(in srgb, var(--team-canvas) 86%, #d7e0e5 14%);
+  border-top-color: color-mix(in srgb, var(--team-rule) 70%, transparent);
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .standings-table td {
+  border-top-color: color-mix(in srgb, var(--team-rule) 62%, transparent);
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .current-team-row {
+  background: color-mix(in srgb, var(--team-accent) 8%, transparent);
+  box-shadow: inset 4px 0 0 var(--team-accent);
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) :is(.data-badge,.live-pill) {
+  color: #faf7f1;
+  border-color: color-mix(in srgb, var(--team-accent-dark) 62%, transparent);
+  background: var(--team-accent);
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .roster-position-heading {
+  color: var(--team-accent-dark);
+  border-bottom-color: color-mix(in srgb, var(--team-accent) 30%, transparent);
+  text-shadow: none;
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .roster-position-count {
+  color: var(--team-medal-ink, #f8f5ef);
+  border-color: color-mix(in srgb, var(--team-medal-dark) 65%, transparent);
+  background: var(--team-medal);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.12),
+    0 2px 5px color-mix(in srgb, var(--team-medal-dark) 22%, transparent);
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .jersey-badge {
+  --jersey-fill: radial-gradient(circle at 34% 28%,
+    color-mix(in srgb, var(--team-medal) 86%, white 14%) 0%,
+    var(--team-medal) 48%,
+    var(--team-medal-dark) 100%);
+  --jersey-ink: var(--team-medal-ink, #faf7f1);
+  --jersey-border: color-mix(in srgb, var(--team-medal-dark) 74%, transparent);
+  flex-basis: 54px;
+  width: 54px;
+  height: 54px;
+  border-width: 2px;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.20),
+    inset 0 -6px 12px rgba(0,0,0,.16),
+    0 3px 8px color-mix(in srgb, var(--team-medal-dark) 24%, transparent);
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .jersey-badge::after {
+  inset: 5px;
+  border-color: rgba(255,255,255,.16);
+  border-radius: 50%;
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) :is(.sports-news-league,.sports-news-team-tag) {
+  color: #faf7f1;
+  background: var(--team-accent);
+  border-color: color-mix(in srgb, var(--team-accent-dark) 55%, transparent);
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .retry-row .button {
+  color: #f5f3eb;
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .team-page-bottom-nav {
+  bottom: 8px;
+  justify-content: center;
+  margin: 0;
+  padding: 10px 16px max(10px, var(--safe-bottom));
+  border: 1px solid rgba(168,186,210,.25);
+  border-top-color: rgba(210,221,232,.24);
+  border-radius: 0 0 10px 10px;
+  background-color: #11243a;
+  background-image: var(--score-metal-image);
+  background-size: 38px 24px, auto, auto;
+  background-position: 0 0, 0 0, 0 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -1px 0 rgba(0,0,0,.56),
+    0 -5px 14px rgba(0,0,0,.14);
+}
+
+.team-page:is(
+  [data-team-id="giants"],
+  [data-team-id="jets"],
+  [data-team-id="rangers"],
+  [data-team-id="army"],
+  [data-team-id="fever"],
+  [data-team-id="eagles"],
+  [data-team-id="flyers"],
+  [data-team-id="sixers"],
+  [data-team-id="knicks"]
+) .team-page-bottom-nav .button {
+  width: min(72vw, 330px);
+  min-width: 0;
+  color: #f7f9fc;
+  border-color: rgba(210,221,232,.34);
+  background:
+    linear-gradient(180deg, #24415f 0%, #17324f 58%, #10243a 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.12),
+    0 4px 10px rgba(0,0,0,.24);
+}
+
+@media (max-width: 560px) {
+  .team-page:is(
+    [data-team-id="giants"],
+    [data-team-id="jets"],
+    [data-team-id="rangers"],
+    [data-team-id="army"],
+    [data-team-id="fever"],
+    [data-team-id="eagles"],
+    [data-team-id="flyers"],
+    [data-team-id="sixers"],
+    [data-team-id="knicks"]
+  ) .team-page-shell {
+    padding: 6px;
+  }
+
+  .team-page:is(
+    [data-team-id="giants"],
+    [data-team-id="jets"],
+    [data-team-id="rangers"],
+    [data-team-id="army"],
+    [data-team-id="fever"],
+    [data-team-id="eagles"],
+    [data-team-id="flyers"],
+    [data-team-id="sixers"],
+    [data-team-id="knicks"]
+  ) .team-page-header {
+    min-height: calc(var(--safe-top) + 86px);
+    margin-top: -4px;
+    margin-bottom: 6px;
+  }
+
+  .team-page:is(
+    [data-team-id="giants"],
+    [data-team-id="jets"],
+    [data-team-id="rangers"],
+    [data-team-id="army"],
+    [data-team-id="fever"],
+    [data-team-id="eagles"],
+    [data-team-id="flyers"],
+    [data-team-id="sixers"],
+    [data-team-id="knicks"]
+  ) .team-page-heading .brand {
+    font-size: .70rem;
+    letter-spacing: .17em;
+  }
+
+  .team-page:is(
+    [data-team-id="giants"],
+    [data-team-id="jets"],
+    [data-team-id="rangers"],
+    [data-team-id="army"],
+    [data-team-id="fever"],
+    [data-team-id="eagles"],
+    [data-team-id="flyers"],
+    [data-team-id="sixers"],
+    [data-team-id="knicks"]
+  ) .team-page-content {
+    padding-inline: 13px;
+  }
+
+  .team-page:is(
+    [data-team-id="giants"],
+    [data-team-id="jets"],
+    [data-team-id="rangers"],
+    [data-team-id="army"],
+    [data-team-id="fever"],
+    [data-team-id="eagles"],
+    [data-team-id="flyers"],
+    [data-team-id="sixers"],
+    [data-team-id="knicks"]
+  ) .jersey-badge {
+    flex-basis: 52px;
+    width: 52px;
+    height: 52px;
+  }
+
+  .team-page:is(
+    [data-team-id="giants"],
+    [data-team-id="jets"],
+    [data-team-id="rangers"],
+    [data-team-id="army"],
+    [data-team-id="fever"],
+    [data-team-id="eagles"],
+    [data-team-id="flyers"],
+    [data-team-id="sixers"],
+    [data-team-id="knicks"]
+  ) .team-page-bottom-nav {
+    bottom: 6px;
+  }
+
+  .team-page:is(
+    [data-team-id="giants"],
+    [data-team-id="jets"],
+    [data-team-id="rangers"],
+    [data-team-id="army"],
+    [data-team-id="fever"],
+    [data-team-id="eagles"],
+    [data-team-id="flyers"],
+    [data-team-id="sixers"],
+    [data-team-id="knicks"]
+  ) .team-page-bottom-nav .button {
+    width: min(78vw, 320px);
+  }
+}
