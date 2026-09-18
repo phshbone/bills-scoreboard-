@@ -232,3 +232,17 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Phone My Teams shows one restrained, informational spatial cue directly below the section plate: `‹ News · Swipe · Standings ›`.
 - The swipe cue is not a control; it does not intercept taps or gestures and does not change the existing swipe thresholds or navigation behavior.
 - The cue is hidden on desktop, while editing, and whenever the active top-level screen is News or Standings.
+
+
+## Stage 11B16 lock — Multi-source Sports News (2026-09-18)
+- ESPN remains the primary structured News provider.
+- FOX Sports, CBS Sports, and Yahoo Sports are added as optional secondary league-news sources through their public RSS/syndication feeds.
+- Browser RSS conversion uses the documented rss2json JSON bridge; failure of that bridge or any individual publisher must not take down ESPN News or other working publishers.
+- The current secondary league map covers MLB, NFL, NBA, NHL, college football, and WNBA where each publisher exposes a feed. CBS does not supply a WNBA RSS feed in its published feed list, so that league continues with ESPN plus the secondary feeds that are available.
+- Every story card carries a visible publisher badge so FOX attribution requirements and source identity remain clear.
+- The global News feed remains capped at 40 current stories across all selected-team leagues.
+- Individual team News combines ESPN's team-scoped feed with matching FOX/CBS/Yahoo league stories and remains capped at 20 stories.
+- Secondary team matching is limited to the story's league and uses explicit team aliases; unrelated league stories are not promoted into a team page.
+- Cross-publisher duplicate control preserves one representative story when headlines are identical or strongly overlapping for the same selected team within a 12-hour window, preferring ESPN, then FOX, CBS, and Yahoo as the retained card while preserving useful image/description metadata.
+- Secondary feeds are cached in-visit for five minutes. Publisher failures are isolated with `Promise.allSettled` so available sources continue rendering.
+- Global and team News retain real outbound article links, no local article scraping, and no fabricated story content.
