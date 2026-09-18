@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="72" viewBox="0 0 96 72">
+  <defs>
+    <linearGradient id="steel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#294866"/>
+      <stop offset=".38" stop-color="#1c3855"/>
+      <stop offset=".72" stop-color="#132c47"/>
+      <stop offset="1" stop-color="#0c2138"/>
+    </linearGradient>
+    <linearGradient id="lug" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9aafc0"/>
+      <stop offset=".22" stop-color="#5f7890"/>
+      <stop offset=".62" stop-color="#263d55"/>
+      <stop offset="1" stop-color="#101d2a"/>
+    </linearGradient>
+    <filter id="grain" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency=".13" numOctaves="2" seed="17"/>
+      <feColorMatrix type="matrix" values="
+        .35 0 0 0 0
+        0 .35 0 0 0
+        0 0 .35 0 0
+        0 0 0 .12 0"/>
+    </filter>
+  </defs>
+
+  <rect width="96" height="72" fill="url(#steel)"/>
+  <rect width="96" height="72" fill="#000" opacity=".18" filter="url(#grain)"/>
+
+  <g>
+    <!-- Row 1: rising to the right -->
+    <g transform="translate(12 12) rotate(-42)">
+      <rect x="-11" y="-5" width="22" height="10" rx="5" fill="#050b11" opacity=".58"/>
+      <rect x="-10" y="-4" width="20" height="8" rx="4" fill="url(#lug)"/>
+      <path d="M-7 -2.2H6.5" stroke="#d8e3eb" stroke-opacity=".30" stroke-width="1.3" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(48 12) rotate(-42)">
+      <rect x="-11" y="-5" width="22" height="10" rx="5" fill="#050b11" opacity=".58"/>
+      <rect x="-10" y="-4" width="20" height="8" rx="4" fill="url(#lug)"/>
+      <path d="M-7 -2.2H6.5" stroke="#d8e3eb" stroke-opacity=".30" stroke-width="1.3" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(84 12) rotate(-42)">
+      <rect x="-11" y="-5" width="22" height="10" rx="5" fill="#050b11" opacity=".58"/>
+      <rect x="-10" y="-4" width="20" height="8" rx="4" fill="url(#lug)"/>
+      <path d="M-7 -2.2H6.5" stroke="#d8e3eb" stroke-opacity=".30" stroke-width="1.3" stroke-linecap="round"/>
+    </g>
+
+    <!-- Row 2: rising to the left -->
+    <g transform="translate(30 36) rotate(42)">
+      <rect x="-11" y="-5" width="22" height="10" rx="5" fill="#050b11" opacity=".58"/>
+      <rect x="-10" y="-4" width="20" height="8" rx="4" fill="url(#lug)"/>
+      <path d="M-7 -2.2H6.5" stroke="#d8e3eb" stroke-opacity=".30" stroke-width="1.3" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(66 36) rotate(42)">
+      <rect x="-11" y="-5" width="22" height="10" rx="5" fill="#050b11" opacity=".58"/>
+      <rect x="-10" y="-4" width="20" height="8" rx="4" fill="url(#lug)"/>
+      <path d="M-7 -2.2H6.5" stroke="#d8e3eb" stroke-opacity=".30" stroke-width="1.3" stroke-linecap="round"/>
+    </g>
+
+    <!-- Row 3 repeats the first direction, staggered by the tile -->
+    <g transform="translate(12 60) rotate(-42)">
+      <rect x="-11" y="-5" width="22" height="10" rx="5" fill="#050b11" opacity=".58"/>
+      <rect x="-10" y="-4" width="20" height="8" rx="4" fill="url(#lug)"/>
+      <path d="M-7 -2.2H6.5" stroke="#d8e3eb" stroke-opacity=".30" stroke-width="1.3" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(48 60) rotate(-42)">
+      <rect x="-11" y="-5" width="22" height="10" rx="5" fill="#050b11" opacity=".58"/>
+      <rect x="-10" y="-4" width="20" height="8" rx="4" fill="url(#lug)"/>
+      <path d="M-7 -2.2H6.5" stroke="#d8e3eb" stroke-opacity=".30" stroke-width="1.3" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(84 60) rotate(-42)">
+      <rect x="-11" y="-5" width="22" height="10" rx="5" fill="#050b11" opacity=".58"/>
+      <rect x="-10" y="-4" width="20" height="8" rx="4" fill="url(#lug)"/>
+      <path d="M-7 -2.2H6.5" stroke="#d8e3eb" stroke-opacity=".30" stroke-width="1.3" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- Deliberate wear: pits, chipped highlights and scratches -->
+  <g opacity=".28">
+    <circle cx="5" cy="28" r="1.1" fill="#dbe6ef"/>
+    <circle cx="42" cy="26" r=".8" fill="#02070c"/>
+    <circle cx="79" cy="49" r="1.2" fill="#02070c"/>
+    <circle cx="92" cy="31" r=".7" fill="#c8d5df"/>
+    <circle cx="22" cy="66" r=".9" fill="#05090e"/>
+    <path d="M4 52L20 49" stroke="#b5c4d0" stroke-opacity=".35" stroke-width=".8"/>
+    <path d="M52 22L72 18" stroke="#02070c" stroke-opacity=".55" stroke-width=".8"/>
+    <path d="M72 68L91 64" stroke="#aab9c6" stroke-opacity=".26" stroke-width=".7"/>
+    <path d="M27 6L39 4" stroke="#02070c" stroke-opacity=".45" stroke-width=".7"/>
+  </g>
+
+  <rect width="96" height="72" fill="none" stroke="#d9e5ef" stroke-opacity=".05"/>
+</svg>
