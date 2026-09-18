@@ -1,20 +1,20 @@
 .live-score-trigger {
   cursor: pointer;
-  border-color: rgba(121, 202, 142, .34) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 0 0 1px rgba(121,202,142,.04);
+  border-color: rgba(63, 127, 85, .52) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 0 0 1px rgba(63,127,85,.10);
 }
 .live-score-trigger::after {
   content: 'Tap for live score';
   display: block;
   margin-top: 12px;
-  color: #b9e7c5;
+  color: #3f7f55;
   font-size: .9rem;
   font-weight: 900;
   letter-spacing: .035em;
   text-transform: uppercase;
 }
 .live-score-trigger:focus-visible {
-  outline: 3px solid rgba(121, 202, 142, .62);
+  outline: 3px solid rgba(63, 127, 85, .68);
   outline-offset: 2px;
 }
 .live-score-overlay[hidden] { display: none; }
