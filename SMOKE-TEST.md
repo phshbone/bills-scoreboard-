@@ -163,3 +163,18 @@ Validated before merge with provider-path review, JavaScript compilation checks,
 - The service-worker cache namespace is bumped to `scoreboard-v11b12-team-news-feed-repair`.
 
 Overall pre-merge classification: **PASS WITH REAL-DEVICE TEAM-NEWS VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B13 smoke — Team News empty-response fallthrough
+Validated before merge with endpoint-order review, JavaScript compilation checks, and deterministic team-news fallthrough fixtures.
+
+### Executed evidence
+- `sports-news-v11.js`, `team-page-v8.js`, and `sw.js` compile successfully.
+- ESPN team-news references support `news?team=<TEAM_ID>`; New York Giants use ESPN team ID `19`.
+- Deterministic Giants team-news fixture: **PASS**.
+- If `news?team=19` returns HTTP success with zero stories, the loader now continues to `teams/19/news` instead of incorrectly caching and returning an empty result.
+- If `news?team=19` returns stories, that documented team-filtered endpoint wins and no secondary request is made.
+- If both team-scoped sources return empty, the existing league-wide category-filter fallback still runs and can return Giants-tagged stories.
+- Service-worker cache namespace is bumped to `scoreboard-v11b13-team-news-empty-fallthrough`.
+
+Overall pre-merge classification: **PASS WITH REAL-DEVICE GIANTS NEWS VERIFICATION RECOMMENDED**.

@@ -137,8 +137,8 @@
     if (!force && cached && Date.now() - cached.loadedAt < STALE_MS) return cached.stories;
 
     const scopedUrls = [
-      `${SITE}/${config.sport}/${config.league}/teams/${encodeURIComponent(teamKey)}/news`,
-      `${SITE}/${config.sport}/${config.league}/news?team=${encodeURIComponent(teamKey)}`
+      `${SITE}/${config.sport}/${config.league}/news?team=${encodeURIComponent(teamKey)}`,
+      `${SITE}/${config.sport}/${config.league}/teams/${encodeURIComponent(teamKey)}/news`
     ];
 
     let scopedError = null;
@@ -153,6 +153,7 @@
           .sort((a, b) => b.published - a.published)
           .slice(0, 20);
 
+        if (!stories.length) continue;
         teamStoryCache.set(cacheKey, { loadedAt: Date.now(), stories });
         return stories;
       } catch (error) {
