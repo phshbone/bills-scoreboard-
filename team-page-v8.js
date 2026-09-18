@@ -15,6 +15,7 @@
   const detailKicker = document.getElementById('detail-kicker');
   const detailTitle = document.getElementById('detail-title');
   const detailContent = document.getElementById('detail-content');
+  const shell = document.querySelector('.team-page-shell');
 
   let currentTeam = null;
   let snapshot = null;
@@ -310,6 +311,7 @@
     statusDot.className = 'status-dot';
     statusText.textContent = 'Connecting to sports data…';
     modal.hidden = false;
+    document.documentElement.classList.add('team-page-open');
     document.body.classList.add('modal-open', 'team-page-open');
     updateBackLabel();
     document.querySelector('.team-page-shell')?.scrollTo({ top: 0 });
@@ -329,10 +331,40 @@
     currentTeam = null;
     snapshot = null;
     returnFocusTarget = null;
+    document.documentElement.classList.remove('team-page-open');
     document.body.classList.remove('modal-open', 'team-page-open');
     window.scrollTo({ top: boardScrollY });
     if (focusTarget?.isConnected) focusTarget.focus();
     else if (id) document.querySelector(`#team-grid [data-team-id="${id}"]`)?.focus();
+  }
+
+  // iOS can still elastically move an internal scroller at its exact edges even
+  // when scroll chaining is disabled. Cancel only the outward edge gesture so
+  // normal team-page scrolling remains native and the Back rail cannot be
+  // dragged away from the viewport.
+  let touchY = null;
+  if (shell) {
+    shell.addEventListener('touchstart', event => {
+      touchY = event.touches.length === 1 ? event.touches[0].clientY : null;
+    }, { passive: true });
+
+    shell.addEventListener('touchmove', event => {
+      if (touchY === null || event.touches.length !== 1) return;
+      const nextY = event.touches[0].clientY;
+      const deltaY = nextY - touchY;
+      const maxScroll = Math.max(0, shell.scrollHeight - shell.clientHeight);
+      const atTop = shell.scrollTop <= 0;
+      const atBottom = shell.scrollTop >= maxScroll - 1;
+
+      if ((atTop && deltaY > 0) || (atBottom && deltaY < 0)) {
+        event.preventDefault();
+      }
+      touchY = nextY;
+    }, { passive: false });
+
+    const clearTouch = () => { touchY = null; };
+    shell.addEventListener('touchend', clearTouch, { passive: true });
+    shell.addEventListener('touchcancel', clearTouch, { passive: true });
   }
 
   back.addEventListener('click', close);
