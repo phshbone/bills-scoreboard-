@@ -322,3 +322,21 @@ Validated before merge as a Yankees-only CSS typography pass.
 - `sw.js` compiles successfully, precaches `team-theme-v15.css`, and uses cache namespace `scoreboard-v11b21-yankees-header-type`.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE TYPOGRAPHY VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B21 checkpoint / Stage 11B22 smoke
+A delayed five-iteration checkpoint was run before merging the next visual pass.
+
+### Checkpoint evidence
+- Core JavaScript compile checks pass for `app.js`, `team-data-v8.js`, `team-page-v8.js`, `live-score-v11.js`, `live-awareness-v6.js`, `home-score-rail-v8.js`, `global-standings-v10.js`, `sports-news-v11.js`, `desktop-nav-v11.js`, `swipe-repair-v11.js`, and `sw.js`.
+
+### Stage 11B22 evidence
+- `team-theme-v16.css` is Yankees-scoped and loads after the prior Yankees theme layers.
+- Team header is explicitly `position: relative` with `top: auto`, so it no longer floats over scrolled content.
+- Header and shell reference the existing `assets/yankees.webp` artwork as their material source.
+- Roster position headings now use dark navy contrast; position-count badges use light text on navy.
+- Yankees Retry button has explicit light text.
+- No team-page JavaScript or provider files changed.
+- `sw.js` compiles successfully, precaches `team-theme-v16.css`, and uses cache namespace `scoreboard-v11b22-yankees-metal-readability`.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.

@@ -304,3 +304,13 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Distress is intentionally minimal: sparse tiny wear marks and a muted vertical steel-toned text gradient, preserving readability.
 - The lowercase MLB kicker is softened to a muted light-steel tone and uses the same narrower typography direction.
 - This refinement is isolated in `team-theme-v15.css`.
+
+
+## Stage 11B22 lock — Yankees metal source + roster readability (2026-09-18)
+- Yankees team header is no longer sticky/floating; it scrolls in normal document flow.
+- The header and thin outer rails use the existing `assets/yankees.webp` plaque artwork as the metal/material source instead of another procedural CSS diamond-plate approximation.
+- A restrained dark veil is used only for title readability; prior procedural weathering pseudo-layers are retired for the Yankees header.
+- Roster position headings (for example Starting Pitchers and Catchers) use dark Yankees navy on the light field.
+- Roster position counts use a navy circular badge with light text.
+- The Yankees Retry button gets explicit light text for contrast on its dark control background.
+- No team-page data, provider, navigation, roster grouping, standings, News, live-state, or Back behavior changes.
