@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b30-ios-overscroll-lock';
+const CACHE = 'scoreboard-v11b31-footer-flush';
 const ASSETS = [
   './',
   './index.html',
