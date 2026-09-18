@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b27-final-inspection';
+const CACHE = 'scoreboard-v11b28-giants-jets-header-lift';
 const ASSETS = [
   './',
   './index.html',
