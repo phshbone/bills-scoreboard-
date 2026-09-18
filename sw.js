@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b14-standings-logos-swipe-hint';
+const CACHE = 'scoreboard-v11b15-swipe-hint-visible';
 const ASSETS = [
   './',
   './index.html',
