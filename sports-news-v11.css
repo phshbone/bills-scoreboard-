@@ -171,3 +171,31 @@
     -webkit-line-clamp: 2;
   }
 }
+
+
+/* Stage 11B16: source attribution for the multi-publisher News feed. */
+.sports-news-source {
+  color: #f7f9fc;
+  background: rgba(19, 26, 36, .90);
+  border-color: rgba(214, 225, 238, .28) !important;
+}
+
+.sports-news-source.source-espn {
+  color: #f4f5f6;
+  background: rgba(98, 17, 24, .72);
+}
+
+.sports-news-source.source-fox {
+  color: #f2f7ff;
+  background: rgba(22, 63, 111, .72);
+}
+
+.sports-news-source.source-cbs {
+  color: #f4f8ff;
+  background: rgba(31, 55, 93, .74);
+}
+
+.sports-news-source.source-yahoo {
+  color: #f8f3ff;
+  background: rgba(70, 28, 104, .72);
+}
