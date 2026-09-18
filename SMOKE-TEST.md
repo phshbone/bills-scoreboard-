@@ -195,3 +195,14 @@ Validated before merge with JavaScript compilation checks, deterministic standin
 - Service-worker cache namespace is bumped to `scoreboard-v11b14-standings-logos-swipe-hint`.
 
 Overall pre-merge classification: **PASS WITH REAL-DEVICE VISUAL VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B15 smoke — Swipe cue visibility repair
+- Confirmed the Stage 11B14 markup was present but the phone media rule never overrode the global `display: none`.
+- Phone rule now explicitly sets `display: grid`.
+- `[hidden]` still overrides the phone rule on News/Standings.
+- Edit mode still hides the cue.
+- The cue remains pointer-transparent and cannot intercept swipe gestures.
+- Service-worker cache namespace is bumped to `scoreboard-v11b15-swipe-hint-visible`.
+
+Overall pre-merge classification: **PASS**.
