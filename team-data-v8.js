@@ -418,6 +418,16 @@
     });
   }
 
+  function scopedStatLookup(categories, pattern) {
+    const scoped = (categories || []).filter(category => pattern.test(String(category?.displayName || category?.name || '')));
+    return statLookup(scoped.length ? scoped : categories);
+  }
+
+  function usableStatValue(value) {
+    const text = String(value ?? '').trim();
+    return text !== '' && text !== '—' && text !== '--' && text !== '-';
+  }
+
   function coreStats(team, player, categories) {
     const map = statLookup(categories);
     const missing = value => value === '' || value == null ? '—' : String(value);
@@ -489,43 +499,54 @@
     if (team?.sport === 'football') {
       const role = footballRole(player);
       if (role === 'qb') {
+        const passing = scopedStatLookup(categories, /pass/i);
+        const qbr = pickStat(passing, ['QBR', 'TOTALQBR']);
+        const rating = pickStat(passing, ['RTG', 'PASSERRATING', 'RATING']);
+        const ratingStat = usableStatValue(qbr)
+          ? { label: 'QBR', value: qbr }
+          : { label: 'RTG', value: missing(rating) };
         return [
-          { label: 'YDS', value: missing(pickStat(map, ['YDS', 'PASSYDS', 'PASSINGYARDS'])) },
-          { label: 'TD', value: missing(pickStat(map, ['TD', 'PASSTD', 'PASSINGTOUCHDOWNS'])) },
-          { label: 'INT', value: missing(pickStat(map, ['INT', 'INTERCEPTIONS'])) },
-          { label: 'QBR', value: missing(pickStat(map, ['QBR', 'RTG', 'PASSERRATING'])) }
+          { label: 'YDS', value: missing(pickStat(passing, ['PASSYDS', 'PASSINGYARDS', 'YDS'])) },
+          { label: 'TD', value: missing(pickStat(passing, ['PASSTD', 'PASSINGTOUCHDOWNS', 'TD'])) },
+          { label: 'INT', value: missing(pickStat(passing, ['INT', 'INTERCEPTIONS'])) },
+          ratingStat
         ];
       }
       if (role === 'rusher') {
+        const rushing = scopedStatLookup(categories, /rush/i);
+        const receiving = scopedStatLookup(categories, /receiv/i);
         return [
-          { label: 'CAR', value: missing(pickStat(map, ['CAR', 'ATT', 'RUSHATT', 'RUSHINGATTEMPTS'])) },
-          { label: 'YDS', value: missing(pickStat(map, ['RUSHYDS', 'RUSHINGYARDS', 'YDS'])) },
-          { label: 'TD', value: missing(pickStat(map, ['RUSHTD', 'RUSHINGTOUCHDOWNS', 'TD'])) },
-          { label: 'REC', value: missing(pickStat(map, ['REC', 'RECEPTIONS'])) }
+          { label: 'CAR', value: missing(pickStat(rushing, ['CAR', 'RUSHATT', 'RUSHINGATTEMPTS', 'ATT'])) },
+          { label: 'YDS', value: missing(pickStat(rushing, ['RUSHYDS', 'RUSHINGYARDS', 'YDS'])) },
+          { label: 'TD', value: missing(pickStat(rushing, ['RUSHTD', 'RUSHINGTOUCHDOWNS', 'TD'])) },
+          { label: 'REC', value: missing(pickStat(receiving, ['REC', 'RECEPTIONS'])) }
         ];
       }
       if (role === 'receiver') {
+        const receiving = scopedStatLookup(categories, /receiv/i);
         return [
-          { label: 'REC', value: missing(pickStat(map, ['REC', 'RECEPTIONS'])) },
-          { label: 'YDS', value: missing(pickStat(map, ['RECYDS', 'RECEIVINGYARDS', 'YDS'])) },
-          { label: 'TD', value: missing(pickStat(map, ['RECTD', 'RECEIVINGTOUCHDOWNS', 'TD'])) },
-          { label: 'TGT', value: missing(pickStat(map, ['TGT', 'TARGETS'])) }
+          { label: 'REC', value: missing(pickStat(receiving, ['REC', 'RECEPTIONS'])) },
+          { label: 'YDS', value: missing(pickStat(receiving, ['RECYDS', 'RECEIVINGYARDS', 'YDS'])) },
+          { label: 'TD', value: missing(pickStat(receiving, ['RECTD', 'RECEIVINGTOUCHDOWNS', 'TD'])) },
+          { label: 'TGT', value: missing(pickStat(receiving, ['TGT', 'TARGETS'])) }
         ];
       }
       if (role === 'kicker') {
+        const kicking = scopedStatLookup(categories, /kick|field goal/i);
         return [
-          { label: 'FG%', value: missing(pickStat(map, ['FG%', 'FGPCT', 'FIELDGOALPERCENTAGE'])) },
-          { label: 'FG', value: missing(pickStat(map, ['FG', 'FGM', 'FIELDGOALSMADE'])) },
-          { label: 'XP', value: missing(pickStat(map, ['XP', 'XPM', 'EXTRAPOINTSMADE'])) },
-          { label: 'PTS', value: missing(pickStat(map, ['PTS', 'POINTS'])) }
+          { label: 'FG%', value: missing(pickStat(kicking, ['FG%', 'FGPCT', 'FIELDGOALPERCENTAGE'])) },
+          { label: 'FG', value: missing(pickStat(kicking, ['FG', 'FGM', 'FIELDGOALSMADE'])) },
+          { label: 'XP', value: missing(pickStat(kicking, ['XP', 'XPM', 'EXTRAPOINTSMADE'])) },
+          { label: 'PTS', value: missing(pickStat(kicking, ['PTS', 'POINTS'])) }
         ];
       }
       if (role === 'punter') {
+        const punting = scopedStatLookup(categories, /punt/i);
         return [
-          { label: 'PUNT', value: missing(pickStat(map, ['PUNT', 'PUNTS'])) },
-          { label: 'AVG', value: missing(pickStat(map, ['AVG', 'PUNTAVG', 'PUNTAVERAGE'])) },
-          { label: 'LNG', value: missing(pickStat(map, ['LNG', 'LONG'])) },
-          { label: 'IN20', value: missing(pickStat(map, ['IN20', 'INSIDE20'])) }
+          { label: 'PUNT', value: missing(pickStat(punting, ['PUNT', 'PUNTS'])) },
+          { label: 'AVG', value: missing(pickStat(punting, ['AVG', 'PUNTAVG', 'PUNTAVERAGE'])) },
+          { label: 'LNG', value: missing(pickStat(punting, ['LNG', 'LONG'])) },
+          { label: 'IN20', value: missing(pickStat(punting, ['IN20', 'INSIDE20'])) }
         ];
       }
       if (role === 'offensive-line') {
@@ -536,11 +557,12 @@
           { label: 'PEN', value: missing(pickStat(map, ['PEN', 'PENALTIES'])) }
         ];
       }
+      const defense = scopedStatLookup(categories, /defen|tack|sack|interception/i);
       return [
-        { label: 'TKL', value: missing(pickStat(map, ['TOT', 'TKL', 'TACKLES', 'TOTALTACKLES'])) },
-        { label: 'SACK', value: missing(pickStat(map, ['SACK', 'SACKS'])) },
-        { label: 'INT', value: missing(pickStat(map, ['INT', 'INTERCEPTIONS'])) },
-        { label: 'FF', value: missing(pickStat(map, ['FF', 'FORCEDFUMBLES'])) }
+        { label: 'TKL', value: missing(pickStat(defense, ['TOT', 'TKL', 'TACKLES', 'TOTALTACKLES'])) },
+        { label: 'SACK', value: missing(pickStat(defense, ['SACK', 'SACKS'])) },
+        { label: 'INT', value: missing(pickStat(defense, ['INT', 'INTERCEPTIONS'])) },
+        { label: 'FF', value: missing(pickStat(defense, ['FF', 'FORCEDFUMBLES'])) }
       ];
     }
 

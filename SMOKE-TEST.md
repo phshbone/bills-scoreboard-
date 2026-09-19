@@ -632,3 +632,16 @@ Overall pre-merge classification: **PASS WITH LIVE-DATA + REAL-IPHONE VISUAL VER
 - Real-device verification remains required for semantic grouping density, football cards, basketball/hockey live card values, roster-return scroll position, and footer stability.
 
 Overall pre-merge classification: **PASS WITH LIVE-DATA + REAL-IPHONE VISUAL VERIFICATION REQUIRED**.
+
+
+## Stage 11B40 smoke — football stat cleanup
+### Executed checks
+- team-data-v8.js parses successfully after football category-scoped core-stat selection and RTG/QBR separation.
+- Synthetic QB test with simultaneous Rushing and Passing categories returns 844 passing YDS / 6 TD / 3 INT and labels 136.5 as RTG rather than QBR.
+- team-page-v8.js parses successfully after category-first football grouping, zero-only suppression, de-duplication, and context-aware stat explanations.
+- Direct helper checks confirm Rushing YDS/TD stay in Rushing, Passing YDS/ATT stay in Passing, receiving REC stays in Receiving, GP maps to Usage, and zero-only football stats are treated as inactive.
+- sw.js cache namespace is scoreboard-v11b40-football-stat-cleanup.
+- No header/footer/scroller files are changed in this stage.
+- Real-iPhone verification remains required for Cam Skattebo/Jaxson Dart/Army football player pages and roster cards.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION REQUIRED**.
