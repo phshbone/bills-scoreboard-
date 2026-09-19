@@ -585,3 +585,18 @@ Triggered by real-iPhone regression evidence showing Stage 11B35 changed the app
 - Service-worker cache namespace is scoreboard-v11b36-restore-approved-header.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE HEADER VISUAL VERIFICATION REQUIRED**.
+
+
+## Stage 11B37 smoke — real plate anchored footer
+Triggered by the approved decision to replace synthetic footer metal with Bill's supplied plain plate artwork.
+
+### Executed evidence
+- New binary asset assets/score-metal-footer.webp is present on the Stage 11B37 branch and derived from the supplied plain diamond-plate image.
+- team-theme-v20.css changes only the Back-rail presentation; no header selectors, team-page markup, or team-page JavaScript are changed.
+- The Back rail is explicitly position: sticky, bottom: 0, z-index: 20, with margin 0 and no bottom radius/border gap.
+- Safe-area padding remains inside the plate background, so the footer owns the full visual bottom edge.
+- The supplied plate is rendered cover/no-repeat, avoiding synthetic tiling.
+- sw.js precaches the new footer asset and compiles successfully.
+- Service-worker cache namespace is scoreboard-v11b37-real-plate-footer.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION REQUIRED**.
