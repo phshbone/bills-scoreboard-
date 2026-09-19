@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b34-authentic-footer-metal';
+const CACHE = 'scoreboard-v11b35-integrated-footer-frame';
 const ASSETS = [
   './',
   './index.html',
