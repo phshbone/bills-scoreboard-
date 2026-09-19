@@ -616,3 +616,19 @@ Scope is isolated to player-data normalization/lazy loading, roster rendering, r
 - Real-device verification remains required for iPhone card density, image loading, scroll restoration, and footer stability.
 
 Overall pre-merge classification: **PASS WITH LIVE-DATA + REAL-IPHONE VISUAL VERIFICATION REQUIRED**.
+
+
+## Stage 11B39 smoke — repaired card stats + semantic player detail + football cards
+### Executed checks
+- team-data-v8.js parses successfully with season-aware athlete URLs, basketball/hockey card fallback, current-season player snapshots, football position-aware core stats, football recent-game summaries, and guarded football trend rules.
+- Synthetic WNBA test: empty overview correctly falls back to season stats and returns PTS/REB/AST/FG% plus a recent-game line.
+- Synthetic NHL goalie test: empty overview correctly falls back to season stats and returns W-L-OTL/GAA/SV%/SO plus the last appearance.
+- Synthetic NFL QB test: rich card returns passing YDS/TD/INT/QBR plus a last-game summary.
+- Synthetic MLB player-detail test confirms current-season core stats remain separate from comprehensive Career Batting / Advanced Batting categories.
+- team-page-v8.js parses successfully with semantic stat grouping and football rich-card enablement.
+- roster-groups-v5.css brace balance is zero and adds only roster/player-detail presentation rules.
+- No changes are made to index.html, team-theme-v20.css, or team-page-v8.css, preserving the approved header/footer/scroller structure.
+- sw.js cache namespace is scoreboard-v11b39-roster-detail-groups.
+- Real-device verification remains required for semantic grouping density, football cards, basketball/hockey live card values, roster-return scroll position, and footer stability.
+
+Overall pre-merge classification: **PASS WITH LIVE-DATA + REAL-IPHONE VISUAL VERIFICATION REQUIRED**.
