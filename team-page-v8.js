@@ -128,7 +128,7 @@
     const trend = row.querySelector('.roster-trend-line');
 
     try {
-      const details = await window.ScoreboardData.loadPlayerDetails(currentTeam, player);
+      const details = await window.ScoreboardData.loadPlayerCard(currentTeam, player);
       if (!row.isConnected) return;
       renderCoreStats(season, details.core);
       if (details.lastAppearance) {
