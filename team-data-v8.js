@@ -333,10 +333,24 @@
     return /^\d+$/.test(id) ? id : '';
   }
 
-  function playerEndpoint(team, player, resource) {
+  function seasonForTeam(team, date = new Date()) {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const league = String(team?.provider?.league || '').toLowerCase();
+
+    // ESPN identifies NBA/NHL seasons by the year in which that season ends.
+    if ((league === 'nba' || league === 'nhl') && month >= 7) return year + 1;
+    return year;
+  }
+
+  function playerEndpoint(team, player, resource, options = {}) {
     const id = espnPlayerId(player);
     if (!id || !team?.provider?.sport || !team?.provider?.league) return '';
-    return `${PLAYER_WEB}/${team.provider.sport}/${team.provider.league}/athletes/${id}/${resource}`;
+    const params = [];
+    if (options.season) params.push(`season=${encodeURIComponent(options.season)}`);
+    if (options.seasontype) params.push(`seasontype=${encodeURIComponent(options.seasontype)}`);
+    const query = params.length ? `?${params.join('&')}` : '';
+    return `${PLAYER_WEB}/${team.provider.sport}/${team.provider.league}/athletes/${id}/${resource}${query}`;
   }
 
   function statCategories(payload) {
@@ -386,9 +400,28 @@
     return /^G$/i.test(String(player?.position || '').trim());
   }
 
+  function footballRole(player) {
+    const position = String(player?.position || '').toUpperCase();
+    if (['QB'].includes(position)) return 'qb';
+    if (['RB','HB','FB'].includes(position)) return 'rusher';
+    if (['WR','TE'].includes(position)) return 'receiver';
+    if (['K','PK'].includes(position)) return 'kicker';
+    if (['P'].includes(position)) return 'punter';
+    if (['LT','RT','OT','LG','RG','OG','G','C','OL'].includes(position)) return 'offensive-line';
+    return 'defense';
+  }
+
+  function meaningfulCore(core) {
+    return Array.isArray(core) && core.some(item => {
+      const value = String(item?.value ?? '').trim();
+      return value && value !== '—' && value !== '--';
+    });
+  }
+
   function coreStats(team, player, categories) {
     const map = statLookup(categories);
     const missing = value => value === '' || value == null ? '—' : String(value);
+
     if (team?.sport === 'baseball') {
       if (isBaseballPitcher(player)) {
         const wins = pickStat(map, ['W', 'WINS']);
@@ -450,6 +483,64 @@
         { label: 'A', value: missing(pickStat(map, ['A', 'ASSISTS'])) },
         { label: 'PTS', value: missing(pickStat(map, ['PTS', 'POINTS'])) },
         { label: '+/-', value: missing(pickStat(map, ['+/-', 'PLUSMINUS'])) }
+      ];
+    }
+
+    if (team?.sport === 'football') {
+      const role = footballRole(player);
+      if (role === 'qb') {
+        return [
+          { label: 'YDS', value: missing(pickStat(map, ['YDS', 'PASSYDS', 'PASSINGYARDS'])) },
+          { label: 'TD', value: missing(pickStat(map, ['TD', 'PASSTD', 'PASSINGTOUCHDOWNS'])) },
+          { label: 'INT', value: missing(pickStat(map, ['INT', 'INTERCEPTIONS'])) },
+          { label: 'QBR', value: missing(pickStat(map, ['QBR', 'RTG', 'PASSERRATING'])) }
+        ];
+      }
+      if (role === 'rusher') {
+        return [
+          { label: 'CAR', value: missing(pickStat(map, ['CAR', 'ATT', 'RUSHATT', 'RUSHINGATTEMPTS'])) },
+          { label: 'YDS', value: missing(pickStat(map, ['RUSHYDS', 'RUSHINGYARDS', 'YDS'])) },
+          { label: 'TD', value: missing(pickStat(map, ['RUSHTD', 'RUSHINGTOUCHDOWNS', 'TD'])) },
+          { label: 'REC', value: missing(pickStat(map, ['REC', 'RECEPTIONS'])) }
+        ];
+      }
+      if (role === 'receiver') {
+        return [
+          { label: 'REC', value: missing(pickStat(map, ['REC', 'RECEPTIONS'])) },
+          { label: 'YDS', value: missing(pickStat(map, ['RECYDS', 'RECEIVINGYARDS', 'YDS'])) },
+          { label: 'TD', value: missing(pickStat(map, ['RECTD', 'RECEIVINGTOUCHDOWNS', 'TD'])) },
+          { label: 'TGT', value: missing(pickStat(map, ['TGT', 'TARGETS'])) }
+        ];
+      }
+      if (role === 'kicker') {
+        return [
+          { label: 'FG%', value: missing(pickStat(map, ['FG%', 'FGPCT', 'FIELDGOALPERCENTAGE'])) },
+          { label: 'FG', value: missing(pickStat(map, ['FG', 'FGM', 'FIELDGOALSMADE'])) },
+          { label: 'XP', value: missing(pickStat(map, ['XP', 'XPM', 'EXTRAPOINTSMADE'])) },
+          { label: 'PTS', value: missing(pickStat(map, ['PTS', 'POINTS'])) }
+        ];
+      }
+      if (role === 'punter') {
+        return [
+          { label: 'PUNT', value: missing(pickStat(map, ['PUNT', 'PUNTS'])) },
+          { label: 'AVG', value: missing(pickStat(map, ['AVG', 'PUNTAVG', 'PUNTAVERAGE'])) },
+          { label: 'LNG', value: missing(pickStat(map, ['LNG', 'LONG'])) },
+          { label: 'IN20', value: missing(pickStat(map, ['IN20', 'INSIDE20'])) }
+        ];
+      }
+      if (role === 'offensive-line') {
+        return [
+          { label: 'GP', value: missing(pickStat(map, ['GP', 'GAMESPLAYED'])) },
+          { label: 'GS', value: missing(pickStat(map, ['GS', 'GAMESSTARTED'])) },
+          { label: 'SNAP', value: missing(pickStat(map, ['SNAP', 'SNAPS'])) },
+          { label: 'PEN', value: missing(pickStat(map, ['PEN', 'PENALTIES'])) }
+        ];
+      }
+      return [
+        { label: 'TKL', value: missing(pickStat(map, ['TOT', 'TKL', 'TACKLES', 'TOTALTACKLES'])) },
+        { label: 'SACK', value: missing(pickStat(map, ['SACK', 'SACKS'])) },
+        { label: 'INT', value: missing(pickStat(map, ['INT', 'INTERCEPTIONS'])) },
+        { label: 'FF', value: missing(pickStat(map, ['FF', 'FORCEDFUMBLES'])) }
       ];
     }
 
@@ -557,6 +648,54 @@
       return pieces.length ? { label: 'Last game', text: pieces.join(' · ') } : null;
     }
 
+    if (team?.sport === 'football') {
+      const role = footballRole(player);
+      if (role === 'qb') {
+        const cmp = eventStat(event, ['PASSINGCOMPLETIONS', 'CMP']);
+        const att = eventStat(event, ['PASSINGATTEMPTS', 'ATT']);
+        const yds = eventStat(event, ['PASSINGYARDS', 'PASSYDS']);
+        const td = eventStat(event, ['PASSINGTOUCHDOWNS', 'PASSTD']);
+        const interceptions = eventStat(event, ['INTERCEPTIONS', 'INT']);
+        if (cmp && att) pieces.push(`${cmp}/${att}`);
+        if (yds) pieces.push(`${yds} YDS`);
+        if (td) pieces.push(`${td} TD`);
+        if (interceptions) pieces.push(`${interceptions} INT`);
+      } else if (role === 'rusher') {
+        const yds = eventStat(event, ['RUSHINGYARDS', 'RUSHYDS']);
+        const td = eventStat(event, ['RUSHINGTOUCHDOWNS', 'RUSHTD']);
+        const rec = eventStat(event, ['RECEPTIONS', 'REC']);
+        if (yds) pieces.push(`${yds} RUSH YDS`);
+        if (td) pieces.push(`${td} TD`);
+        if (rec) pieces.push(`${rec} REC`);
+      } else if (role === 'receiver') {
+        const rec = eventStat(event, ['RECEPTIONS', 'REC']);
+        const yds = eventStat(event, ['RECEIVINGYARDS', 'RECYDS']);
+        const td = eventStat(event, ['RECEIVINGTOUCHDOWNS', 'RECTD']);
+        if (rec) pieces.push(`${rec} REC`);
+        if (yds) pieces.push(`${yds} YDS`);
+        if (td) pieces.push(`${td} TD`);
+      } else if (role === 'kicker') {
+        const fgm = eventStat(event, ['FIELDGOALSMADE', 'FGM']);
+        const fga = eventStat(event, ['FIELDGOALATTEMPTS', 'FGA']);
+        const xpm = eventStat(event, ['EXTRAPOINTSMADE', 'XPM']);
+        if (fgm && fga) pieces.push(`${fgm}/${fga} FG`);
+        if (xpm) pieces.push(`${xpm} XP`);
+      } else if (role === 'punter') {
+        const punts = eventStat(event, ['PUNTS', 'PUNT']);
+        const avg = eventStat(event, ['PUNTAVERAGE', 'PUNTAVG', 'AVG']);
+        if (punts) pieces.push(`${punts} PUNTS`);
+        if (avg) pieces.push(`${avg} AVG`);
+      } else {
+        const tackles = eventStat(event, ['TOTALTACKLES', 'TACKLES', 'TOT', 'TKL']);
+        const sacks = eventStat(event, ['SACKS', 'SACK']);
+        const interceptions = eventStat(event, ['INTERCEPTIONS', 'INT']);
+        if (tackles) pieces.push(`${tackles} TKL`);
+        if (sacks) pieces.push(`${sacks} SACK`);
+        if (interceptions) pieces.push(`${interceptions} INT`);
+      }
+      return pieces.length ? { label: 'Last game', text: pieces.join(' · ') } : null;
+    }
+
     return null;
   }
 
@@ -647,6 +786,26 @@
       }
     }
 
+    if (team?.sport === 'football') {
+      const role = footballRole(player);
+      let streak = 0;
+      for (const event of recent) {
+        let value = NaN;
+        if (role === 'qb') value = numberValue(eventStat(event, ['PASSINGTOUCHDOWNS', 'PASSTD']));
+        else if (role === 'rusher') value = numberValue(eventStat(event, ['RUSHINGTOUCHDOWNS', 'RUSHTD']));
+        else if (role === 'receiver') value = numberValue(eventStat(event, ['RECEIVINGTOUCHDOWNS', 'RECTD']));
+        else if (role === 'defense') value = numberValue(eventStat(event, ['SACKS', 'SACK']));
+        else break;
+        if (!Number.isFinite(value) || value <= 0) break;
+        streak += 1;
+      }
+      if (streak >= 2) {
+        if (role === 'qb') return `Passing TD in ${streak} straight games`;
+        if (role === 'rusher' || role === 'receiver') return `TD in ${streak} straight games`;
+        if (role === 'defense') return `Sack in ${streak} straight games`;
+      }
+    }
+
     return '';
   }
 
@@ -675,6 +834,7 @@
       return {
         supported: false,
         core: [],
+        coreContext: '',
         lastAppearance: null,
         trend: '',
         errors: { player: 'Detailed ESPN player data is unavailable for this roster-only entry.' }
@@ -685,42 +845,64 @@
     if (!force && playerCardCache.has(key)) return playerCardCache.get(key);
 
     const promise = (async () => {
-      const url = playerEndpoint(team, player, 'overview');
+      const season = seasonForTeam(team);
+      let core = [];
+      let coreContext = 'Current season';
+      let events = [];
+      let lastAppearance = null;
+      const errors = {};
+
       try {
-        const payload = await fetchJson(url);
-        const categories = overviewCategories(payload);
-        let events = gamelogEvents(payload?.gameLog || payload?.gamelog || {});
-        let lastAppearance = appearanceSummary(team, player, events[0]);
-
-        // Some overview responses include recent events without the label metadata
-        // needed to interpret each stats array. Only then pay for the dedicated
-        // gamelog request so the roster remains light by default.
-        if (!lastAppearance) {
-          try {
-            const gamelog = await fetchJson(playerEndpoint(team, player, 'gamelog'));
-            events = gamelogEvents(gamelog);
-            lastAppearance = appearanceSummary(team, player, events[0]);
-          } catch {
-            // Keep the season card useful even when recent-game data is unavailable.
-          }
-        }
-
-        return {
-          supported: true,
-          core: coreStats(team, player, categories),
-          lastAppearance,
-          trend: trendSummary(team, player, events),
-          errors: {}
-        };
+        const overview = await fetchJson(playerEndpoint(team, player, 'overview'));
+        core = coreStats(team, player, overviewCategories(overview));
+        events = gamelogEvents(overview?.gameLog || overview?.gamelog || {});
+        lastAppearance = appearanceSummary(team, player, events[0]);
       } catch (error) {
-        return {
-          supported: true,
-          core: [],
-          lastAppearance: null,
-          trend: '',
-          errors: { overview: error.message }
-        };
+        errors.overview = error.message;
       }
+
+      // Basketball and hockey overview responses can carry the player shell but
+      // omit the stat snapshot. Fall back to the season-scoped stats endpoint.
+      if (!meaningfulCore(core)) {
+        try {
+          const seasonStats = await fetchJson(playerEndpoint(team, player, 'stats', { season, seasontype: 2 }));
+          core = coreStats(team, player, statCategories(seasonStats));
+        } catch (error) {
+          errors.stats = error.message;
+        }
+      }
+
+      // If the current season has not started yet, a labeled career fallback is
+      // more useful than four dashes and is never presented as season data.
+      if (!meaningfulCore(core)) {
+        try {
+          const allStats = await fetchJson(playerEndpoint(team, player, 'stats'));
+          const allCategories = statCategories(allStats);
+          core = coreStats(team, player, allCategories);
+          if (meaningfulCore(core)) coreContext = 'Career';
+        } catch (error) {
+          errors.career = error.message;
+        }
+      }
+
+      if (!lastAppearance) {
+        try {
+          const gamelog = await fetchJson(playerEndpoint(team, player, 'gamelog', { season }));
+          events = gamelogEvents(gamelog);
+          lastAppearance = appearanceSummary(team, player, events[0]);
+        } catch (error) {
+          errors.gamelog = error.message;
+        }
+      }
+
+      return {
+        supported: true,
+        core,
+        coreContext,
+        lastAppearance,
+        trend: trendSummary(team, player, events),
+        errors
+      };
     })();
 
     playerCardCache.set(key, promise);
@@ -736,9 +918,11 @@
         supported: false,
         categories: [],
         core: [],
+        coreContext: '',
         events: [],
         lastAppearance: null,
         trend: '',
+        glossary: {},
         errors: { player: 'Detailed ESPN player data is unavailable for this roster-only entry.' }
       };
     }
@@ -747,26 +931,53 @@
     if (!force && playerDetailCache.has(key)) return playerDetailCache.get(key);
 
     const promise = (async () => {
-      const resources = ['stats', 'gamelog'];
-      const results = await Promise.all(resources.map(async resource => {
-        const url = playerEndpoint(team, player, resource);
+      const season = seasonForTeam(team);
+      const requests = [
+        ['stats', playerEndpoint(team, player, 'stats')],
+        ['seasonStats', playerEndpoint(team, player, 'stats', { season, seasontype: 2 })],
+        ['gamelog', playerEndpoint(team, player, 'gamelog', { season })]
+      ];
+      const results = await Promise.all(requests.map(async ([resource, url]) => {
         try { return [resource, await fetchJson(url), null]; }
         catch (error) { return [resource, null, error.message]; }
       }));
       const payloads = Object.fromEntries(results.map(([resource, payload]) => [resource, payload]));
       const errors = Object.fromEntries(results.filter(([, , error]) => error).map(([resource, , error]) => [resource, error]));
-      const categories = statCategories(payloads.stats);
+
+      const comprehensiveCategories = statCategories(payloads.stats);
+      const seasonCategories = statCategories(payloads.seasonStats);
+      const categories = comprehensiveCategories.length ? comprehensiveCategories : seasonCategories;
+      let core = coreStats(team, player, seasonCategories);
+      let coreContext = 'Current season';
+      if (!meaningfulCore(core)) {
+        core = coreStats(team, player, categories);
+        if (meaningfulCore(core)) coreContext = 'Career';
+      }
+
+      const glossaryItems = [
+        ...(Array.isArray(payloads.stats?.glossary) ? payloads.stats.glossary : []),
+        ...(Array.isArray(payloads.seasonStats?.glossary) ? payloads.seasonStats.glossary : [])
+      ];
+      const glossary = {};
+      glossaryItems.forEach(item => {
+        const keyName = String(item?.abbreviation || item?.name || '').trim().toUpperCase();
+        const displayName = item?.displayName || item?.description || '';
+        if (keyName && displayName && !glossary[keyName]) glossary[keyName] = displayName;
+      });
+
       const events = gamelogEvents(payloads.gamelog);
       return {
         supported: true,
         categories: categories.map(category => ({
-          name: category?.displayName || category?.name || 'Season',
+          name: category?.displayName || category?.name || 'Statistics',
           stats: categoryPairs(category)
         })).filter(category => category.stats.length),
-        core: coreStats(team, player, categories),
+        core,
+        coreContext,
         events,
         lastAppearance: appearanceSummary(team, player, events[0]),
         trend: trendSummary(team, player, events),
+        glossary,
         errors
       };
     })();
