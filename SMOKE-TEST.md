@@ -600,3 +600,18 @@ Triggered by the approved decision to replace synthetic footer metal with Bill's
 - Service-worker cache namespace is scoreboard-v11b37-real-plate-footer.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION REQUIRED**.
+
+
+## Stage 11B38 smoke — rich roster cards + player detail
+Scope is isolated to player-data normalization/lazy loading, roster rendering, roster/player styling, and the service-worker cache namespace.
+
+### Static/runtime checks
+- team-data-v8.js parses successfully after adding provider headshot normalization, team logo normalization, athlete season-stat loading, gamelog loading, core-stat selection, last-appearance summaries, and guarded recent-trend derivation.
+- team-page-v8.js parses successfully after adding Prototype C cards, lazy viewport hydration, player detail view, Back-to-Roster behavior, and roster-scroll restoration.
+- No new team-page wrapper/scroller is introduced; Stage 11B36 header/scroll structure is retained.
+- Rich cards are limited to baseball, basketball, and hockey. Football/NCAA roster rendering follows the prior code path.
+- Missing headshots, detailed stats, or gamelogs fall back without inventing content.
+- sw.js cache namespace is scoreboard-v11b38-rich-roster-cards.
+- Real-device verification remains required for iPhone card density, image loading, scroll restoration, and footer stability.
+
+Overall pre-merge classification: **PASS WITH LIVE-DATA + REAL-IPHONE VISUAL VERIFICATION REQUIRED**.
