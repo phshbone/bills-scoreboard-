@@ -436,3 +436,12 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - The previous CSS/data-URI tread is retired for the footer because it repeated only one diagonal direction and read as a synthetic approximation beside the team artwork.
 - The footer now uses a dedicated reusable steel texture asset with alternating opposing tread rows, raised-lug highlight/shadow treatment, dark blue steel depth, and restrained pits/scratches/grain.
 - The texture is visual only. No team-page layout, scrolling, live-score, provider, or navigation logic changes.
+
+
+## Stage 11B35 lock — integrated footer frame (2026-09-18)
+- The Stage 11B34 steel texture is retained, but the Back rail is no longer a sticky slab painted over scrolling team content.
+- The team-page header and light content now live together inside a dedicated internal scroller so the header still scrolls away exactly as before.
+- The Back rail is a separate structural bottom row outside that scroller, so team cards/content cannot run underneath it.
+- The team-page shell and Back-rail area share the same weathered alternating steel texture. The nav itself is transparent over that common shell surface, eliminating the pasted-on rectangle effect.
+- Existing Back button dimensions, safe-area padding, team content themes, live-score behavior, and My Teams scroll/focus restoration remain unchanged.
+- Stage 11B30 iOS edge-rubber-band protection now targets the dedicated internal scroller.
