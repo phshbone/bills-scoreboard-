@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b36-restore-approved-header';
+const CACHE = 'scoreboard-v11b37-real-plate-footer';
 const ASSETS = [
   './',
   './index.html',
@@ -51,6 +51,7 @@ const ASSETS = [
   './manifest.webmanifest',
   './assets/icon.svg',
   './assets/score-metal-tread.svg',
+  './assets/score-metal-footer.webp',
   './assets/scoreboard-header.webp',
   './assets/giants.webp',
   './assets/yankees.webp',
