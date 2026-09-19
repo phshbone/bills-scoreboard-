@@ -570,3 +570,18 @@ Triggered by real-iPhone visual verification showing that Stage 11B34's improved
 - Service-worker cache namespace is scoreboard-v11b35-integrated-footer-frame.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION REQUIRED**.
+
+
+## Stage 11B36 smoke — restore approved team-page header/content structure
+Triggered by real-iPhone regression evidence showing Stage 11B35 changed the approved team-page header/frame while attempting to solve the footer overlay appearance.
+
+### Executed evidence
+- index.html matches Stage 11B34 exactly for the team-page structure; the temporary .team-page-scroll wrapper is removed.
+- team-page-v8.js matches Stage 11B34 exactly; scroll reset and iOS edge guard target the original .team-page-shell again.
+- team-page-v8.css matches Stage 11B34 exactly; .team-page-shell is restored as the vertical scroller.
+- team-theme-v20.css matches Stage 11B34 exactly, restoring the approved team-page framing and retaining the alternating/weathered steel footer texture.
+- Stage 11B32 live-feed bridge and Stage 11B33 darker live cue are not modified.
+- sw.js compiles successfully.
+- Service-worker cache namespace is scoreboard-v11b36-restore-approved-header.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE HEADER VISUAL VERIFICATION REQUIRED**.
