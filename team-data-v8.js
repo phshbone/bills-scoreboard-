@@ -8,6 +8,7 @@
   const MLB_TEAM_IDS = Object.freeze({ nyy: 147, nym: 121, phi: 143 });
   const teamCache = new Map();
   const standingsCache = new Map();
+  const playerCardCache = new Map();
   const playerDetailCache = new Map();
 
   function endpoint(team, resource = '') {
@@ -634,6 +635,70 @@
     return '';
   }
 
+  function overviewCategories(payload) {
+    const statistics = payload?.statistics || {};
+    const labels = Array.isArray(statistics.labels) ? statistics.labels : [];
+    const names = Array.isArray(statistics.names) ? statistics.names : [];
+    const totals = Array.isArray(statistics.displayValues)
+      ? statistics.displayValues
+      : (Array.isArray(statistics.totals) ? statistics.totals : []);
+    if (labels.length && totals.length) {
+      return [{
+        name: 'overview',
+        displayName: 'Season',
+        labels,
+        names,
+        totals
+      }];
+    }
+    return statCategories(payload);
+  }
+
+  async function loadPlayerCard(team, player, force = false) {
+    const id = espnPlayerId(player);
+    if (!id) {
+      return {
+        supported: false,
+        core: [],
+        lastAppearance: null,
+        trend: '',
+        errors: { player: 'Detailed ESPN player data is unavailable for this roster-only entry.' }
+      };
+    }
+
+    const key = `${team.provider.sport}/${team.provider.league}/${id}`;
+    if (!force && playerCardCache.has(key)) return playerCardCache.get(key);
+
+    const promise = (async () => {
+      const url = playerEndpoint(team, player, 'overview');
+      try {
+        const payload = await fetchJson(url);
+        const categories = overviewCategories(payload);
+        const events = gamelogEvents(payload?.gameLog || payload?.gamelog || {});
+        return {
+          supported: true,
+          core: coreStats(team, player, categories),
+          lastAppearance: appearanceSummary(team, player, events[0]),
+          trend: trendSummary(team, player, events),
+          errors: {}
+        };
+      } catch (error) {
+        return {
+          supported: true,
+          core: [],
+          lastAppearance: null,
+          trend: '',
+          errors: { overview: error.message }
+        };
+      }
+    })();
+
+    playerCardCache.set(key, promise);
+    const data = await promise;
+    playerCardCache.set(key, Promise.resolve(data));
+    return data;
+  }
+
   async function loadPlayerDetails(team, player, force = false) {
     const id = espnPlayerId(player);
     if (!id) {
@@ -736,5 +801,5 @@
     return normalized;
   }
 
-  window.ScoreboardData = Object.freeze({ load, standingRow, loadPlayerDetails });
+  window.ScoreboardData = Object.freeze({ load, standingRow, loadPlayerCard, loadPlayerDetails });
 })();
