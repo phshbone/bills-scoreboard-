@@ -445,3 +445,11 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - The team-page shell and Back-rail area share the same weathered alternating steel texture. The nav itself is transparent over that common shell surface, eliminating the pasted-on rectangle effect.
 - Existing Back button dimensions, safe-area padding, team content themes, live-score behavior, and My Teams scroll/focus restoration remain unchanged.
 - Stage 11B30 iOS edge-rubber-band protection now targets the dedicated internal scroller.
+
+
+## Stage 11B36 lock — restore approved team-page header/content structure (2026-09-18)
+- Stage 11B35 changed the team-page document structure to solve a footer presentation problem and unintentionally altered the already-approved header/frame behavior.
+- index.html, team-page-v8.js, team-page-v8.css, and team-theme-v20.css are restored exactly to the Stage 11B34 source state.
+- This restores the approved artwork header, original team-page shell scrolling model, established content framing, and the Stage 11B34 alternating/weathered footer texture.
+- Stage 11B32 live-feed state bridge and Stage 11B33 darker live-score cue remain intact because they live outside the reverted Stage 11B35 structural files.
+- No attempt is made in this stage to further redesign the footer. Header restoration is isolated first.

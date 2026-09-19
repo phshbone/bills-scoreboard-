@@ -56,17 +56,9 @@
 }
 
 .team-page-shell {
-  display: flex;
-  flex-direction: column;
   height: 100%;
   min-height: 100%;
   max-height: 100%;
-  overflow: hidden;
-}
-
-.team-page-scroll {
-  flex: 1 1 auto;
-  min-height: 0;
   overflow-y: auto;
   overscroll-behavior-x: none;
   overscroll-behavior-y: none;
