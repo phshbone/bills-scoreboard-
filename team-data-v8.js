@@ -4,9 +4,11 @@
   const SITE = 'https://site.api.espn.com/apis/site/v2/sports';
   const STANDINGS = 'https://site.api.espn.com/apis/v2/sports';
   const MLB_ROSTER = 'https://statsapi.mlb.com/api/v1/teams';
+  const PLAYER_WEB = 'https://site.web.api.espn.com/apis/common/v3/sports';
   const MLB_TEAM_IDS = Object.freeze({ nyy: 147, nym: 121, phi: 143 });
   const teamCache = new Map();
   const standingsCache = new Map();
+  const playerDetailCache = new Map();
 
   function endpoint(team, resource = '') {
     const p = team.provider;
@@ -30,11 +32,16 @@
   }
 
   function player(playerObj, groupName = '') {
+    const headshot = playerObj?.headshot?.href
+      || playerObj?.headshot?.url
+      || (Array.isArray(playerObj?.headshots) ? playerObj.headshots[0]?.href : '')
+      || '';
     return {
       name: playerObj?.fullName || playerObj?.displayName || playerObj?.shortName || playerObj?.name || 'Unnamed player',
       position: playerObj?.position?.abbreviation || playerObj?.position?.displayName || playerObj?.position?.name || (typeof playerObj?.position === 'string' ? playerObj.position : '') || groupName || '',
       jersey: playerObj?.jersey || playerObj?.uniform || '',
-      id: String(playerObj?.id || playerObj?.uid || playerObj?.guid || '')
+      id: String(playerObj?.id || playerObj?.uid || playerObj?.guid || ''),
+      headshot
     };
   }
 
@@ -280,7 +287,8 @@
       name: item?.person?.fullName || item?.person?.name || 'Unnamed player',
       position: item?.position?.abbreviation || item?.position?.name || '',
       jersey: item?.jerseyNumber || '',
-      id: item?.person?.id ? `mlb-${item.person.id}` : ''
+      id: item?.person?.id ? `mlb-${item.person.id}` : '',
+      headshot: ''
     })).filter(item => item.name !== 'Unnamed player');
   }
 
@@ -319,6 +327,366 @@
     return merged;
   }
 
+  function espnPlayerId(player) {
+    const id = String(player?.id || '');
+    return /^\d+$/.test(id) ? id : '';
+  }
+
+  function playerEndpoint(team, player, resource) {
+    const id = espnPlayerId(player);
+    if (!id || !team?.provider?.sport || !team?.provider?.league) return '';
+    return `${PLAYER_WEB}/${team.provider.sport}/${team.provider.league}/athletes/${id}/${resource}`;
+  }
+
+  function statCategories(payload) {
+    const candidates = [];
+    if (Array.isArray(payload?.categories)) candidates.push(...payload.categories);
+    if (Array.isArray(payload?.statistics?.categories)) candidates.push(...payload.statistics.categories);
+    return candidates.filter(category => Array.isArray(category?.labels) && Array.isArray(category?.totals));
+  }
+
+  function categoryPairs(category) {
+    const labels = category?.labels || [];
+    const names = category?.names || [];
+    const totals = category?.totals || [];
+    return totals.map((value, index) => ({
+      label: String(labels[index] || names[index] || '').trim(),
+      name: String(names[index] || '').trim(),
+      value: value == null || value === '' ? '—' : String(value)
+    })).filter(item => item.label || item.name);
+  }
+
+  function statLookup(categories) {
+    const map = new Map();
+    categories.forEach(category => {
+      categoryPairs(category).forEach(item => {
+        [item.label, item.name].filter(Boolean).forEach(key => {
+          const normalized = String(key).trim().toUpperCase().replace(/\s+/g, '');
+          if (normalized && !map.has(normalized)) map.set(normalized, item.value);
+        });
+      });
+    });
+    return map;
+  }
+
+  function pickStat(map, aliases) {
+    for (const alias of aliases) {
+      const key = String(alias).trim().toUpperCase().replace(/\s+/g, '');
+      if (map.has(key)) return map.get(key);
+    }
+    return '';
+  }
+
+  function isBaseballPitcher(player) {
+    return /^(SP|RP|P|CP|CL)$/i.test(String(player?.position || '').trim());
+  }
+
+  function isHockeyGoalie(player) {
+    return /^G$/i.test(String(player?.position || '').trim());
+  }
+
+  function coreStats(team, player, categories) {
+    const map = statLookup(categories);
+    const missing = value => value === '' || value == null ? '—' : String(value);
+    if (team?.sport === 'baseball') {
+      if (isBaseballPitcher(player)) {
+        const wins = pickStat(map, ['W', 'WINS']);
+        const losses = pickStat(map, ['L', 'LOSSES']);
+        const record = wins && losses ? `${wins}-${losses}` : pickStat(map, ['W-L', 'W/L', 'RECORD']);
+        return [
+          { label: 'W-L', value: missing(record) },
+          { label: 'ERA', value: missing(pickStat(map, ['ERA'])) },
+          { label: 'WHIP', value: missing(pickStat(map, ['WHIP'])) },
+          { label: 'K', value: missing(pickStat(map, ['SO', 'K', 'STRIKEOUTS'])) }
+        ];
+      }
+      return [
+        { label: 'AVG', value: missing(pickStat(map, ['AVG', 'BA', 'BATTINGAVERAGE'])) },
+        { label: 'HR', value: missing(pickStat(map, ['HR', 'HOMERUNS'])) },
+        { label: 'RBI', value: missing(pickStat(map, ['RBI'])) },
+        { label: 'OPS', value: missing(pickStat(map, ['OPS'])) }
+      ];
+    }
+
+    if (team?.sport === 'basketball') {
+      return [
+        { label: 'PTS', value: missing(pickStat(map, ['PTS', 'POINTS', 'AVGPOINTS'])) },
+        { label: 'REB', value: missing(pickStat(map, ['REB', 'REBOUNDS', 'AVGREBOUNDS'])) },
+        { label: 'AST', value: missing(pickStat(map, ['AST', 'ASSISTS', 'AVGASSISTS'])) },
+        { label: 'FG%', value: missing(pickStat(map, ['FG%', 'FGP', 'FIELDGOALPCT', 'FIELDGOALPERCENTAGE'])) }
+      ];
+    }
+
+    if (team?.sport === 'hockey') {
+      if (isHockeyGoalie(player)) {
+        const wins = pickStat(map, ['W', 'WINS']);
+        const losses = pickStat(map, ['L', 'LOSSES']);
+        const otl = pickStat(map, ['OTL', 'OTLOSSES', 'OVERTIMELOSSES']);
+        const record = wins && losses ? [wins, losses, otl].filter(value => value !== '').join('-') : '';
+        return [
+          { label: 'W-L-OTL', value: missing(record) },
+          { label: 'GAA', value: missing(pickStat(map, ['GAA', 'GOALSAGAINSTAVERAGE'])) },
+          { label: 'SV%', value: missing(pickStat(map, ['SV%', 'SAVEPERCENTAGE', 'SAVEPCT'])) },
+          { label: 'SO', value: missing(pickStat(map, ['SO', 'SHUTOUTS'])) }
+        ];
+      }
+      return [
+        { label: 'G', value: missing(pickStat(map, ['G', 'GOALS'])) },
+        { label: 'A', value: missing(pickStat(map, ['A', 'ASSISTS'])) },
+        { label: 'PTS', value: missing(pickStat(map, ['PTS', 'POINTS'])) },
+        { label: '+/-', value: missing(pickStat(map, ['+/-', 'PLUSMINUS'])) }
+      ];
+    }
+
+    return [];
+  }
+
+  function gamelogEvents(payload) {
+    const rawEvents = Array.isArray(payload?.events)
+      ? payload.events
+      : (payload?.events && typeof payload.events === 'object' ? Object.values(payload.events) : []);
+    const labels = Array.isArray(payload?.labels) ? payload.labels : [];
+    const names = Array.isArray(payload?.names) ? payload.names : [];
+
+    return rawEvents.map((event, sourceIndex) => {
+      const values = Array.isArray(event?.stats) ? event.stats : [];
+      const eventLabels = labels.length >= values.length ? labels.slice(labels.length - values.length) : labels;
+      const eventNames = names.length >= values.length ? names.slice(names.length - values.length) : names;
+      const stats = new Map();
+      values.forEach((value, index) => {
+        [eventLabels[index], eventNames[index]].filter(Boolean).forEach(key => {
+          stats.set(String(key).trim().toUpperCase().replace(/\s+/g, ''), String(value ?? ''));
+        });
+      });
+      const parsedDate = Date.parse(event?.date || '');
+      return {
+        id: String(event?.id || ''),
+        date: Number.isFinite(parsedDate) ? parsedDate : NaN,
+        sourceIndex,
+        opponent: event?.opponent?.abbreviation || event?.opponent?.shortDisplayName || event?.opponent?.displayName || '',
+        result: event?.gameResult || event?.result || '',
+        stats
+      };
+    }).sort((a, b) => {
+      if (Number.isFinite(a.date) && Number.isFinite(b.date)) return b.date - a.date;
+      return a.sourceIndex - b.sourceIndex;
+    });
+  }
+
+  function eventStat(event, aliases) {
+    for (const alias of aliases) {
+      const key = String(alias).trim().toUpperCase().replace(/\s+/g, '');
+      if (event?.stats?.has(key)) return event.stats.get(key);
+    }
+    return '';
+  }
+
+  function numberValue(value) {
+    const n = Number.parseFloat(String(value || '').replace('%', ''));
+    return Number.isFinite(n) ? n : NaN;
+  }
+
+  function appearanceSummary(team, player, event) {
+    if (!event) return null;
+    const pieces = [];
+
+    if (team?.sport === 'baseball') {
+      if (isBaseballPitcher(player)) {
+        const ip = eventStat(event, ['IP', 'INNINGSPITCHED']);
+        const er = eventStat(event, ['ER', 'EARNEDRUNS']);
+        const k = eventStat(event, ['SO', 'K', 'STRIKEOUTS']);
+        if (ip) pieces.push(`${ip} IP`);
+        if (er) pieces.push(`${er} ER`);
+        if (k) pieces.push(`${k} K`);
+        return pieces.length ? { label: 'Last start', text: pieces.join(' · ') } : null;
+      }
+      const hits = eventStat(event, ['H', 'HITS']);
+      const atBats = eventStat(event, ['AB', 'ATBATS']);
+      const hr = eventStat(event, ['HR', 'HOMERUNS']);
+      const rbi = eventStat(event, ['RBI']);
+      if (hits && atBats) pieces.push(`${hits}-for-${atBats}`);
+      const hrNum = numberValue(hr);
+      if (Number.isFinite(hrNum) && hrNum > 0) pieces.push(hrNum === 1 ? 'HR' : `${hrNum} HR`);
+      const rbiNum = numberValue(rbi);
+      if (Number.isFinite(rbiNum) && rbiNum > 0) pieces.push(`${rbiNum} RBI`);
+      return pieces.length ? { label: 'Last game', text: pieces.join(' · ') } : null;
+    }
+
+    if (team?.sport === 'basketball') {
+      const pts = eventStat(event, ['PTS', 'POINTS']);
+      const reb = eventStat(event, ['REB', 'REBOUNDS']);
+      const ast = eventStat(event, ['AST', 'ASSISTS']);
+      if (pts) pieces.push(`${pts} PTS`);
+      if (reb) pieces.push(`${reb} REB`);
+      if (ast) pieces.push(`${ast} AST`);
+      return pieces.length ? { label: 'Last game', text: pieces.join(' · ') } : null;
+    }
+
+    if (team?.sport === 'hockey') {
+      if (isHockeyGoalie(player)) {
+        const sv = eventStat(event, ['SV', 'SAVES']);
+        const ga = eventStat(event, ['GA', 'GOALSAGAINST']);
+        const svp = eventStat(event, ['SV%', 'SAVEPERCENTAGE', 'SAVEPCT']);
+        if (sv) pieces.push(`${sv} SV`);
+        if (ga) pieces.push(`${ga} GA`);
+        if (svp) pieces.push(`${svp} SV%`);
+        return pieces.length ? { label: 'Last appearance', text: pieces.join(' · ') } : null;
+      }
+      const goals = eventStat(event, ['G', 'GOALS']);
+      const assists = eventStat(event, ['A', 'ASSISTS']);
+      const sog = eventStat(event, ['SOG', 'SHOTS', 'SHOTSONGOAL']);
+      if (goals) pieces.push(`${goals} G`);
+      if (assists) pieces.push(`${assists} A`);
+      if (sog) pieces.push(`${sog} SOG`);
+      return pieces.length ? { label: 'Last game', text: pieces.join(' · ') } : null;
+    }
+
+    return null;
+  }
+
+  function trendSummary(team, player, events) {
+    const recent = events.slice(0, 5);
+    if (!recent.length) return '';
+
+    if (team?.sport === 'basketball') {
+      const lastFour = recent.slice(0, 4);
+      const tripleDoubles = lastFour.filter(event => {
+        const values = [
+          numberValue(eventStat(event, ['PTS', 'POINTS'])),
+          numberValue(eventStat(event, ['REB', 'REBOUNDS'])),
+          numberValue(eventStat(event, ['AST', 'ASSISTS']))
+        ];
+        return values.filter(value => Number.isFinite(value) && value >= 10).length >= 3;
+      }).length;
+      if (tripleDoubles >= 2) return `${tripleDoubles} triple-doubles in last ${lastFour.length} games`;
+      if (tripleDoubles === 1 && lastFour[0]) {
+        const first = lastFour[0];
+        const values = [
+          numberValue(eventStat(first, ['PTS', 'POINTS'])),
+          numberValue(eventStat(first, ['REB', 'REBOUNDS'])),
+          numberValue(eventStat(first, ['AST', 'ASSISTS']))
+        ];
+        if (values.filter(value => Number.isFinite(value) && value >= 10).length >= 3) return 'Triple-double last game';
+      }
+      const doubleDoubles = lastFour.filter(event => {
+        const values = [
+          numberValue(eventStat(event, ['PTS', 'POINTS'])),
+          numberValue(eventStat(event, ['REB', 'REBOUNDS'])),
+          numberValue(eventStat(event, ['AST', 'ASSISTS']))
+        ];
+        return values.filter(value => Number.isFinite(value) && value >= 10).length >= 2;
+      }).length;
+      if (doubleDoubles >= 3) return `${doubleDoubles} double-doubles in last ${lastFour.length} games`;
+    }
+
+    if (team?.sport === 'baseball') {
+      if (isBaseballPitcher(player)) {
+        const lastThree = recent.slice(0, 3);
+        if (lastThree.length === 3) {
+          const qualityStarts = lastThree.filter(event => {
+            const ip = numberValue(eventStat(event, ['IP', 'INNINGSPITCHED']));
+            const er = numberValue(eventStat(event, ['ER', 'EARNEDRUNS']));
+            return Number.isFinite(ip) && Number.isFinite(er) && ip >= 6 && er <= 3;
+          }).length;
+          if (qualityStarts >= 2) return `${qualityStarts} quality starts in last 3`;
+        }
+      } else {
+        let hrStreak = 0;
+        for (const event of recent) {
+          const hr = numberValue(eventStat(event, ['HR', 'HOMERUNS']));
+          if (!Number.isFinite(hr) || hr <= 0) break;
+          hrStreak += 1;
+        }
+        if (hrStreak >= 2) return `HR in ${hrStreak} straight games`;
+
+        let hitStreak = 0;
+        for (const event of recent) {
+          const hits = numberValue(eventStat(event, ['H', 'HITS']));
+          if (!Number.isFinite(hits) || hits <= 0) break;
+          hitStreak += 1;
+        }
+        if (hitStreak >= 5) return `${hitStreak}-game hitting streak`;
+      }
+    }
+
+    if (team?.sport === 'hockey') {
+      if (isHockeyGoalie(player)) {
+        let strongAppearances = 0;
+        for (const event of recent) {
+          let svp = numberValue(eventStat(event, ['SV%', 'SAVEPERCENTAGE', 'SAVEPCT']));
+          if (Number.isFinite(svp) && svp > 1) svp /= 100;
+          if (!Number.isFinite(svp) || svp < .92) break;
+          strongAppearances += 1;
+        }
+        if (strongAppearances >= 3) return `${strongAppearances} straight appearances at .920+ SV%`;
+      } else {
+        let pointStreak = 0;
+        for (const event of recent) {
+          const goals = numberValue(eventStat(event, ['G', 'GOALS']));
+          const assists = numberValue(eventStat(event, ['A', 'ASSISTS']));
+          if ((!Number.isFinite(goals) ? 0 : goals) + (!Number.isFinite(assists) ? 0 : assists) <= 0) break;
+          pointStreak += 1;
+        }
+        if (pointStreak >= 3) return `${pointStreak}-game point streak`;
+      }
+    }
+
+    return '';
+  }
+
+  async function loadPlayerDetails(team, player, force = false) {
+    const id = espnPlayerId(player);
+    if (!id) {
+      return {
+        supported: false,
+        categories: [],
+        core: [],
+        events: [],
+        lastAppearance: null,
+        trend: '',
+        errors: { player: 'Detailed ESPN player data is unavailable for this roster-only entry.' }
+      };
+    }
+
+    const key = `${team.provider.sport}/${team.provider.league}/${id}`;
+    if (!force && playerDetailCache.has(key)) return playerDetailCache.get(key);
+
+    const promise = (async () => {
+      const resources = ['stats', 'gamelog'];
+      const results = await Promise.all(resources.map(async resource => {
+        const url = playerEndpoint(team, player, resource);
+        try { return [resource, await fetchJson(url), null]; }
+        catch (error) { return [resource, null, error.message]; }
+      }));
+      const payloads = Object.fromEntries(results.map(([resource, payload]) => [resource, payload]));
+      const errors = Object.fromEntries(results.filter(([, , error]) => error).map(([resource, , error]) => [resource, error]));
+      const categories = statCategories(payloads.stats);
+      const events = gamelogEvents(payloads.gamelog);
+      return {
+        supported: true,
+        categories: categories.map(category => ({
+          name: category?.displayName || category?.name || 'Season',
+          stats: categoryPairs(category)
+        })).filter(category => category.stats.length),
+        core: coreStats(team, player, categories),
+        events,
+        lastAppearance: appearanceSummary(team, player, events[0]),
+        trend: trendSummary(team, player, events),
+        errors
+      };
+    })();
+
+    playerDetailCache.set(key, promise);
+    try {
+      const data = await promise;
+      playerDetailCache.set(key, Promise.resolve(data));
+      return data;
+    } catch (error) {
+      playerDetailCache.delete(key);
+      throw error;
+    }
+  }
+
   async function load(team, force = false) {
     if (!force && teamCache.has(team.id)) return teamCache.get(team.id);
     const urls = { team: endpoint(team), schedule: endpoint(team, 'schedule'), roster: endpoint(team, 'roster') };
@@ -352,6 +720,7 @@
       raw,
       record: teamObj ? record(teamObj) : 'Unavailable',
       standingSummary: teamObj?.standingSummary || '',
+      teamLogo: teamObj?.logos?.[0]?.href || teamObj?.logo || '',
       games: raw.schedulePayload ? games(raw.schedulePayload, providerTeamId, team.provider.team) : null,
       roster: mergedRoster,
       rosterMeta: {
@@ -367,5 +736,5 @@
     return normalized;
   }
 
-  window.ScoreboardData = Object.freeze({ load, standingRow });
+  window.ScoreboardData = Object.freeze({ load, standingRow, loadPlayerDetails });
 })();
