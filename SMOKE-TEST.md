@@ -554,3 +554,19 @@ Validated as a footer-texture-only production repair after real-iPhone visual re
 - Service-worker cache namespace is scoreboard-v11b34-authentic-footer-metal.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RECOMMENDED**.
+
+
+## Stage 11B35 smoke — integrated footer frame
+Triggered by real-iPhone visual verification showing that Stage 11B34's improved tread still read as a separate overlay slab.
+
+### Executed evidence
+- index.html now wraps team-page header + content in .team-page-scroll while keeping the Back nav as a sibling structural bottom row.
+- The header remains inside the scrolling region, preserving the locked behavior that team artwork scrolls away with page content.
+- team-page-v8.css makes .team-page-shell non-scrolling and .team-page-scroll the sole vertical scroller.
+- team-page-v8.js scroll reset and iOS top/bottom edge guard now target .team-page-scroll, preserving Stage 11B30 overscroll containment.
+- team-theme-v20.css applies the same Stage 11B34 steel texture to the shell and makes the nav background transparent; content no longer paints underneath the nav.
+- Existing Back button styling/safe-area padding and Stage 11B32 live-feed bridge are unchanged.
+- index.html, team-page-v8.js, and sw.js pass syntax/structure checks.
+- Service-worker cache namespace is scoreboard-v11b35-integrated-footer-frame.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION REQUIRED**.
