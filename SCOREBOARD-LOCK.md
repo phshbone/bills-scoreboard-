@@ -483,3 +483,12 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Common opaque abbreviations can expose a compact stat key beneath their semantic group (for example WHIP = walks + hits allowed per inning pitched, HLD = holds, BLSV = blown saves).
 - Rich roster cards now apply to football as well as baseball, basketball, and hockey. Football core-card stats are position-aware and recent-game/trend lines remain feed-driven only.
 - Existing header artwork, anchored real-plate footer, team-page scrolling model, top-level swipes, live score behavior, standings, schedules, and news remain untouched.
+
+
+## Stage 11B40 lock — football stat cleanup (2026-09-19)
+- Football player-detail grouping is category-first. Generic abbreviations such as YDS, TD, ATT, AVG, INT and LNG inherit meaning from the provider category (Passing, Rushing, Receiving, etc.) before abbreviation fallbacks are considered.
+- Football player-detail groups that contain only zero/dash values are suppressed. Repeated GP/GS/other values are de-duplicated across provider categories.
+- Football roster/player snapshot stats use category-scoped lookups so passing yards cannot be mistaken for rushing/receiving yards.
+- QBR and passer rating are distinct. QBR is shown only when a real QBR value is returned; otherwise a passer-rating field is labeled RTG.
+- Football abbreviation keys prefer local context-aware definitions before provider glossary entries, preventing collisions such as ATT being described as a punt-return field inside Passing.
+- Baseball, basketball, hockey, approved headers, anchored diamond-plate footer, team-page scroll model, top-level swipes, live scores, standings, schedules, and news are unchanged.
