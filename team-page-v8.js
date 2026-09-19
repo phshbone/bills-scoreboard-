@@ -143,8 +143,10 @@
       if (details.trend) {
         trend.hidden = false;
         trend.textContent = details.trend;
+        row.classList.add('has-trend');
       } else {
         trend.hidden = true;
+        row.classList.remove('has-trend');
       }
       row.dataset.statsState = 'ready';
     } catch {
@@ -152,6 +154,7 @@
       renderCoreStats(season, []);
       recent.hidden = true;
       trend.hidden = true;
+      row.classList.remove('has-trend');
       row.dataset.statsState = 'error';
     }
   }
