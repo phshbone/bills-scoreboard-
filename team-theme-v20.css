@@ -841,3 +841,27 @@
     inset 0 -1px 0 rgba(0,0,0,.62),
     0 -5px 14px rgba(0,0,0,.17);
 }
+
+
+/* Stage 11B37: use Bill's actual plain diamond-plate artwork for the Back rail.
+   Keep the approved team-page/header structure untouched; this is footer-only. */
+.team-page[data-team-id] .team-page-bottom-nav {
+  position: sticky !important;
+  z-index: 20 !important;
+  bottom: 0 !important;
+  margin: 0 !important;
+  padding: 10px 16px max(14px, var(--safe-bottom)) !important;
+  border-radius: 0 !important;
+  border-bottom: 0 !important;
+  background-color: #07111d !important;
+  background-image: url("./assets/score-metal-footer.webp") !important;
+  background-size: cover !important;
+  background-position: center 52% !important;
+  background-repeat: no-repeat !important;
+  background-clip: border-box !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 -5px 14px rgba(0,0,0,.16) !important;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
