@@ -453,3 +453,12 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - This restores the approved artwork header, original team-page shell scrolling model, established content framing, and the Stage 11B34 alternating/weathered footer texture.
 - Stage 11B32 live-feed state bridge and Stage 11B33 darker live-score cue remain intact because they live outside the reverted Stage 11B35 structural files.
 - No attempt is made in this stage to further redesign the footer. Header restoration is isolated first.
+
+
+## Stage 11B37 lock — real plate anchored footer (2026-09-19)
+- The approved Stage 11B36 team-page/header structure is untouched.
+- The Back rail now uses Bill's supplied plain diamond-plate artwork directly as its background asset: assets/score-metal-footer.webp.
+- The footer remains sticky at bottom: 0 inside the existing team-page scroller, with an explicit high z-index and GPU compositing hint for iOS stability.
+- The footer has no bottom radius or bottom border gap and includes safe-area padding inside the plate itself, so no page/background strip should appear beneath it.
+- The plate uses cover/no-repeat positioning so the rail reads as one continuous section of the same weathered metal rather than a tiled or synthetic pattern.
+- Live-score behavior, header artwork, team themes, navigation, and scroll restoration are unchanged.
