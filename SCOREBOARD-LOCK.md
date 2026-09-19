@@ -468,7 +468,7 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - MLB, NBA/WNBA, and NHL roster detail pages use the approved Prototype C density: team emblem, team-colored jersey medallion, provider headshot when available, player name/position, four core season stats, last appearance/start line, and at most one recent-trend line.
 - Cards are fully tappable and open a player detail view inside the existing team detail surface; no second modal layer is introduced.
 - Back behavior from a player returns to Roster and restores the prior roster scroll position.
-- Player detail data is lazy-loaded per visible roster card from ESPN common-v3 athlete stats/gamelog endpoints and cached per athlete for the session. Missing data degrades without fabricated values.
+- Roster cards lazy-load one ESPN common-v3 athlete overview request per visible player and cache it for the session; a dedicated gamelog request is used only when the overview lacks enough labeled recent-game data. Full stats/gamelog requests are reserved for a player tap. Missing data degrades without fabricated values.
 - Trend text is derived only from returned game logs and only for explicit supported rules (for example triple-doubles, quality starts, hitting/HR streaks, NHL point streaks); otherwise the trend row stays hidden.
 - NFL/NCAA football roster cards remain on the existing simpler layout in this stage.
 - Global site typography is NOT changed in this stage. The richer roster cards use the existing condensed system font stack as a contained typography test before any site-wide font decision.
