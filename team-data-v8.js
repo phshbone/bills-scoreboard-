@@ -678,11 +678,26 @@
       try {
         const payload = await fetchJson(url);
         const categories = overviewCategories(payload);
-        const events = gamelogEvents(payload?.gameLog || payload?.gamelog || {});
+        let events = gamelogEvents(payload?.gameLog || payload?.gamelog || {});
+        let lastAppearance = appearanceSummary(team, player, events[0]);
+
+        // Some overview responses include recent events without the label metadata
+        // needed to interpret each stats array. Only then pay for the dedicated
+        // gamelog request so the roster remains light by default.
+        if (!lastAppearance) {
+          try {
+            const gamelog = await fetchJson(playerEndpoint(team, player, 'gamelog'));
+            events = gamelogEvents(gamelog);
+            lastAppearance = appearanceSummary(team, player, events[0]);
+          } catch {
+            // Keep the season card useful even when recent-game data is unavailable.
+          }
+        }
+
         return {
           supported: true,
           core: coreStats(team, player, categories),
-          lastAppearance: appearanceSummary(team, player, events[0]),
+          lastAppearance,
           trend: trendSummary(team, player, events),
           errors: {}
         };
