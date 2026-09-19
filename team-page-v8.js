@@ -148,9 +148,95 @@
     GAA: 'Goals-against average',
     'SV%': 'Save percentage',
     OTL: 'Overtime losses',
-    QBR: 'Quarterback Rating',
+    QBR: 'Total quarterback rating',
+    RTG: 'Passer rating',
     TGT: 'Targets',
     IN20: 'Punts inside the 20-yard line'
+  });
+
+  const FOOTBALL_STAT_EXPLANATIONS = Object.freeze({
+    Usage: Object.freeze({
+      GP: 'Games played',
+      GS: 'Games started',
+      SNAP: 'Snaps',
+      SNAPS: 'Snaps'
+    }),
+    Passing: Object.freeze({
+      GP: 'Games played',
+      CMP: 'Completions',
+      ATT: 'Passing attempts',
+      'CMP%': 'Completion percentage',
+      YDS: 'Passing yards',
+      AVG: 'Yards per attempt',
+      TD: 'Passing touchdowns',
+      INT: 'Interceptions thrown',
+      LNG: 'Longest completion',
+      SACK: 'Times sacked',
+      RTG: 'Passer rating',
+      QBR: 'Total quarterback rating'
+    }),
+    Rushing: Object.freeze({
+      GP: 'Games played',
+      CAR: 'Rushing attempts',
+      ATT: 'Rushing attempts',
+      YDS: 'Rushing yards',
+      AVG: 'Yards per carry',
+      TD: 'Rushing touchdowns',
+      LNG: 'Longest rush',
+      FD: 'Rushing first downs',
+      FUM: 'Fumbles',
+      LST: 'Fumbles lost'
+    }),
+    Receiving: Object.freeze({
+      GP: 'Games played',
+      REC: 'Receptions',
+      TGT: 'Receiving targets',
+      YDS: 'Receiving yards',
+      AVG: 'Yards per reception',
+      TD: 'Receiving touchdowns',
+      LNG: 'Longest reception',
+      FD: 'Receiving first downs',
+      FUM: 'Fumbles',
+      LST: 'Fumbles lost'
+    }),
+    Tackling: Object.freeze({
+      TKL: 'Tackles',
+      TOT: 'Total tackles',
+      SOLO: 'Solo tackles',
+      AST: 'Assisted tackles',
+      TFL: 'Tackles for loss'
+    }),
+    'Pressure & turnovers': Object.freeze({
+      SACK: 'Sacks',
+      QBHT: 'Quarterback hits',
+      HUR: 'Quarterback hurries',
+      FF: 'Forced fumbles',
+      FR: 'Fumble recoveries'
+    }),
+    'Pass defense': Object.freeze({
+      INT: 'Interceptions',
+      PD: 'Passes defended',
+      PDEF: 'Passes defended',
+      DEFL: 'Deflections'
+    }),
+    Kicking: Object.freeze({
+      FG: 'Field goals made',
+      FGM: 'Field goals made',
+      FGA: 'Field goal attempts',
+      'FG%': 'Field goal percentage',
+      XP: 'Extra points made',
+      XPM: 'Extra points made',
+      XPA: 'Extra point attempts',
+      PTS: 'Points'
+    }),
+    Punting: Object.freeze({
+      PUNT: 'Punts',
+      PUNTS: 'Punts',
+      AVG: 'Punt average',
+      LNG: 'Longest punt',
+      IN20: 'Punts inside the 20-yard line',
+      TB: 'Touchbacks'
+    })
   });
 
   function bucketForStat(sport, player, item, categoryName = '') {
@@ -207,15 +293,31 @@
     }
 
     if (sport === 'football') {
-      if (/pass/i.test(category) || inSet('CMP','ATT','CMP%','YDS','TD','INT','QBR','RTG','Y/A','AY/A')) return 'Passing';
-      if (/rush/i.test(category) || inSet('CAR','RUSH','RUSHYDS','YPC','RUSHTD')) return 'Rushing';
-      if (/receiv/i.test(category) || inSet('REC','TGT','RECYDS','YPR','RECTD')) return 'Receiving';
+      // Generic labels such as YDS, TD, ATT and AVG mean different things in
+      // different football categories. Use the provider's category first, then
+      // use abbreviations only for the category-specific refinements.
       if (inSet('GP','GS','SNAP','SNAPS')) return 'Usage';
+      if (/receiv/i.test(category)) return 'Receiving';
+      if (/rush/i.test(category)) return 'Rushing';
+      if (/pass/i.test(category)) return 'Passing';
+      if (/punt/i.test(category)) return 'Punting';
+      if (/kick|field goal|extra point/i.test(category)) return 'Kicking';
+      if (/interception|pass defen|deflection/i.test(category)) return 'Pass defense';
+      if (/sack|pressure|fumble/i.test(category)) return 'Pressure & turnovers';
+      if (/defen|tack/i.test(category)) {
+        if (inSet('INT','PD','PDEF','DEFL')) return 'Pass defense';
+        if (inSet('SACK','QBHT','HUR','FF','FR')) return 'Pressure & turnovers';
+        return 'Tackling';
+      }
+
+      if (inSet('CMP','CMP%','QBR','RTG','Y/A','AY/A')) return 'Passing';
+      if (inSet('CAR','RUSH','RUSHYDS','YPC','RUSHTD')) return 'Rushing';
+      if (inSet('REC','TGT','RECYDS','YPR','RECTD')) return 'Receiving';
       if (inSet('TOT','TKL','SOLO','AST','TFL')) return 'Tackling';
       if (inSet('SACK','QBHT','HUR','FF','FR')) return 'Pressure & turnovers';
-      if (inSet('INT','PD','PDEF','DEFL')) return 'Pass defense';
-      if (/kick/i.test(category) || inSet('FG','FGM','FGA','FG%','XP','XPM','XPA','PTS')) return 'Kicking';
-      if (/punt/i.test(category) || inSet('PUNT','PUNTS','AVG','LNG','IN20','TB')) return 'Punting';
+      if (inSet('PD','PDEF','DEFL')) return 'Pass defense';
+      if (inSet('FG','FGM','FGA','FG%','XP','XPM','XPA')) return 'Kicking';
+      if (inSet('PUNT','PUNTS','IN20')) return 'Punting';
       return 'Other';
     }
 
@@ -239,6 +341,14 @@
     return ['Other'];
   }
 
+  function statHasActivity(item) {
+    const text = String(item?.value ?? '').trim();
+    if (!text || text === '—' || text === '--' || text === '-') return false;
+    const numbers = text.replace(/,/g, '').match(/-?\d+(?:\.\d+)?/g);
+    if (!numbers?.length) return true;
+    return numbers.some(value => Number(value) !== 0);
+  }
+
   function semanticGroups(player, category) {
     const groups = new Map();
     (category?.stats || []).forEach(item => {
@@ -253,27 +363,46 @@
         const bi = priority.indexOf(b[0]);
         return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
       })
-      .map(([title, stats]) => ({ title, stats }));
+      .map(([title, stats]) => ({ title, stats }))
+      .filter(group => currentTeam?.sport !== 'football' || group.stats.some(statHasActivity));
   }
 
-  function statExplanation(item, glossary = {}) {
+  function statExplanation(item, glossary = {}, groupTitle = '') {
     const key = statKey(item);
+    if (currentTeam?.sport === 'football') {
+      const local = FOOTBALL_STAT_EXPLANATIONS[groupTitle]?.[key];
+      if (local) return local;
+    }
     return glossary[key] || STAT_EXPLANATIONS[key] || '';
   }
 
-  function renderSemanticCategory(player, category, glossary = {}) {
+  function renderSemanticCategory(player, category, glossary = {}, seenFootballStats = null) {
     const fragment = document.createDocumentFragment();
     semanticGroups(player, category).forEach(groupData => {
+      let stats = groupData.stats;
+
+      // Football feeds repeat GP/GS and can repeat other values across offense,
+      // defense and special-team categories. Show each semantic stat once.
+      if (currentTeam?.sport === 'football' && seenFootballStats) {
+        stats = stats.filter(item => {
+          const key = `${groupData.title}:${statKey(item)}`;
+          if (seenFootballStats.has(key)) return false;
+          seenFootballStats.add(key);
+          return true;
+        });
+        if (!stats.some(statHasActivity)) return;
+      }
+
       const group = el('section', 'player-stat-group');
       const head = el('div', 'player-stat-group-head');
-      head.append(
-        el('div', 'detail-group-title', groupData.title),
-        el('div', 'player-stat-scope', category?.name || 'Statistics')
-      );
+      const scope = groupData.title === category?.name ? '' : (category?.name || 'Statistics');
+      const heading = el('div', 'detail-group-title', groupData.title);
+      head.appendChild(heading);
+      if (scope) head.appendChild(el('div', 'player-stat-scope', scope));
       group.appendChild(head);
 
       const grid = el('div', 'player-semantic-stat-grid');
-      groupData.stats.forEach(item => {
+      stats.forEach(item => {
         const stat = el('div', 'player-semantic-stat');
         const value = el('strong', 'player-semantic-value', item.value || '—');
         const label = el('span', 'player-semantic-label', item.label || item.name || '');
@@ -283,8 +412,8 @@
       group.appendChild(grid);
 
       const explanations = [];
-      groupData.stats.forEach(item => {
-        const description = statExplanation(item, glossary);
+      stats.forEach(item => {
+        const description = statExplanation(item, glossary, groupData.title);
         const key = statKey(item);
         if (description && key && !explanations.some(entry => entry.key === key)) {
           explanations.push({ key, description });
@@ -412,10 +541,11 @@
 
     if (Array.isArray(details.categories) && details.categories.length) {
       const groups = el('div', 'player-season-groups player-semantic-groups');
+      const seenFootballStats = currentTeam?.sport === 'football' ? new Set() : null;
       details.categories.forEach(category => {
-        groups.appendChild(renderSemanticCategory(player, category, details.glossary || {}));
+        groups.appendChild(renderSemanticCategory(player, category, details.glossary || {}, seenFootballStats));
       });
-      detailContent.appendChild(groups);
+      if (groups.childNodes.length) detailContent.appendChild(groups);
     }
 
     if (!details.core?.length && !details.categories?.length) {
