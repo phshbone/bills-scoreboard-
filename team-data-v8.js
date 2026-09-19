@@ -410,11 +410,15 @@
     }
 
     if (team?.sport === 'basketball') {
+      const fieldGoalPct = pickStat(map, ['FG%', 'FGP', 'FIELDGOALPCT', 'FIELDGOALPERCENTAGE']);
+      const gamesPlayed = pickStat(map, ['GP', 'GAMESPLAYED']);
       return [
         { label: 'PTS', value: missing(pickStat(map, ['PTS', 'POINTS', 'AVGPOINTS'])) },
         { label: 'REB', value: missing(pickStat(map, ['REB', 'REBOUNDS', 'AVGREBOUNDS'])) },
         { label: 'AST', value: missing(pickStat(map, ['AST', 'ASSISTS', 'AVGASSISTS'])) },
-        { label: 'FG%', value: missing(pickStat(map, ['FG%', 'FGP', 'FIELDGOALPCT', 'FIELDGOALPERCENTAGE'])) }
+        fieldGoalPct
+          ? { label: 'FG%', value: missing(fieldGoalPct) }
+          : { label: 'GP', value: missing(gamesPlayed) }
       ];
     }
 
