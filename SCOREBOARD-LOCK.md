@@ -462,3 +462,14 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - The footer has no bottom radius or bottom border gap and includes safe-area padding inside the plate itself, so no page/background strip should appear beneath it.
 - The plate uses cover/no-repeat positioning so the rail reads as one continuous section of the same weathered metal rather than a tiled or synthetic pattern.
 - Live-score behavior, header artwork, team themes, navigation, and scroll restoration are unchanged.
+
+
+## Stage 11B38 lock — rich roster cards + player detail (2026-09-19)
+- MLB, NBA/WNBA, and NHL roster detail pages use the approved Prototype C density: team emblem, team-colored jersey medallion, provider headshot when available, player name/position, four core season stats, last appearance/start line, and at most one recent-trend line.
+- Cards are fully tappable and open a player detail view inside the existing team detail surface; no second modal layer is introduced.
+- Back behavior from a player returns to Roster and restores the prior roster scroll position.
+- Roster cards lazy-load one ESPN common-v3 athlete overview request per visible player and cache it for the session; a dedicated gamelog request is used only when the overview lacks enough labeled recent-game data. Full stats/gamelog requests are reserved for a player tap. Missing data degrades without fabricated values.
+- Trend text is derived only from returned game logs and only for explicit supported rules (for example triple-doubles, quality starts, hitting/HR streaks, NHL point streaks); otherwise the trend row stays hidden.
+- NFL/NCAA football roster cards remain on the existing simpler layout in this stage.
+- Global site typography is NOT changed in this stage. The richer roster cards use the existing condensed system font stack as a contained typography test before any site-wide font decision.
+- Existing team-page header structure, footer plate, live-score behavior, top-level swipes, standings, schedules, and news are unchanged.

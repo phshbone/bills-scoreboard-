@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b37-real-plate-footer';
+const CACHE = 'scoreboard-v11b38-rich-roster-cards';
 const ASSETS = [
   './',
   './index.html',

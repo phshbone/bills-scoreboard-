@@ -22,6 +22,9 @@
   let view = 'overview';
   let boardScrollY = 0;
   let returnFocusTarget = null;
+  let rosterObserver = null;
+  let rosterReturnScrollTop = 0;
+  let activePlayerKey = '';
 
   function el(tag, className = '', text = '') {
     const node = document.createElement(tag);
@@ -49,10 +52,243 @@
   }
 
   function updateBackLabel() {
-    back.textContent = view === 'overview' ? '← Back to My Teams' : '← Back to Team';
+    if (view === 'overview') back.textContent = '← Back to My Teams';
+    else if (view === 'player') back.textContent = '← Back to Roster';
+    else back.textContent = '← Back to Team';
+  }
+
+  function stopRosterObserver() {
+    if (rosterObserver) rosterObserver.disconnect();
+    rosterObserver = null;
+  }
+
+  function richRosterSport() {
+    return ['baseball', 'basketball', 'hockey'].includes(currentTeam?.sport || '');
+  }
+
+  function playerKey(player) {
+    return String(player?.id || player?.name || '');
+  }
+
+  function initials(name) {
+    return String(name || '')
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(part => part[0])
+      .join('')
+      .toUpperCase();
+  }
+
+  function imageTile(className, src, alt, fallbackText = '') {
+    const wrap = el('div', className);
+    if (src) {
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = alt;
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.addEventListener('error', () => {
+        img.remove();
+        if (fallbackText) wrap.textContent = fallbackText;
+        else wrap.hidden = true;
+      }, { once: true });
+      wrap.appendChild(img);
+    } else if (fallbackText) {
+      wrap.textContent = fallbackText;
+    } else {
+      wrap.hidden = true;
+    }
+    return wrap;
+  }
+
+  function renderCoreStats(target, core) {
+    target.replaceChildren();
+    if (!Array.isArray(core) || !core.length) {
+      target.classList.add('roster-season-stats-unavailable');
+      target.textContent = 'Season stats unavailable';
+      return;
+    }
+    target.classList.remove('roster-season-stats-unavailable');
+    core.forEach(item => {
+      const stat = el('div', 'roster-stat');
+      stat.append(
+        el('strong', 'roster-stat-value', item.value || '—'),
+        el('span', 'roster-stat-label', item.label || '')
+      );
+      target.appendChild(stat);
+    });
+  }
+
+  async function hydrateRosterCard(row, player) {
+    if (!row?.isConnected || row.dataset.statsState === 'loading' || row.dataset.statsState === 'ready') return;
+    row.dataset.statsState = 'loading';
+    const season = row.querySelector('.roster-season-stats');
+    const recent = row.querySelector('.roster-last-line');
+    const trend = row.querySelector('.roster-trend-line');
+
+    try {
+      const details = await window.ScoreboardData.loadPlayerCard(currentTeam, player);
+      if (!row.isConnected) return;
+      renderCoreStats(season, details.core);
+      if (details.lastAppearance) {
+        recent.hidden = false;
+        recent.replaceChildren(
+          el('strong', '', `${details.lastAppearance.label}:`),
+          document.createTextNode(` ${details.lastAppearance.text}`)
+        );
+      } else {
+        recent.hidden = true;
+      }
+      if (details.trend) {
+        trend.hidden = false;
+        trend.textContent = details.trend;
+        row.classList.add('has-trend');
+      } else {
+        trend.hidden = true;
+        row.classList.remove('has-trend');
+      }
+      row.dataset.statsState = 'ready';
+    } catch {
+      if (!row.isConnected) return;
+      renderCoreStats(season, []);
+      recent.hidden = true;
+      trend.hidden = true;
+      row.classList.remove('has-trend');
+      row.dataset.statsState = 'error';
+    }
+  }
+
+  function startRosterHydration(rows) {
+    stopRosterObserver();
+    const candidates = rows.filter(row => row.classList.contains('rich-roster-card'));
+    if (!candidates.length) return;
+    if (!('IntersectionObserver' in window)) {
+      candidates.forEach(row => hydrateRosterCard(row, row.__scoreboardPlayer));
+      return;
+    }
+    rosterObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        rosterObserver?.unobserve(entry.target);
+        hydrateRosterCard(entry.target, entry.target.__scoreboardPlayer);
+      });
+    }, { root: shell, rootMargin: '320px 0px', threshold: 0.01 });
+    candidates.forEach(row => rosterObserver.observe(row));
+  }
+
+  function renderPlayerHero(player) {
+    const hero = el('section', 'player-detail-hero');
+    const logo = imageTile('player-detail-team-logo', snapshot?.teamLogo || '', `${currentTeam.name} logo`);
+    const badge = el('div', 'jersey-badge player-detail-number', player.jersey || '—');
+    const headshot = imageTile('player-detail-headshot', player.headshot || '', `${player.name} headshot`, initials(player.name));
+    const identity = el('div', 'player-detail-identity');
+    identity.append(
+      el('div', 'player-detail-name', player.name),
+      el('div', 'player-detail-position', player.position || 'Position unavailable')
+    );
+    hero.append(logo, badge, headshot, identity);
+    return hero;
+  }
+
+  function renderPlayerDetail(player, details) {
+    detailContent.replaceChildren();
+    detailContent.appendChild(renderPlayerHero(player));
+
+    if (Array.isArray(details.core) && details.core.length) {
+      const core = el('section', 'player-core-panel');
+      core.appendChild(el('div', 'detail-group-title', 'Season snapshot'));
+      const grid = el('div', 'player-core-stats');
+      renderCoreStats(grid, details.core);
+      core.appendChild(grid);
+      detailContent.appendChild(core);
+    }
+
+    if (details.lastAppearance || details.trend) {
+      const recent = el('section', 'player-recent-panel');
+      recent.appendChild(el('div', 'detail-group-title', 'Recent'));
+      if (details.lastAppearance) {
+        const line = el('div', 'player-recent-line');
+        line.append(
+          el('strong', '', `${details.lastAppearance.label}:`),
+          document.createTextNode(` ${details.lastAppearance.text}`)
+        );
+        recent.appendChild(line);
+      }
+      if (details.trend) recent.appendChild(el('div', 'player-trend-line', details.trend));
+      detailContent.appendChild(recent);
+    }
+
+    if (Array.isArray(details.categories) && details.categories.length) {
+      const season = el('div', 'player-season-groups');
+      details.categories.forEach(category => {
+        const group = el('section', 'player-season-group');
+        group.appendChild(el('div', 'detail-group-title', category.name || 'Season'));
+        const statGrid = el('div', 'player-season-stat-grid');
+        category.stats.forEach(item => {
+          const stat = el('div', 'player-season-stat');
+          stat.append(
+            el('strong', '', item.value || '—'),
+            el('span', '', item.label || item.name || '')
+          );
+          statGrid.appendChild(stat);
+        });
+        group.appendChild(statGrid);
+        season.appendChild(group);
+      });
+      detailContent.appendChild(season);
+    }
+
+    if (!details.core?.length && !details.categories?.length) {
+      detailContent.appendChild(panel(
+        'Player stats',
+        'Unavailable',
+        details.errors?.stats || details.errors?.player || 'No detailed season statistics were returned for this player.',
+        { wide: true, error: true }
+      ));
+    }
+  }
+
+  async function openPlayer(player) {
+    if (!player || !currentTeam) return;
+    rosterReturnScrollTop = shell?.scrollTop || 0;
+    activePlayerKey = playerKey(player);
+    stopRosterObserver();
+    view = 'player';
+    overview.hidden = true;
+    detail.hidden = false;
+    detailKicker.textContent = currentTeam.name;
+    detailTitle.textContent = player.name;
+    detailContent.replaceChildren(
+      renderPlayerHero(player),
+      panel('Player stats', 'Loading…', 'Fetching current season and recent-game data.', { wide: true })
+    );
+    updateBackLabel();
+    shell?.scrollTo({ top: 0, behavior: 'instant' });
+
+    try {
+      const details = await window.ScoreboardData.loadPlayerDetails(currentTeam, player);
+      if (view !== 'player' || activePlayerKey !== playerKey(player)) return;
+      renderPlayerDetail(player, details);
+    } catch (error) {
+      if (view !== 'player' || activePlayerKey !== playerKey(player)) return;
+      detailContent.replaceChildren(
+        renderPlayerHero(player),
+        panel('Player stats', 'Unavailable', error?.message || 'The player feed did not respond.', { wide: true, error: true })
+      );
+    }
+  }
+
+  function returnToRoster() {
+    const restoreTop = rosterReturnScrollTop;
+    activePlayerKey = '';
+    openDetail('roster');
+    requestAnimationFrame(() => shell?.scrollTo({ top: restoreTop, behavior: 'instant' }));
   }
 
   function showOverview() {
+    stopRosterObserver();
+    activePlayerKey = '';
     view = 'overview';
     overview.hidden = false;
     detail.hidden = true;
@@ -64,6 +300,8 @@
 
   function openDetail(kind) {
     if (!snapshot || !currentTeam) return;
+    if (kind !== 'roster') stopRosterObserver();
+    activePlayerKey = '';
     view = kind;
     overview.hidden = true;
     detail.hidden = false;
@@ -226,6 +464,7 @@
 
   function renderRoster() {
     detailTitle.textContent = 'Roster';
+    stopRosterObserver();
     if (!snapshot.roster.length) {
       detailContent.appendChild(panel('Roster', 'Unavailable', snapshot.errors.roster || 'No current players were returned.', { wide: true, error: true }));
       return;
@@ -241,17 +480,55 @@
     ));
 
     const list = el('div', 'roster-list');
+    const renderedRows = [];
     snapshot.roster.forEach(player => {
-      const row = el('div', 'roster-row');
+      if (!richRosterSport()) {
+        const row = el('div', 'roster-row');
+        const badge = el('div', 'jersey-badge', player.jersey || '—');
+        badge.setAttribute('aria-label', player.jersey ? `Number ${player.jersey}` : 'Jersey number unavailable');
+        const identity = el('div', 'roster-identity');
+        identity.appendChild(el('div', 'roster-name', player.name));
+        identity.appendChild(el('div', 'roster-meta', player.position || 'Unassigned'));
+        row.append(badge, identity);
+        list.appendChild(row);
+        renderedRows.push(row);
+        return;
+      }
+
+      const row = el('button', 'roster-row rich-roster-card');
+      row.type = 'button';
+      row.dataset.playerId = player.id || '';
+      row.dataset.position = player.position || '';
+      row.setAttribute('aria-label', `Open statistics for ${player.name}`);
+      row.__scoreboardPlayer = player;
+
+      const top = el('div', 'roster-card-top');
+      const teamLogo = imageTile('roster-team-logo', snapshot.teamLogo || '', `${currentTeam.name} logo`);
       const badge = el('div', 'jersey-badge', player.jersey || '—');
       badge.setAttribute('aria-label', player.jersey ? `Number ${player.jersey}` : 'Jersey number unavailable');
+      const headshot = imageTile('roster-headshot', player.headshot || '', `${player.name} headshot`, initials(player.name));
       const identity = el('div', 'roster-identity');
-      identity.appendChild(el('div', 'roster-name', player.name));
-      identity.appendChild(el('div', 'roster-meta', player.position || 'Unassigned'));
-      row.append(badge, identity);
+      identity.append(
+        el('div', 'roster-name', player.name),
+        el('div', 'roster-meta', player.position || 'Unassigned')
+      );
+      top.append(teamLogo, badge, headshot, identity);
+
+      const season = el('div', 'roster-season-stats roster-season-stats-unavailable', 'Loading season stats…');
+      const recent = el('div', 'roster-last-line');
+      recent.hidden = true;
+      const trend = el('div', 'roster-trend-line');
+      trend.hidden = true;
+      const chevron = el('span', 'roster-card-chevron', '›');
+      chevron.setAttribute('aria-hidden', 'true');
+
+      row.append(top, season, recent, trend, chevron);
+      row.addEventListener('click', () => openPlayer(player));
       list.appendChild(row);
+      renderedRows.push(row);
     });
     detailContent.appendChild(list);
+    startRosterHydration(renderedRows);
   }
 
   function renderOverview() {
@@ -323,6 +600,7 @@
   }
 
   function close() {
+    if (view === 'player') return returnToRoster();
     if (view !== 'overview') return showOverview();
     const id = currentTeam?.id;
     const focusTarget = returnFocusTarget;
