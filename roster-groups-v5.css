@@ -160,6 +160,7 @@
 .player-core-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  min-height: 52px;
   margin-top: 13px;
   padding: 8px 0 7px;
   border-top: 1px solid color-mix(in srgb, var(--team-rule, rgba(80,100,120,.28)) 72%, transparent);
@@ -262,7 +263,7 @@
   pointer-events: none;
 }
 
-.rich-roster-card:has(.roster-trend-line:not([hidden])) .roster-card-chevron {
+.rich-roster-card.has-trend .roster-card-chevron {
   bottom: 46px;
 }
 
