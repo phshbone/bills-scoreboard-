@@ -473,3 +473,13 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - NFL/NCAA football roster cards remain on the existing simpler layout in this stage.
 - Global site typography is NOT changed in this stage. The richer roster cards use the existing condensed system font stack as a contained typography test before any site-wide font decision.
 - Existing team-page header structure, footer plate, live-score behavior, top-level swipes, standings, schedules, and news are unchanged.
+
+
+## Stage 11B39 lock — repaired card stats + semantic player detail + football cards (2026-09-19)
+- Basketball and hockey rich roster cards no longer stop at an empty overview snapshot. When overview lacks useful values, cards fall back to season-scoped ESPN athlete stats; if the current season is not yet populated, a career fallback is allowed only when explicitly labeled "Career snapshot".
+- Player-detail "Current season snapshot" is now sourced from a season-scoped regular-season stats request. Comprehensive provider categories remain available below it for career/expanded/advanced/postseason context.
+- Player-detail statistics are reorganized into semantic concept cards rather than a flat wall of unrelated stat tiles. Examples: baseball Record & role / Run prevention / Command & workload / Core batting / Power & production / Plate discipline / Baserunning; basketball Scoring / Playmaking / Rebounding / Defense / Usage / Milestones; hockey Record / Goaltending / Scoring / Shooting; football Passing / Rushing / Receiving / Tackling / Pressure & turnovers / Pass defense / Kicking / Punting.
+- Each semantic card uses a three-column scan grid inside one grouped panel. Wins/losses/percentage and other related values remain visually adjacent.
+- Common opaque abbreviations can expose a compact stat key beneath their semantic group (for example WHIP = walks + hits allowed per inning pitched, HLD = holds, BLSV = blown saves).
+- Rich roster cards now apply to football as well as baseball, basketball, and hockey. Football core-card stats are position-aware and recent-game/trend lines remain feed-driven only.
+- Existing header artwork, anchored real-plate footer, team-page scrolling model, top-level swipes, live score behavior, standings, schedules, and news remain untouched.

@@ -454,3 +454,148 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+
+/* Stage 11B39: semantic player-stat groups.
+   Keep one outer card per related concept instead of presenting every metric as
+   an unrelated tile. The 3-column inner grid preserves quick scanning. */
+.roster-stats-context {
+  margin: 10px 2px -7px;
+  color: var(--team-accent-dark, var(--team-ink, #172d45));
+  font-family: "Arial Narrow", "Aptos Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-size: .66rem;
+  font-weight: 900;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.player-semantic-groups {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.player-stat-group {
+  padding: 14px;
+  border: 2px solid var(--team-rule, rgba(80,100,120,.28));
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--team-canvas, #f2f5f7) 88%, white 12%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.74),
+    0 3px 9px rgba(28,52,75,.06);
+}
+
+.player-stat-group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.player-stat-group-head .detail-group-title {
+  margin: 0;
+}
+
+.player-stat-scope {
+  min-width: 0;
+  color: var(--team-muted, #647284);
+  font-family: "Arial Narrow", "Aptos Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-size: .64rem;
+  font-weight: 850;
+  letter-spacing: .06em;
+  line-height: 1.15;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.player-semantic-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  border-top: 1px solid color-mix(in srgb, var(--team-rule, rgba(80,100,120,.28)) 66%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--team-rule, rgba(80,100,120,.28)) 48%, transparent);
+}
+
+.player-semantic-stat {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  min-width: 0;
+  min-height: 76px;
+  padding: 10px 6px;
+  text-align: center;
+}
+
+.player-semantic-stat:not(:nth-child(3n + 1)) {
+  border-left: 1px solid color-mix(in srgb, var(--team-rule, rgba(80,100,120,.28)) 56%, transparent);
+}
+
+.player-semantic-stat:nth-child(n + 4) {
+  border-top: 1px solid color-mix(in srgb, var(--team-rule, rgba(80,100,120,.28)) 46%, transparent);
+}
+
+.player-semantic-value {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--team-ink, #172d45);
+  font-family: "Arial Narrow", "Aptos Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-size: 1.08rem;
+  font-weight: 950;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.player-semantic-label {
+  margin-top: 5px;
+  color: var(--team-muted, #647284);
+  font-family: "Arial Narrow", "Aptos Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-size: .68rem;
+  font-weight: 900;
+  letter-spacing: .055em;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.player-stat-key {
+  margin-top: 9px;
+  color: var(--team-muted, #647284);
+  font-size: .68rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.player-stat-key span {
+  white-space: normal;
+}
+
+@media (max-width: 560px) {
+  .player-stat-group {
+    padding: 12px 10px;
+  }
+
+  .player-stat-group-head {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .player-stat-scope {
+    max-width: 46%;
+    font-size: .6rem;
+  }
+
+  .player-semantic-stat {
+    min-height: 70px;
+    padding: 9px 4px;
+  }
+
+  .player-semantic-value {
+    font-size: 1rem;
+  }
+
+  .player-semantic-label {
+    font-size: .63rem;
+  }
+}
