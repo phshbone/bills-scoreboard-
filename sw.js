@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b39-roster-detail-groups';
+const CACHE = 'scoreboard-v11b40-football-stat-cleanup';
 const ASSETS = [
   './',
   './index.html',
