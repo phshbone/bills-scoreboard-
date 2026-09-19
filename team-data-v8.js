@@ -394,11 +394,21 @@
         const wins = pickStat(map, ['W', 'WINS']);
         const losses = pickStat(map, ['L', 'LOSSES']);
         const record = wins && losses ? `${wins}-${losses}` : pickStat(map, ['W-L', 'W/L', 'RECORD']);
+        const position = String(player?.position || '').toUpperCase();
+        if (position === 'SP') {
+          return [
+            { label: 'W-L', value: missing(record) },
+            { label: 'ERA', value: missing(pickStat(map, ['ERA'])) },
+            { label: 'WHIP', value: missing(pickStat(map, ['WHIP'])) },
+            { label: 'K', value: missing(pickStat(map, ['SO', 'K', 'STRIKEOUTS'])) }
+          ];
+        }
+        const saves = pickStat(map, ['SV', 'SAVES']);
         return [
-          { label: 'W-L', value: missing(record) },
           { label: 'ERA', value: missing(pickStat(map, ['ERA'])) },
           { label: 'WHIP', value: missing(pickStat(map, ['WHIP'])) },
-          { label: 'K', value: missing(pickStat(map, ['SO', 'K', 'STRIKEOUTS'])) }
+          { label: 'K', value: missing(pickStat(map, ['SO', 'K', 'STRIKEOUTS'])) },
+          saves ? { label: 'SV', value: missing(saves) } : { label: 'W-L', value: missing(record) }
         ];
       }
       return [
@@ -503,7 +513,8 @@
         if (ip) pieces.push(`${ip} IP`);
         if (er) pieces.push(`${er} ER`);
         if (k) pieces.push(`${k} K`);
-        return pieces.length ? { label: 'Last start', text: pieces.join(' · ') } : null;
+        const label = /^SP$/i.test(String(player?.position || '').trim()) ? 'Last start' : 'Last appearance';
+        return pieces.length ? { label, text: pieces.join(' · ') } : null;
       }
       const hits = eventStat(event, ['H', 'HITS']);
       const atBats = eventStat(event, ['AB', 'ATBATS']);
@@ -585,7 +596,7 @@
     }
 
     if (team?.sport === 'baseball') {
-      if (isBaseballPitcher(player)) {
+      if (/^SP$/i.test(String(player?.position || '').trim())) {
         const lastThree = recent.slice(0, 3);
         if (lastThree.length === 3) {
           const qualityStarts = lastThree.filter(event => {
