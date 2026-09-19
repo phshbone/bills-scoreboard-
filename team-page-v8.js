@@ -15,7 +15,7 @@
   const detailKicker = document.getElementById('detail-kicker');
   const detailTitle = document.getElementById('detail-title');
   const detailContent = document.getElementById('detail-content');
-  const shell = document.querySelector('.team-page-shell');
+  const scroller = document.querySelector('.team-page-scroll') || document.querySelector('.team-page-shell');
 
   let currentTeam = null;
   let snapshot = null;
@@ -59,7 +59,7 @@
     kicker.textContent = currentTeam?.league || 'scoreboard';
     title.textContent = currentTeam?.name || 'Team';
     updateBackLabel();
-    document.querySelector('.team-page-shell')?.scrollTo({ top: 0, behavior: 'instant' });
+    scroller?.scrollTo({ top: 0, behavior: 'instant' });
   }
 
   function openDetail(kind) {
@@ -74,7 +74,7 @@
     if (kind === 'roster') renderRoster();
     if (kind === 'news') renderTeamNews();
     updateBackLabel();
-    document.querySelector('.team-page-shell')?.scrollTo({ top: 0, behavior: 'instant' });
+    scroller?.scrollTo({ top: 0, behavior: 'instant' });
   }
 
   function currentTeamMatches(row) {
@@ -314,7 +314,7 @@
     document.documentElement.classList.add('team-page-open');
     document.body.classList.add('modal-open', 'team-page-open');
     updateBackLabel();
-    document.querySelector('.team-page-shell')?.scrollTo({ top: 0 });
+    scroller?.scrollTo({ top: 0 });
     back.focus();
     const result = await window.ScoreboardData.load(team, force);
     if (modal.hidden || currentTeam?.id !== team.id) return;
@@ -343,18 +343,18 @@
   // normal team-page scrolling remains native and the Back rail cannot be
   // dragged away from the viewport.
   let touchY = null;
-  if (shell) {
-    shell.addEventListener('touchstart', event => {
+  if (scroller) {
+    scroller.addEventListener('touchstart', event => {
       touchY = event.touches.length === 1 ? event.touches[0].clientY : null;
     }, { passive: true });
 
-    shell.addEventListener('touchmove', event => {
+    scroller.addEventListener('touchmove', event => {
       if (touchY === null || event.touches.length !== 1) return;
       const nextY = event.touches[0].clientY;
       const deltaY = nextY - touchY;
-      const maxScroll = Math.max(0, shell.scrollHeight - shell.clientHeight);
-      const atTop = shell.scrollTop <= 0;
-      const atBottom = shell.scrollTop >= maxScroll - 1;
+      const maxScroll = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
+      const atTop = scroller.scrollTop <= 0;
+      const atBottom = scroller.scrollTop >= maxScroll - 1;
 
       if ((atTop && deltaY > 0) || (atBottom && deltaY < 0)) {
         event.preventDefault();
@@ -363,8 +363,8 @@
     }, { passive: false });
 
     const clearTouch = () => { touchY = null; };
-    shell.addEventListener('touchend', clearTouch, { passive: true });
-    shell.addEventListener('touchcancel', clearTouch, { passive: true });
+    scroller.addEventListener('touchend', clearTouch, { passive: true });
+    scroller.addEventListener('touchcancel', clearTouch, { passive: true });
   }
 
   back.addEventListener('click', close);
