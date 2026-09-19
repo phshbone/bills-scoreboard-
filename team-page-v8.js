@@ -63,7 +63,7 @@
   }
 
   function richRosterSport() {
-    return ['baseball', 'basketball', 'hockey'].includes(currentTeam?.sport || '');
+    return ['baseball', 'basketball', 'hockey', 'football'].includes(currentTeam?.sport || '');
   }
 
   function playerKey(player) {
@@ -104,9 +104,13 @@
 
   function renderCoreStats(target, core) {
     target.replaceChildren();
-    if (!Array.isArray(core) || !core.length) {
+    const useful = Array.isArray(core) && core.some(item => {
+      const value = String(item?.value ?? '').trim();
+      return value && value !== '—' && value !== '--';
+    });
+    if (!useful) {
       target.classList.add('roster-season-stats-unavailable');
-      target.textContent = 'Season stats unavailable';
+      target.textContent = 'Stats unavailable';
       return;
     }
     target.classList.remove('roster-season-stats-unavailable');
@@ -120,10 +124,191 @@
     });
   }
 
+  function statKey(item) {
+    return String(item?.label || item?.name || '')
+      .trim()
+      .toUpperCase()
+      .replace(/\s+/g, '')
+      .replace(/[^A-Z0-9%/+\-]/g, '');
+  }
+
+  const STAT_EXPLANATIONS = Object.freeze({
+    WHIP: 'Walks + hits allowed per inning pitched',
+    HLD: 'Holds',
+    BLSV: 'Blown saves',
+    GIDP: 'Grounded into double plays',
+    ISO: 'Isolated power',
+    ISOP: 'Isolated power',
+    'RC/27': 'Runs created per 27 outs',
+    SECA: 'Secondary average',
+    'GO/FO': 'Ground outs to fly outs',
+    DD2: 'Double-doubles',
+    TD3: 'Triple-doubles',
+    'AST/TO': 'Assist-to-turnover ratio',
+    GAA: 'Goals-against average',
+    'SV%': 'Save percentage',
+    OTL: 'Overtime losses',
+    QBR: 'Quarterback Rating',
+    TGT: 'Targets',
+    IN20: 'Punts inside the 20-yard line'
+  });
+
+  function bucketForStat(sport, player, item, categoryName = '') {
+    const key = statKey(item);
+    const category = String(categoryName || '').toLowerCase();
+    const inSet = (...values) => values.includes(key);
+
+    if (sport === 'baseball') {
+      const pitcher = /^(SP|RP|P|CP|CL)$/i.test(String(player?.position || '').trim()) || /pitch/i.test(category);
+      if (pitcher) {
+        if (inSet('GP','GS','W','L','W%','SV','HLD','BLSV')) return 'Record & role';
+        if (inSet('ERA','WHIP','R','ER','H','HR','HBP','WP','BK')) return 'Run prevention';
+        if (inSet('IP','K','SO','BB','K/BB','K9','K/9','BB9','BB/9','BF')) return 'Command & workload';
+        if (inSet('P','P/PA','P/GS','GO','FO','GO/FO')) return 'Contact & efficiency';
+        if (/advanced/i.test(category) || inSet('WAR','FIP','XFIP')) return 'Advanced';
+        return 'Other pitching';
+      }
+      if (inSet('GP','PA','AB')) return 'Playing time';
+      if (inSet('H','AVG','OBP','SLG','OPS')) return 'Core batting';
+      if (inSet('R','HR','RBI','2B','3B','XBH','TB')) return 'Power & production';
+      if (inSet('BB','SO','K','HBP','IBB','BB/K','BB/PA','AB/HR')) return 'Plate discipline';
+      if (inSet('SB','CS','SB%')) return 'Baserunning';
+      if (inSet('GIDP','SH','SF')) return 'Situational';
+      if (/advanced/i.test(category) || inSet('WAR','OWAR','RC','RC/27','ISO','ISOP','SECA','GO','FO','GO/FO')) return 'Advanced';
+      return 'Other batting';
+    }
+
+    if (sport === 'basketball') {
+      if (inSet('GP','GS','MIN')) return 'Usage';
+      if (inSet('PTS','FG','FG%','3PT','3P%','FT','FT%')) return 'Scoring';
+      if (inSet('OR','DR','REB')) return 'Rebounding';
+      if (inSet('AST','TO','AST/TO')) return 'Playmaking';
+      if (inSet('STL','BLK')) return 'Defense';
+      if (inSet('DD2','TD3')) return 'Milestones';
+      if (inSet('PF','TECH','FLAG','DQ','EJECT')) return 'Fouls & discipline';
+      if (inSet('STL/TO','SC-EFF','SH-EFF')) return 'Efficiency';
+      return 'Other';
+    }
+
+    if (sport === 'hockey') {
+      const goalie = /^G$/i.test(String(player?.position || '').trim()) || /goal/i.test(category);
+      if (goalie) {
+        if (inSet('GP','GS','W','L','OTL','SO')) return 'Record';
+        if (inSet('GAA','SV%','SV','GA')) return 'Goaltending';
+        if (inSet('SA','MIN','TOI')) return 'Workload';
+        return 'Other goaltending';
+      }
+      if (inSet('GP','TOI','ATOI','MIN')) return 'Usage';
+      if (inSet('G','A','PTS','+/-')) return 'Scoring';
+      if (inSet('S','SOG','SH%','PPG','SHG','GWG')) return 'Shooting & special teams';
+      if (inSet('PIM','HIT','HITS','BLK','BLOCKS')) return 'Physical & discipline';
+      if (inSet('FOW','FOL','FO%')) return 'Faceoffs';
+      return 'Other';
+    }
+
+    if (sport === 'football') {
+      if (/pass/i.test(category) || inSet('CMP','ATT','CMP%','YDS','TD','INT','QBR','RTG','Y/A','AY/A')) return 'Passing';
+      if (/rush/i.test(category) || inSet('CAR','RUSH','RUSHYDS','YPC','RUSHTD')) return 'Rushing';
+      if (/receiv/i.test(category) || inSet('REC','TGT','RECYDS','YPR','RECTD')) return 'Receiving';
+      if (inSet('GP','GS','SNAP','SNAPS')) return 'Usage';
+      if (inSet('TOT','TKL','SOLO','AST','TFL')) return 'Tackling';
+      if (inSet('SACK','QBHT','HUR','FF','FR')) return 'Pressure & turnovers';
+      if (inSet('INT','PD','PDEF','DEFL')) return 'Pass defense';
+      if (/kick/i.test(category) || inSet('FG','FGM','FGA','FG%','XP','XPM','XPA','PTS')) return 'Kicking';
+      if (/punt/i.test(category) || inSet('PUNT','PUNTS','AVG','LNG','IN20','TB')) return 'Punting';
+      return 'Other';
+    }
+
+    return 'Other';
+  }
+
+  function bucketPriority(sport, player) {
+    if (sport === 'baseball') {
+      const pitcher = /^(SP|RP|P|CP|CL)$/i.test(String(player?.position || '').trim());
+      return pitcher
+        ? ['Record & role','Run prevention','Command & workload','Contact & efficiency','Advanced','Other pitching']
+        : ['Playing time','Core batting','Power & production','Plate discipline','Baserunning','Situational','Advanced','Other batting'];
+    }
+    if (sport === 'basketball') return ['Usage','Scoring','Playmaking','Rebounding','Defense','Milestones','Efficiency','Fouls & discipline','Other'];
+    if (sport === 'hockey') {
+      return /^G$/i.test(String(player?.position || '').trim())
+        ? ['Record','Goaltending','Workload','Other goaltending']
+        : ['Usage','Scoring','Shooting & special teams','Physical & discipline','Faceoffs','Other'];
+    }
+    if (sport === 'football') return ['Usage','Passing','Rushing','Receiving','Tackling','Pressure & turnovers','Pass defense','Kicking','Punting','Other'];
+    return ['Other'];
+  }
+
+  function semanticGroups(player, category) {
+    const groups = new Map();
+    (category?.stats || []).forEach(item => {
+      const bucket = bucketForStat(currentTeam?.sport || '', player, item, category?.name || '');
+      if (!groups.has(bucket)) groups.set(bucket, []);
+      groups.get(bucket).push(item);
+    });
+    const priority = bucketPriority(currentTeam?.sport || '', player);
+    return [...groups.entries()]
+      .sort((a, b) => {
+        const ai = priority.indexOf(a[0]);
+        const bi = priority.indexOf(b[0]);
+        return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+      })
+      .map(([title, stats]) => ({ title, stats }));
+  }
+
+  function statExplanation(item, glossary = {}) {
+    const key = statKey(item);
+    return glossary[key] || STAT_EXPLANATIONS[key] || '';
+  }
+
+  function renderSemanticCategory(player, category, glossary = {}) {
+    const fragment = document.createDocumentFragment();
+    semanticGroups(player, category).forEach(groupData => {
+      const group = el('section', 'player-stat-group');
+      const head = el('div', 'player-stat-group-head');
+      head.append(
+        el('div', 'detail-group-title', groupData.title),
+        el('div', 'player-stat-scope', category?.name || 'Statistics')
+      );
+      group.appendChild(head);
+
+      const grid = el('div', 'player-semantic-stat-grid');
+      groupData.stats.forEach(item => {
+        const stat = el('div', 'player-semantic-stat');
+        const value = el('strong', 'player-semantic-value', item.value || '—');
+        const label = el('span', 'player-semantic-label', item.label || item.name || '');
+        stat.append(value, label);
+        grid.appendChild(stat);
+      });
+      group.appendChild(grid);
+
+      const explanations = [];
+      groupData.stats.forEach(item => {
+        const description = statExplanation(item, glossary);
+        const key = statKey(item);
+        if (description && key && !explanations.some(entry => entry.key === key)) {
+          explanations.push({ key, description });
+        }
+      });
+      if (explanations.length) {
+        const keyLine = el('div', 'player-stat-key');
+        explanations.slice(0, 3).forEach((entry, index) => {
+          if (index) keyLine.appendChild(document.createTextNode(' · '));
+          keyLine.appendChild(el('span', '', `${entry.key}: ${entry.description}`));
+        });
+        group.appendChild(keyLine);
+      }
+
+      fragment.appendChild(group);
+    });
+    return fragment;
+  }
+
   async function hydrateRosterCard(row, player) {
     if (!row?.isConnected || row.dataset.statsState === 'loading' || row.dataset.statsState === 'ready') return;
     row.dataset.statsState = 'loading';
     const season = row.querySelector('.roster-season-stats');
+    const context = row.querySelector('.roster-stats-context');
     const recent = row.querySelector('.roster-last-line');
     const trend = row.querySelector('.roster-trend-line');
 
@@ -131,6 +316,11 @@
       const details = await window.ScoreboardData.loadPlayerCard(currentTeam, player);
       if (!row.isConnected) return;
       renderCoreStats(season, details.core);
+      if (context) {
+        const career = details.coreContext === 'Career';
+        context.hidden = !career;
+        context.textContent = career ? 'Career snapshot' : '';
+      }
       if (details.lastAppearance) {
         recent.hidden = false;
         recent.replaceChildren(
@@ -197,7 +387,8 @@
 
     if (Array.isArray(details.core) && details.core.length) {
       const core = el('section', 'player-core-panel');
-      core.appendChild(el('div', 'detail-group-title', 'Season snapshot'));
+      const context = details.coreContext === 'Career' ? 'Career snapshot' : 'Current season snapshot';
+      core.appendChild(el('div', 'detail-group-title', context));
       const grid = el('div', 'player-core-stats');
       renderCoreStats(grid, details.core);
       core.appendChild(grid);
@@ -220,30 +411,18 @@
     }
 
     if (Array.isArray(details.categories) && details.categories.length) {
-      const season = el('div', 'player-season-groups');
+      const groups = el('div', 'player-season-groups player-semantic-groups');
       details.categories.forEach(category => {
-        const group = el('section', 'player-season-group');
-        group.appendChild(el('div', 'detail-group-title', category.name || 'Season'));
-        const statGrid = el('div', 'player-season-stat-grid');
-        category.stats.forEach(item => {
-          const stat = el('div', 'player-season-stat');
-          stat.append(
-            el('strong', '', item.value || '—'),
-            el('span', '', item.label || item.name || '')
-          );
-          statGrid.appendChild(stat);
-        });
-        group.appendChild(statGrid);
-        season.appendChild(group);
+        groups.appendChild(renderSemanticCategory(player, category, details.glossary || {}));
       });
-      detailContent.appendChild(season);
+      detailContent.appendChild(groups);
     }
 
     if (!details.core?.length && !details.categories?.length) {
       detailContent.appendChild(panel(
         'Player stats',
         'Unavailable',
-        details.errors?.stats || details.errors?.player || 'No detailed season statistics were returned for this player.',
+        details.errors?.stats || details.errors?.player || 'No detailed statistics were returned for this player.',
         { wide: true, error: true }
       ));
     }
@@ -514,6 +693,8 @@
       );
       top.append(teamLogo, badge, headshot, identity);
 
+      const context = el('div', 'roster-stats-context');
+      context.hidden = true;
       const season = el('div', 'roster-season-stats roster-season-stats-unavailable', 'Loading season stats…');
       const recent = el('div', 'roster-last-line');
       recent.hidden = true;
@@ -522,7 +703,7 @@
       const chevron = el('span', 'roster-card-chevron', '›');
       chevron.setAttribute('aria-hidden', 'true');
 
-      row.append(top, season, recent, trend, chevron);
+      row.append(top, context, season, recent, trend, chevron);
       row.addEventListener('click', () => openPlayer(player));
       list.appendChild(row);
       renderedRows.push(row);
