@@ -411,6 +411,61 @@
     return 'defense';
   }
 
+  function footballSeasonCategoryLooksCareer(category) {
+    const name = String(category?.displayName || category?.name || '').toLowerCase();
+    if (/career|postseason|playoff/.test(name)) return true;
+
+    const values = new Map(categoryPairs(category).map(item => [
+      String(item.label || item.name || '').trim().toUpperCase().replace(/\s+/g, ''),
+      Number.parseFloat(String(item.value || '').replace(/,/g, ''))
+    ]));
+    const value = (...keys) => {
+      for (const key of keys) {
+        const n = values.get(key);
+        if (Number.isFinite(n)) return n;
+      }
+      return NaN;
+    };
+
+    const gp = value('GP','GAMESPLAYED');
+    if (Number.isFinite(gp) && gp > 25) return true;
+
+    if (/pass/.test(name)) {
+      const yds = value('YDS','PASSYDS','PASSINGYARDS');
+      const td = value('TD','PASSTD','PASSINGTOUCHDOWNS');
+      const cmp = value('CMP','COMPLETIONS');
+      const att = value('ATT','PASSINGATTEMPTS');
+      if ((Number.isFinite(yds) && yds > 8000)
+        || (Number.isFinite(td) && td > 80)
+        || (Number.isFinite(cmp) && cmp > 800)
+        || (Number.isFinite(att) && att > 1200)) return true;
+    }
+
+    if (/rush/.test(name)) {
+      const yds = value('YDS','RUSHYDS','RUSHINGYARDS');
+      const td = value('TD','RUSHTD','RUSHINGTOUCHDOWNS');
+      if ((Number.isFinite(yds) && yds > 3500)
+        || (Number.isFinite(td) && td > 40)) return true;
+    }
+
+    if (/receiv/.test(name)) {
+      const yds = value('YDS','RECYDS','RECEIVINGYARDS');
+      const td = value('TD','RECTD','RECEIVINGTOUCHDOWNS');
+      const rec = value('REC','RECEPTIONS');
+      if ((Number.isFinite(yds) && yds > 3500)
+        || (Number.isFinite(td) && td > 40)
+        || (Number.isFinite(rec) && rec > 250)) return true;
+    }
+
+    return false;
+  }
+
+  function seasonSnapshotCategories(team, payload) {
+    const categories = statCategories(payload);
+    if (team?.sport !== 'football') return categories;
+    return categories.filter(category => !footballSeasonCategoryLooksCareer(category));
+  }
+
   function meaningfulCore(core) {
     return Array.isArray(core) && core.some(item => {
       const value = String(item?.value ?? '').trim();
@@ -876,7 +931,13 @@
 
       try {
         const overview = await fetchJson(playerEndpoint(team, player, 'overview'));
-        core = coreStats(team, player, overviewCategories(overview));
+        // Football athlete overviews can expose career totals even while the
+        // app is asking for a current-season card. Use overview only for recent
+        // game context; current-season football core stats must come from the
+        // season-scoped stats request below.
+        if (team?.sport !== 'football') {
+          core = coreStats(team, player, overviewCategories(overview));
+        }
         events = gamelogEvents(overview?.gameLog || overview?.gamelog || {});
         lastAppearance = appearanceSummary(team, player, events[0]);
       } catch (error) {
@@ -888,15 +949,15 @@
       if (!meaningfulCore(core)) {
         try {
           const seasonStats = await fetchJson(playerEndpoint(team, player, 'stats', { season, seasontype: 2 }));
-          core = coreStats(team, player, statCategories(seasonStats));
+          core = coreStats(team, player, seasonSnapshotCategories(team, seasonStats));
         } catch (error) {
           errors.stats = error.message;
         }
       }
 
-      // If the current season has not started yet, a labeled career fallback is
-      // more useful than four dashes and is never presented as season data.
-      if (!meaningfulCore(core)) {
+      // Never substitute career totals into a football season card. For other
+      // sports retain the explicitly labeled career fallback used previously.
+      if (!meaningfulCore(core) && team?.sport !== 'football') {
         try {
           const allStats = await fetchJson(playerEndpoint(team, player, 'stats'));
           const allCategories = statCategories(allStats);
@@ -921,6 +982,7 @@
         supported: true,
         core,
         coreContext,
+        coreUnavailable: team?.sport === 'football' && !meaningfulCore(core),
         lastAppearance,
         trend: trendSummary(team, player, events),
         errors
@@ -967,14 +1029,15 @@
       const errors = Object.fromEntries(results.filter(([, , error]) => error).map(([resource, , error]) => [resource, error]));
 
       const comprehensiveCategories = statCategories(payloads.stats);
-      const seasonCategories = statCategories(payloads.seasonStats);
+      const seasonCategories = seasonSnapshotCategories(team, payloads.seasonStats);
       const categories = comprehensiveCategories.length ? comprehensiveCategories : seasonCategories;
       let core = coreStats(team, player, seasonCategories);
       let coreContext = 'Current season';
-      if (!meaningfulCore(core)) {
+      if (!meaningfulCore(core) && team?.sport !== 'football') {
         core = coreStats(team, player, categories);
         if (meaningfulCore(core)) coreContext = 'Career';
       }
+      const coreUnavailable = team?.sport === 'football' && !meaningfulCore(core);
 
       const glossaryItems = [
         ...(Array.isArray(payloads.stats?.glossary) ? payloads.stats.glossary : []),
@@ -990,12 +1053,18 @@
       const events = gamelogEvents(payloads.gamelog);
       return {
         supported: true,
-        categories: categories.map(category => ({
-          name: category?.displayName || category?.name || 'Statistics',
-          stats: categoryPairs(category)
-        })).filter(category => category.stats.length),
+        categories: categories.map(category => {
+          const rawName = category?.displayName || category?.name || 'Statistics';
+          const name = team?.sport === 'football'
+            && comprehensiveCategories.includes(category)
+            && !/career|postseason|playoff/i.test(rawName)
+              ? `Career ${rawName}`
+              : rawName;
+          return { name, stats: categoryPairs(category) };
+        }).filter(category => category.stats.length),
         core,
         coreContext,
+        coreUnavailable,
         events,
         lastAppearance: appearanceSummary(team, player, events[0]),
         trend: trendSummary(team, player, events),
