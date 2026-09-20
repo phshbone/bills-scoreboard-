@@ -340,23 +340,32 @@
     return `${base}?type=0&level=${encodeURIComponent(level)}&sort=playoffseed%3Aasc`;
   }
 
-  function broadPlayoffGroups(payload) {
+  function broadPlayoffGroups(payload, preferConference = false) {
     const candidates = standingGroups(payload)
       .filter(group => Array.isArray(group?.entries) && group.entries.length);
     if (!candidates.length) return [];
 
-    const maxEntries = Math.max(...candidates.map(group => group.entries.length));
     const conferenceLike = /conference|eastern|western|\bafc\b|\bnfc\b|american football|national football/i;
-
-    const broad = candidates.filter(group => {
-      const count = group.entries.length;
+    const conferenceGroups = candidates.filter(group => {
       const label = `${group.name || ''} ${group.parentName || ''}`;
-      return count === maxEntries
-        || (count >= Math.max(2, maxEntries - 1) && conferenceLike.test(label));
+      return conferenceLike.test(label) && group.entries.length >= 4;
     });
 
+    const maxEntries = Math.max(...candidates.map(group => group.entries.length));
+    const broadBySize = candidates.filter(group => {
+      const count = group.entries.length;
+      return count === maxEntries;
+    });
+
+    // At conference scope prefer actual conference groups even if the response
+    // also includes a larger league-wide parent table. Otherwise keep the
+    // broadest table returned by the provider.
+    const selected = preferConference && conferenceGroups.length
+      ? conferenceGroups
+      : broadBySize;
+
     const seen = new Set();
-    return broad.filter(group => {
+    return selected.filter(group => {
       const signature = group.entries
         .map(entry => String(entry?.team?.id || entry?.team?.abbreviation || ''))
         .filter(Boolean)
@@ -374,11 +383,16 @@
     const key = `${team.provider.sport}/${team.provider.league}`;
     if (!force && playoffStandingsCache.has(key)) return playoffStandingsCache.get(key);
 
+    const league = String(team?.provider?.league || '').toLowerCase();
+    // WNBA playoff seeds are league-wide; NFL/NBA/NHL are better represented
+    // by the provider's conference-level standings first.
+    const levels = league === 'wnba' ? [1, 2] : [2, 1];
+
     let lastError = null;
-    for (const level of [2, 1]) {
+    for (const level of levels) {
       try {
         const payload = await fetchJson(playoffStandingsUrl(team, level));
-        const groups = broadPlayoffGroups(payload);
+        const groups = broadPlayoffGroups(payload, level === 2 && league !== 'wnba');
         if (groups.length) {
           const result = { payload, groups, level };
           playoffStandingsCache.set(key, result);
