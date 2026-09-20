@@ -780,7 +780,7 @@
 
         const nameCell = el('td', 'standing-team-cell');
         nameCell.appendChild(document.createTextNode(row.name));
-        if (playoff && row?.playoff?.label) {
+        if (row?.playoff?.label) {
           const badge = el(
             'span',
             `standing-playoff-mark${row.playoff.eliminated ? ' eliminated' : row.playoff.clinched ? ' clinched' : ''}`,
