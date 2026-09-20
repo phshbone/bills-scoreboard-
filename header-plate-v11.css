@@ -3,59 +3,48 @@
   width: 100%;
   grid-template-columns: minmax(0, 1fr);
   justify-content: stretch;
-  gap: 3px;
-  margin: 10px 0 10px;
+  gap: 2px;
+  margin: 8px 0 8px;
   padding: 0;
   border-bottom: 0;
 }
 
 .header-title-row {
   position: relative;
-  min-height: 50px;
+  min-height: 44px;
   align-items: center;
-  gap: 10px;
-  padding: 2px 12px 2px 14px;
+  gap: 8px;
+  padding: 0 10px 0 12px;
   overflow: hidden;
-  border: 1px solid rgba(168, 186, 210, .25);
-  border-radius: 10px;
-  background-color: #11243a;
-  background-image:
-    radial-gradient(circle at 9px 9px, rgba(210,221,232,.78) 0 1.5px, rgba(78,94,112,.95) 2px 3.2px, rgba(2,7,12,.85) 3.3px 4.2px, transparent 4.4px),
-    radial-gradient(circle at calc(100% - 9px) 9px, rgba(210,221,232,.78) 0 1.5px, rgba(78,94,112,.95) 2px 3.2px, rgba(2,7,12,.85) 3.3px 4.2px, transparent 4.4px),
-    radial-gradient(circle at 9px calc(100% - 9px), rgba(210,221,232,.68) 0 1.4px, rgba(78,94,112,.92) 2px 3.1px, rgba(2,7,12,.82) 3.2px 4.1px, transparent 4.3px),
-    radial-gradient(circle at calc(100% - 9px) calc(100% - 9px), rgba(210,221,232,.68) 0 1.4px, rgba(78,94,112,.92) 2px 3.1px, rgba(2,7,12,.82) 3.2px 4.1px, transparent 4.3px),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='24' viewBox='0 0 38 24'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M5 17L15 7M24 18L34 8' stroke='%23040a11' stroke-opacity='.48' stroke-width='4'/%3E%3Cpath d='M4 16L14 6M23 17L33 7' stroke='%238ea5bf' stroke-opacity='.30' stroke-width='3'/%3E%3Cpath d='M4 15L14 5M23 16L33 6' stroke='%23d7e4f1' stroke-opacity='.10' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E"),
-    linear-gradient(180deg, rgba(255,255,255,.055) 0%, rgba(255,255,255,.02) 22%, transparent 40%, rgba(0,0,0,.13) 100%),
-    linear-gradient(180deg, #203a58 0%, #17324f 30%, #112943 62%, #0d2035 100%);
-  background-size: auto, auto, auto, auto, 38px 24px, auto, auto;
-  background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+  border: 1px solid rgba(166, 187, 211, .34);
+  border-radius: 8px;
+  background-color: #0d2035;
+  background-image: url("./assets/score-metal-footer.webp");
+  background-size: cover;
+  background-position: center 49%;
+  background-repeat: no-repeat;
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.08),
-    inset 0 -1px 0 rgba(0,0,0,.56),
-    0 3px 9px rgba(0,0,0,.18);
+    inset 0 1px 0 rgba(255,255,255,.16),
+    inset 0 -1px 0 rgba(0,0,0,.62),
+    0 2px 7px rgba(0,0,0,.20);
 }
 
-.header-title-row::before,
-.header-title-row::after {
+/* The metal itself is now the supplied artwork. Keep only a restrained inner
+   edge so the thin rail still reads as a raised plate; no generated tread. */
+.header-title-row::before {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: 3px;
+  border: 1px solid rgba(215, 228, 240, .10);
+  border-radius: 5px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.035),
+    inset 0 -1px 0 rgba(0,0,0,.20);
   pointer-events: none;
 }
 
-/* Very light paint dust and weathering; keep the words dominant. */
-.header-title-row::before {
-  opacity: .14;
-  background:
-    radial-gradient(circle at 11% 30%, rgba(244,247,249,.18) 0 1px, transparent 1.4px),
-    radial-gradient(circle at 39% 66%, rgba(244,247,249,.11) 0 1px, transparent 1.4px),
-    radial-gradient(circle at 77% 36%, rgba(0,0,0,.25) 0 1px, transparent 1.5px);
-  background-size: 41px 31px, 47px 37px, 43px 33px;
-}
-
 .header-title-row::after {
-  opacity: .10;
-  background: linear-gradient(100deg, transparent 0 23%, rgba(255,255,255,.10) 24%, transparent 25% 67%, rgba(0,0,0,.16) 68%, transparent 69% 100%);
+  content: none;
 }
 
 .header-title-row > * {
@@ -128,8 +117,8 @@
 
 .header-title-row #edit-toggle,
 .header-title-row .desktop-top-nav .desktop-nav-button {
-  min-height: 44px;
-  padding: 0 10px;
+  min-height: 40px;
+  padding: 0 9px;
   border: 0;
   border-radius: 4px;
   background-color: transparent;
@@ -162,22 +151,24 @@
   }
 
   .header-title-row {
-    min-height: 50px;
-    gap: 8px;
-    padding: 2px 9px 2px 13px;
+    min-height: 44px;
+    gap: 6px;
+    padding: 0 7px 0 11px;
+    border-radius: 7px;
   }
 
   .header-title-row h1 {
-    font-size: clamp(1.3rem, 6.35vw, 1.58rem);
+    font-size: clamp(1.16rem, 5.65vw, 1.38rem);
     letter-spacing: .075em;
   }
 
   .header-title-row .header-actions { gap: 0; }
 
   .header-title-row #edit-toggle {
-    min-width: 58px;
-    padding: 0 6px;
-    font-size: clamp(1.06rem, 5vw, 1.22rem);
+    min-width: 54px;
+    min-height: 40px;
+    padding: 0 5px;
+    font-size: clamp(1rem, 4.6vw, 1.14rem);
   }
 }
 
