@@ -83,7 +83,7 @@
       label = Number.isFinite(rank) ? `WC${rank}` : `WC ${wcRank}`;
     }
 
-    const playoffInfo = playoff ? {
+    const playoffInfo = (playoff || label || status) ? {
       label,
       status,
       clinched: Boolean(item?.clinched || item?.divisionChamp),
@@ -91,7 +91,7 @@
       divisionLeader: Boolean(item?.divisionLeader || divisionRank === '1'),
       wildCardRank: wcRank,
       wildCardGamesBack: wcgb,
-      cutAfter: wcRank === '3'
+      cutAfter: playoff && wcRank === '3'
     } : null;
 
     return {
