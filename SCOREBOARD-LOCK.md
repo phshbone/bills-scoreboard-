@@ -519,3 +519,13 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Schedule rows show provider TV/venue context when present.
 - If the provider supplies neither broadcast nor venue, no placeholder line is rendered.
 - Existing score/state/date logic is unchanged.
+
+
+## Stage 11B44 lock — real diamond-plate top navigation rail (2026-09-19)
+- The top title/navigation rail keeps the existing DOM, buttons, edit control, desktop navigation, and phone swipe model.
+- The former CSS-generated tread/background is removed from header-plate-v11.css.
+- The rail now uses the same approved real diamond-plate asset as the footer: assets/score-metal-footer.webp.
+- The visual rail is reduced to 44px minimum height on phone and desktop, with 40px controls inside it.
+- A restrained inner border/shadow is retained only to preserve the raised-plate edge; no generated tread or weathering overlay remains.
+- Existing painted/stencil text treatment is preserved.
+- Header artwork above the rail is unchanged.

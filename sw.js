@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b43-tv-venue-context';
+const CACHE = 'scoreboard-v11b44-real-plate-top-nav';
 const ASSETS = [
   './',
   './index.html',
