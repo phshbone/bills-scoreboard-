@@ -265,11 +265,14 @@
   }
 
   function standingPlayoff(entry) {
-    const seed = stat(entry, ['playoffseed', 'seed']);
+    const rawSeed = String(stat(entry, ['playoffseed', 'seed']) ?? '').trim();
+    const seed = /^(?:0|-|—|none|null)$/i.test(rawSeed) ? '' : rawSeed;
     const clincher = statItem(entry, ['clincher', 'clinch']);
     const rawSymbol = String(clincher?.displayValue ?? clincher?.value ?? '').trim();
     const symbol = /^(?:0|-|—|none|null)$/i.test(rawSymbol) ? '' : rawSymbol;
-    const description = String(clincher?.description || clincher?.displayName || '').trim();
+    // Use the provider's actual description, not the generic displayName
+    // "Clincher", which can exist even when a team has not clinched anything.
+    const description = String(clincher?.description || '').trim();
     const eliminated = /^e$/i.test(symbol) || /eliminat/i.test(description);
     const clinched = !eliminated && (
       Boolean(symbol)
@@ -293,7 +296,7 @@
     return {
       label,
       status,
-      seed: seed === '' ? '' : String(seed),
+      seed,
       clinched,
       eliminated
     };
