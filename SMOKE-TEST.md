@@ -685,3 +685,17 @@ Overall pre-merge classification: **PASS WITH REAL-IPHONE LIVE-DATA VERIFICATION
 - sw.js cache namespace is scoreboard-v11b43-tv-venue-context.
 
 Overall pre-merge classification: **PASS WITH LIVE-DATA VISUAL VERIFICATION REQUIRED**.
+
+
+## Stage 11B44 smoke — real-plate top navigation rail
+### Executed checks
+- header-plate-v11.css brace balance is zero.
+- The top rail references assets/score-metal-footer.webp and no longer contains the old inline SVG tread.
+- Rail minimum height is 44px; contained controls are 40px.
+- Existing My Teams / Edit / desktop News-My Teams-Standings markup is unchanged.
+- Existing phone swipe discovery hint is unchanged.
+- assets/score-metal-footer.webp remains present in the service-worker precache.
+- sw.js cache namespace is scoreboard-v11b44-real-plate-top-nav.
+- Team-page header/footer/player/schedule data files are untouched by this stage.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION REQUIRED**.
