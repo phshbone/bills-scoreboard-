@@ -555,3 +555,16 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Wild Card rank, WC games back, division-leader state, clinched state, clinch indicator, magic/elimination values are taken from provider fields only.
 - The third Wild Card row is visually marked as the current cut line when the provider supplies wildCardRank=3.
 - No playoff qualification or clinch state is invented from record math.
+
+
+## Stage 11B48 lock — multileague playoff context (2026-09-19)
+- NFL, NBA, WNBA, and NHL load a supplemental ESPN playoff-standings view using conference-level standings first (level=2, sorted by playoff seed) with an overall level=1 fallback.
+- The supplemental loader selects broad league/conference groups rather than division-sized groups and caches them per league.
+- Generic playoff rows use provider playoffSeed and clincher fields only. No playoff qualification, clinch, elimination, or seed is inferred from record math.
+- A clincher badge is shown only when ESPN supplies a real clincher display value or clincher description. The generic stat label "Clincher" by itself never creates a false clinched state.
+- Provider clincher descriptions drive the accessible status; eliminated rows show OUT, explicit clinched rows show the provider symbol plus IN, and seed-only rows carry the seed without a false clinch badge.
+- Global standings show a separate Playoff Picture after normal standings when supplemental groups exist. Individual team standings show the playoff group containing the selected team when possible.
+- Regular standings may also show explicit provider clinch/elimination markers.
+- NBA secondary standings context now receives the same GB / HOME / AWAY / L10 / STK treatment already used for WNBA.
+- NCAA/Army does not use this generic playoff loader.
+- MLB continues to use the Stage 11B47 MLB StatsAPI Wild Card implementation rather than the generic ESPN playoff loader.
