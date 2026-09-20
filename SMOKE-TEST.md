@@ -645,3 +645,16 @@ Overall pre-merge classification: **PASS WITH LIVE-DATA + REAL-IPHONE VISUAL VER
 - Real-iPhone verification remains required for Cam Skattebo/Jaxson Dart/Army football player pages and roster cards.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION REQUIRED**.
+
+
+## Stage 11B41 smoke — football detail refinement
+### Executed checks
+- team-page-v8.js parses successfully after football usage folding, Scoring normalization, semantic touchdown de-duplication, category ordering, and secondary-zero suppression.
+- Helper checks confirm RB Rushing/Receiving and QB Passing groups preserve meaningful zeros while RB Defense and football Scoring do not.
+- Semantic identity checks confirm Rushing TD == Scoring RUSH and Passing TD == Scoring PASS, while Scoring TD remains a distinct total-touchdown concept.
+- Football category ordering test confirms Passing → Rushing → Receiving → Defense → Scoring.
+- sw.js cache namespace is scoreboard-v11b41-football-detail-refine.
+- No changes are made to team data loading, roster CSS, header/footer/theme files, or team-page structural CSS.
+- Real-iPhone verification remains required on Cam Skattebo/Jaxson Dart/Army to confirm the lone Usage cards disappear, Scoring collapses cleanly, and secondary defensive zeros are removed.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION REQUIRED**.

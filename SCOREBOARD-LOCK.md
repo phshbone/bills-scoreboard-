@@ -492,3 +492,12 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - QBR and passer rating are distinct. QBR is shown only when a real QBR value is returned; otherwise a passer-rating field is labeled RTG.
 - Football abbreviation keys prefer local context-aware definitions before provider glossary entries, preventing collisions such as ATT being described as a punt-return field inside Passing.
 - Baseball, basketball, hockey, approved headers, anchored diamond-plate footer, team-page scroll model, top-level swipes, live scores, standings, schedules, and news are unchanged.
+
+
+## Stage 11B41 lock — football detail refinement (2026-09-19)
+- Football category binding happens before generic GP/GS/ATT/YDS/TD handling, so GP from Passing/Rushing/Receiving/Defense folds into that player-relevant group instead of creating a one-stat Usage card.
+- Provider Scoring data is normalized into one Scoring group. Passing/rushing/receiving touchdown entries that duplicate an already-rendered position group are suppressed through semantic identities; total touchdowns/2PT/PAT/points may remain when they add information.
+- Football primary position groups retain meaningful zero values (for example a quarterback with 0 INT). Secondary/off-position groups suppress zero/dash fields and show only real activity (for example an RB with 1 FR shows the recovery without 0 SACK and 0 FF).
+- Generic non-line Usage cards are suppressed. Offensive-line players may retain Usage when that is the only meaningful statistical context.
+- Football source categories are ordered so Passing/Rushing/Receiving/Defense/Special Teams render before Scoring, enabling deterministic duplicate removal.
+- Baseball, basketball, hockey, roster-card layout, approved header, anchored diamond-plate footer, team-page scrolling, top-level swipes, live score, standings, schedules, and news are unchanged.
