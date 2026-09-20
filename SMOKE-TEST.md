@@ -712,3 +712,14 @@ Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RE
 - sw.js cache namespace is scoreboard-v11b45-football-gamelog-fallback.
 
 Overall pre-merge classification: **PASS WITH EAGLES REAL-DATA VERIFICATION REQUIRED**.
+
+
+## Stage 11B46 smoke — painted Back rail
+- team-theme-v20.css brace balance is zero.
+- Back button width is 68% with transparent border/background and no box shadow.
+- Distressed/stencil text treatment matches the top navigation font/mask approach.
+- Focus-visible styling remains present and the interactive target is 48px high.
+- Footer plate image/anchoring rules are unchanged.
+- sw.js cache namespace is scoreboard-v11b46-painted-back-rail.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE TAP-ZONE VERIFICATION REQUIRED**.
