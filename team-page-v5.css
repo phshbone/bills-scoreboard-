@@ -234,3 +234,51 @@
 .game-context-line {
   font-size: .75rem;
 }
+
+
+/* Stage 11B47: team-page playoff / wild-card picture. */
+.team-playoff-heading {
+  margin: 18px 2px 2px;
+  color: var(--team-ink, #172d45);
+  font-family: "Arial Narrow", "Aptos Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-size: .92rem;
+  font-weight: 950;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.standing-team-cell {
+  text-align: left !important;
+}
+
+.standing-playoff-mark {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 5px;
+  border: 1px solid color-mix(in srgb, var(--team-accent, #315f8d) 36%, transparent);
+  border-radius: 999px;
+  color: var(--team-ink, #172d45);
+  background: color-mix(in srgb, var(--team-accent, #315f8d) 10%, white);
+  font-size: .56rem;
+  font-weight: 950;
+  letter-spacing: .035em;
+  line-height: 1.1;
+  vertical-align: 1px;
+  white-space: nowrap;
+}
+
+.standing-playoff-mark.clinched {
+  color: #285c3e;
+  border-color: rgba(72,126,89,.24);
+  background: rgba(218,237,223,.64);
+}
+
+.standing-playoff-mark.eliminated {
+  color: #7b3d3d;
+  border-color: rgba(142,78,78,.22);
+  background: rgba(241,221,221,.64);
+}
+
+.standings-table tr.playoff-cut-row td {
+  border-bottom: 2px solid color-mix(in srgb, var(--team-rule, rgba(80,100,120,.28)) 82%, transparent);
+}
