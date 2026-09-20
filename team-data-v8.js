@@ -5,6 +5,7 @@
   const STANDINGS = 'https://site.api.espn.com/apis/v2/sports';
   const MLB_ROSTER = 'https://statsapi.mlb.com/api/v1/teams';
   const PLAYER_WEB = 'https://site.web.api.espn.com/apis/common/v3/sports';
+  const PLAYER_CORE = 'https://sports.core.api.espn.com/v2/sports';
   const MLB_TEAM_IDS = Object.freeze({ nyy: 147, nym: 121, phi: 143 });
   const teamCache = new Map();
   const standingsCache = new Map();
@@ -33,6 +34,29 @@
     return total?.summary || total?.displayValue || '—';
   }
 
+  function playerExperienceYears(playerObj) {
+    const experience = playerObj?.experience;
+    const candidates = [
+      experience?.years,
+      experience?.year,
+      experience?.value,
+      experience?.displayValue,
+      experience
+    ];
+
+    for (const candidate of candidates) {
+      if (candidate == null || typeof candidate === 'object') continue;
+      const text = String(candidate).trim();
+      if (!text) continue;
+      if (/rookie/i.test(text)) return 0;
+      const match = text.match(/\d+/);
+      if (!match) continue;
+      const years = Number.parseInt(match[0], 10);
+      if (Number.isFinite(years) && years >= 0 && years < 40) return years;
+    }
+    return null;
+  }
+
   function player(playerObj, groupName = '') {
     const headshot = playerObj?.headshot?.href
       || playerObj?.headshot?.url
@@ -43,7 +67,8 @@
       position: playerObj?.position?.abbreviation || playerObj?.position?.displayName || playerObj?.position?.name || (typeof playerObj?.position === 'string' ? playerObj.position : '') || groupName || '',
       jersey: playerObj?.jersey || playerObj?.uniform || '',
       id: String(playerObj?.id || playerObj?.uid || playerObj?.guid || ''),
-      headshot
+      headshot,
+      experienceYears: playerExperienceYears(playerObj)
     };
   }
 
@@ -492,11 +517,36 @@
     return `${PLAYER_WEB}/${team.provider.sport}/${team.provider.league}/athletes/${id}/${resource}${query}`;
   }
 
+  function playerCoreStatsEndpoint(team, player, season) {
+    const id = espnPlayerId(player);
+    if (!id || team?.sport !== 'football' || !team?.provider?.league || !season) return '';
+    return `${PLAYER_CORE}/football/leagues/${team.provider.league}/seasons/${encodeURIComponent(season)}/types/2/athletes/${id}/statistics`;
+  }
+
   function statCategories(payload) {
     const candidates = [];
     if (Array.isArray(payload?.categories)) candidates.push(...payload.categories);
     if (Array.isArray(payload?.statistics?.categories)) candidates.push(...payload.statistics.categories);
-    return candidates.filter(category => Array.isArray(category?.labels) && Array.isArray(category?.totals));
+    if (Array.isArray(payload?.splits?.categories)) candidates.push(...payload.splits.categories);
+
+    return candidates.map(category => {
+      if (Array.isArray(category?.labels) && Array.isArray(category?.totals)) return category;
+      if (!Array.isArray(category?.stats) || !category.stats.length) return null;
+
+      return {
+        ...category,
+        labels: category.stats.map(item =>
+          item?.abbreviation || item?.shortDisplayName || item?.displayName || item?.name || ''
+        ),
+        names: category.stats.map(item => item?.name || item?.displayName || item?.abbreviation || ''),
+        totals: category.stats.map(item => {
+          const value = item?.displayValue ?? item?.value;
+          return value == null || value === '' ? '—' : String(value);
+        })
+      };
+    }).filter(category =>
+      category && Array.isArray(category.labels) && Array.isArray(category.totals)
+    );
   }
 
   function categoryPairs(category) {
@@ -1216,6 +1266,23 @@
         }
       }
 
+      // NFL common/v3 athlete endpoints are inconsistent for some roster
+      // entries. Before falling back to game-log aggregation, try ESPN's
+      // season-scoped Core athlete statistics endpoint.
+      if (team?.sport === 'football' && !meaningfulCore(core)) {
+        try {
+          const coreSeasonStats = await fetchJson(playerCoreStatsEndpoint(team, player, season));
+          const coreCategories = seasonSnapshotCategories(team, coreSeasonStats);
+          const resolved = coreStats(team, player, coreCategories);
+          if (meaningfulCore(resolved)) {
+            core = resolved;
+            coreContext = 'Current season';
+          }
+        } catch (error) {
+          errors.coreStats = error.message;
+        }
+      }
+
       // Never substitute career totals into a football season card. For other
       // sports retain the explicitly labeled career fallback used previously.
       if (!meaningfulCore(core) && team?.sport !== 'football') {
@@ -1286,6 +1353,9 @@
         ['seasonStats', playerEndpoint(team, player, 'stats', { season, seasontype: 2 })],
         ['gamelog', playerEndpoint(team, player, 'gamelog', { season })]
       ];
+      if (team?.sport === 'football') {
+        requests.push(['coreSeasonStats', playerCoreStatsEndpoint(team, player, season)]);
+      }
       const results = await Promise.all(requests.map(async ([resource, url]) => {
         try { return [resource, await fetchJson(url), null]; }
         catch (error) { return [resource, null, error.message]; }
@@ -1294,19 +1364,32 @@
       const errors = Object.fromEntries(results.filter(([, , error]) => error).map(([resource, , error]) => [resource, error]));
 
       const comprehensiveCategories = statCategories(payloads.stats);
-      const seasonCategories = seasonSnapshotCategories(team, payloads.seasonStats);
-      const categories = comprehensiveCategories.length ? comprehensiveCategories : seasonCategories;
+      const webSeasonCategories = seasonSnapshotCategories(team, payloads.seasonStats);
+      const coreSeasonCategories = seasonSnapshotCategories(team, payloads.coreSeasonStats);
+      let seasonCategories = webSeasonCategories;
       let core = coreStats(team, player, seasonCategories);
       let coreContext = 'Current season';
+
+      if (team?.sport === 'football' && !meaningfulCore(core) && coreSeasonCategories.length) {
+        const resolved = coreStats(team, player, coreSeasonCategories);
+        if (meaningfulCore(resolved)) {
+          core = resolved;
+          seasonCategories = coreSeasonCategories;
+        }
+      }
+
+      const categories = comprehensiveCategories.length ? comprehensiveCategories : seasonCategories;
       if (!meaningfulCore(core) && team?.sport !== 'football') {
         core = coreStats(team, player, categories);
         if (meaningfulCore(core)) coreContext = 'Career';
       }
-      const coreUnavailable = team?.sport === 'football' && !meaningfulCore(core);
 
       const glossaryItems = [
         ...(Array.isArray(payloads.stats?.glossary) ? payloads.stats.glossary : []),
-        ...(Array.isArray(payloads.seasonStats?.glossary) ? payloads.seasonStats.glossary : [])
+        ...(Array.isArray(payloads.seasonStats?.glossary) ? payloads.seasonStats.glossary : []),
+        ...((payloads.coreSeasonStats?.splits?.categories || []).flatMap(category =>
+          Array.isArray(category?.stats) ? category.stats : []
+        ))
       ];
       const glossary = {};
       glossaryItems.forEach(item => {
