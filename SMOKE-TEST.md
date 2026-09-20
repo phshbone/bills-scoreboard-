@@ -723,3 +723,16 @@ Overall pre-merge classification: **PASS WITH EAGLES REAL-DATA VERIFICATION REQU
 - sw.js cache namespace is scoreboard-v11b46-painted-back-rail.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE TAP-ZONE VERIFICATION REQUIRED**.
+
+
+## Stage 11B47 smoke — MLB playoff + Wild Card picture
+### Executed checks
+- standings-repair-v6.js, global-standings-v10.js and team-page-v8.js parse successfully.
+- global-standings-v10.css and team-page-v5.css brace balances are zero.
+- Synthetic MLB regular standings still select the Yankees' AL East division.
+- Synthetic wildCardWithLeaders payload produces separate American League and National League Playoff Picture groups.
+- Synthetic rows confirm division-clinched, playoff-clinched, WC2, WC3 cut-line and WC4 race states.
+- Global standings and individual team standings are both wired to snapshot.playoffGroups.
+- sw.js cache namespace is scoreboard-v11b47-mlb-playoff-picture.
+
+Overall pre-merge classification: **PASS WITH LIVE MLB PROVIDER + REAL-IPHONE VISUAL VERIFICATION REQUIRED**.

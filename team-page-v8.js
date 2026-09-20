@@ -760,27 +760,73 @@
       return;
     }
 
-    const groupsWrap = el('div', 'standings-groups');
-    groups.forEach(group => {
-      const wrap = el('section', 'standings-wrap');
+    function tableForGroup(group, playoff = false) {
+      const wrap = el('section', `standings-wrap${playoff ? ' playoff-picture-group' : ''}`);
       wrap.appendChild(el('div', 'detail-group-title', standingGroupLabel(group)));
+
       const table = document.createElement('table');
-      table.className = 'standings-table';
+      table.className = `standings-table${playoff ? ' playoff-picture-table' : ''}`;
       const thead = document.createElement('thead');
       const head = document.createElement('tr');
-      ['Team', 'Record', 'Pct', 'GB'].forEach(name => head.appendChild(el('th', '', name)));
+      const fourth = playoff ? (currentTeam.league === 'MLB' ? 'WCGB' : 'Seed') : 'GB';
+      ['Team', 'Record', 'Pct', fourth].forEach(name => head.appendChild(el('th', '', name)));
       thead.appendChild(head);
+
       const tbody = document.createElement('tbody');
       group.entries.map(window.ScoreboardData.standingRow).forEach(row => {
         const tr = document.createElement('tr');
-        if (currentTeamMatches(row)) tr.className = 'current-team-row';
-        [row.name, row.record, row.pct || '—', row.gb || '—'].forEach(value => tr.appendChild(el('td', '', value)));
+        if (currentTeamMatches(row)) tr.classList.add('current-team-row');
+        if (playoff && row?.playoff?.cutAfter) tr.classList.add('playoff-cut-row');
+
+        const nameCell = el('td', 'standing-team-cell');
+        nameCell.appendChild(document.createTextNode(row.name));
+        if (playoff && row?.playoff?.label) {
+          const badge = el(
+            'span',
+            `standing-playoff-mark${row.playoff.eliminated ? ' eliminated' : row.playoff.clinched ? ' clinched' : ''}`,
+            row.playoff.label
+          );
+          if (row.playoff.status) badge.title = row.playoff.status;
+          nameCell.appendChild(badge);
+        }
+
+        const raceValue = currentTeam.league === 'MLB'
+          ? (row?.extras?.wcgb || '—')
+          : (row?.playoff?.seed || '—');
+
+        tr.append(
+          nameCell,
+          el('td', '', row.record),
+          el('td', '', row.pct || '—'),
+          el('td', '', playoff ? raceValue : (row.gb || '—'))
+        );
         tbody.appendChild(tr);
       });
+
       table.append(thead, tbody);
       wrap.appendChild(table);
-      groupsWrap.appendChild(wrap);
-    });
+      return wrap;
+    }
+
+    const groupsWrap = el('div', 'standings-groups');
+    groups.forEach(group => groupsWrap.appendChild(tableForGroup(group, false)));
+
+    const playoffGroups = Array.isArray(snapshot?.playoffGroups)
+      ? snapshot.playoffGroups.filter(group => Array.isArray(group?.entries) && group.entries.length)
+      : [];
+    if (playoffGroups.length) {
+      const matching = playoffGroups.filter(group =>
+        group.entries.map(window.ScoreboardData.standingRow).some(currentTeamMatches)
+      );
+      const relevant = matching.length ? matching : playoffGroups;
+      groupsWrap.appendChild(el(
+        'div',
+        'team-playoff-heading',
+        currentTeam.league === 'MLB' ? 'Playoff + Wild Card Picture' : 'Playoff Picture'
+      ));
+      relevant.forEach(group => groupsWrap.appendChild(tableForGroup(group, true)));
+    }
+
     detailContent.appendChild(groupsWrap);
   }
 

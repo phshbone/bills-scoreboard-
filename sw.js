@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b46-painted-back-rail';
+const CACHE = 'scoreboard-v11b47-mlb-playoff-picture';
 const ASSETS = [
   './',
   './index.html',

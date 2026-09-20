@@ -250,3 +250,62 @@
 .global-standings-table tr.my-team-standing[data-team-id="flyers"] { --team-accent: #f74902; }
 .global-standings-table tr.my-team-standing[data-team-id="sixers"] { --team-accent: #006bb6; }
 .global-standings-table tr.my-team-standing[data-team-id="knicks"] { --team-accent: #f58426; }
+
+
+/* Stage 11B47: playoff / wild-card standings. */
+.global-playoff-heading {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  padding: 2px 2px 0;
+}
+
+.global-playoff-heading h2 {
+  margin: 0;
+  color: #f4f7fb;
+  font-size: 1.04rem;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+}
+
+.global-playoff-note {
+  margin-top: 4px;
+  color: #8f9dad;
+  font-size: .72rem;
+  line-height: 1.35;
+}
+
+.playoff-picture-group {
+  border-color: rgba(193,211,232,.24);
+}
+
+.playoff-status-mark {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  padding: 2px 5px;
+  border: 1px solid rgba(183,205,231,.28);
+  border-radius: 999px;
+  color: #e4edf7;
+  background: rgba(48,72,99,.68);
+  font-size: .58rem;
+  font-weight: 950;
+  letter-spacing: .045em;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.playoff-status-mark.clinched {
+  color: #d9f1df;
+  border-color: rgba(137,194,151,.34);
+  background: rgba(49,103,67,.52);
+}
+
+.playoff-status-mark.eliminated {
+  color: #e0baba;
+  border-color: rgba(188,116,116,.34);
+  background: rgba(92,47,47,.46);
+}
+
+.global-standings-table tr.playoff-cut-row td {
+  border-bottom: 2px solid rgba(207,220,237,.34);
+}
