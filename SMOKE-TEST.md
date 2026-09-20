@@ -753,3 +753,13 @@ Overall pre-merge classification: **PASS WITH LIVE MLB PROVIDER + REAL-IPHONE VI
 - sw.js cache namespace is scoreboard-v11b48-multileague-playoff-context.
 
 Overall pre-merge classification: **PASS WITH LIVE PROVIDER + REAL-IPHONE VISUAL VERIFICATION REQUIRED**.
+
+
+## Stage 11B49 smoke — playoff scope hardening
+### Executed checks
+- team-data-v8.js parses successfully.
+- Synthetic NFL level=2 response containing a 32-team parent plus 16-team AFC/NFC children correctly selects AFC and NFC rather than the parent.
+- Synthetic WNBA response checks level=1 first and selects one 13-team league-wide playoff table without calling level=2.
+- sw.js cache namespace is scoreboard-v11b49-playoff-scope-hardening.
+
+Overall pre-merge classification: **PASS WITH LIVE PROVIDER VERIFICATION REQUIRED**.
