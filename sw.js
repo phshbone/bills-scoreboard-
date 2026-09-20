@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b47-mlb-playoff-picture';
+const CACHE = 'scoreboard-v11b48-multileague-playoff-context';
 const ASSETS = [
   './',
   './index.html',
