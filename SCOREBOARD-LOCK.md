@@ -501,3 +501,12 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Generic non-line Usage cards are suppressed. Offensive-line players may retain Usage when that is the only meaningful statistical context.
 - Football source categories are ordered so Passing/Rushing/Receiving/Defense/Special Teams render before Scoring, enabling deterministic duplicate removal.
 - Baseball, basketball, hockey, roster-card layout, approved header, anchored diamond-plate footer, team-page scrolling, top-level swipes, live score, standings, schedules, and news are unchanged.
+
+
+## Stage 11B42 lock — strict football season snapshots (2026-09-19)
+- Football roster/player "Current season" snapshots may use only the season-scoped stats response after career/postseason/impossible-season categories are rejected.
+- Football overview responses are never trusted for current-season core stats because ESPN can expose career totals there.
+- Football current-season snapshots never fall back silently to career totals. If a trustworthy season block is unavailable, the UI explicitly shows "Season stats unavailable".
+- Comprehensive football stat sections remain available below and are labeled Career when their source is the unscoped career stats response.
+- A conservative football season sanity gate rejects categories marked Career/Postseason/Playoff and impossible regular-season totals such as >25 GP or obviously career-scale passing/rushing/receiving totals.
+- Baseball, basketball, hockey behavior is unchanged.
