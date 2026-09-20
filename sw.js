@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b41-football-detail-refine';
+const CACHE = 'scoreboard-v11b42-football-season-source';
 const ASSETS = [
   './',
   './index.html',
