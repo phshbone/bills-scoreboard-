@@ -545,3 +545,13 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - The text uses the same stencil/distressed paint treatment as the top navigation.
 - Only the centered 68% of the footer is interactive; the outer ~16% on each side is a dead zone to reduce accidental thumb navigation.
 - The interactive center remains at least 48px tall and retains keyboard focus treatment.
+
+
+## Stage 11B47 lock — MLB playoff + Wild Card picture (2026-09-19)
+- MLB division standings continue to use MLB StatsAPI regular-season standings.
+- A second MLB StatsAPI request uses standingsTypes=wildCardWithLeaders for the playoff race.
+- Global MLB standings show a separate Playoff + Wild Card Picture after the division tables.
+- Individual MLB team standings show only the relevant AL or NL playoff picture when that team is present.
+- Wild Card rank, WC games back, division-leader state, clinched state, clinch indicator, magic/elimination values are taken from provider fields only.
+- The third Wild Card row is visually marked as the current cut line when the provider supplies wildCardRank=3.
+- No playoff qualification or clinch state is invented from record math.
