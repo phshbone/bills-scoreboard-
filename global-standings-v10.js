@@ -121,7 +121,10 @@
     return row.record || '—';
   }
 
-  function primaryMetric(league, row, entry) {
+  function primaryMetric(league, row, entry, playoff = false) {
+    if (playoff && league === 'MLB') {
+      return { label: 'WCGB', value: row?.extras?.wcgb || '—' };
+    }
     if (league === 'NHL') {
       const points = entryStat(entry, ['points', 'pts']);
       return { label: 'PTS', value: points || row.pct || '—' };
@@ -138,6 +141,8 @@
 
     if (league === 'MLB') {
       add('GB', firstValue(row.gb, row?.extras?.gb));
+      add('WC', row?.extras?.wcRank ? `#${row.extras.wcRank}` : '');
+      add('WCGB', row?.extras?.wcgb);
       add('L10', extraValue(row, entry, 'lastTen', ['lasttengames', 'lastten', 'last10']));
       add('HOME', extraValue(row, entry, 'home', ['home', 'homerecord']));
       add('AWAY', extraValue(row, entry, 'away', ['road', 'away', 'roadrecord', 'awayrecord']));
@@ -171,15 +176,15 @@
     return parts;
   }
 
-  function makeTable(group, teams, league) {
-    const wrap = el('section', 'global-standings-group');
+  function makeTable(group, teams, league, options = {}) {
+    const wrap = el('section', `global-standings-group${options.playoff ? ' playoff-picture-group' : ''}`);
     wrap.appendChild(el('h3', 'global-standings-group-title', groupLabel(group)));
     const tableWrap = el('div', 'global-standings-table-wrap');
     const table = document.createElement('table');
     table.className = 'global-standings-table';
     const thead = document.createElement('thead');
     const head = document.createElement('tr');
-    const metric = primaryMetric(league, {}, {});
+    const metric = primaryMetric(league, {}, {}, options.playoff);
     ['Team', 'Record', metric.label].forEach(label => head.appendChild(el('th', '', label)));
     thead.appendChild(head);
     const tbody = document.createElement('tbody');
@@ -228,17 +233,23 @@
       }
       nameLine.appendChild(document.createTextNode(row.name || 'Team'));
       if (mine) nameLine.appendChild(el('span', 'my-team-mark', 'MY TEAM'));
+      if (options.playoff && row?.playoff?.label) {
+        const badge = el('span', `playoff-status-mark${row.playoff.eliminated ? ' eliminated' : row.playoff.clinched ? ' clinched' : ''}`, row.playoff.label);
+        if (row.playoff.status) badge.title = row.playoff.status;
+        nameLine.appendChild(badge);
+      }
       nameCell.appendChild(nameLine);
 
       const secondary = secondaryParts(league, row, entry);
       if (secondary.length) nameCell.appendChild(el('div', 'global-standing-secondary', secondary.join(' · ')));
 
-      const liveMetric = primaryMetric(league, row, entry);
+      const liveMetric = primaryMetric(league, row, entry, options.playoff);
       tr.append(
         nameCell,
         el('td', 'global-standing-record', leagueRecord(league, row, entry)),
         el('td', 'global-standing-metric', liveMetric.value)
       );
+      if (options.playoff && row?.playoff?.cutAfter) tr.classList.add('playoff-cut-row');
       tbody.appendChild(tr);
     });
 
@@ -246,6 +257,24 @@
     tableWrap.appendChild(table);
     wrap.appendChild(tableWrap);
     return wrap;
+  }
+
+  function playoffGroupsFor(snapshot) {
+    return Array.isArray(snapshot?.playoffGroups)
+      ? snapshot.playoffGroups.filter(group => Array.isArray(group?.entries) && group.entries.length)
+      : [];
+  }
+
+  function renderPlayoffPicture(fragment, snapshot, teams, league) {
+    const groups = playoffGroupsFor(snapshot);
+    if (!groups.length) return;
+    const heading = el('div', 'global-playoff-heading');
+    heading.append(
+      el('h2', '', league === 'MLB' ? 'Playoff + Wild Card Picture' : 'Playoff Picture'),
+      el('div', 'global-playoff-note', 'Provider-supplied race, seed and clinch information only.')
+    );
+    fragment.appendChild(heading);
+    groups.forEach(group => fragment.appendChild(makeTable(group, teams, league, { playoff: true })));
   }
 
   function setStatus(message, state = '') {
@@ -297,6 +326,7 @@
       if (!groupsToShow.length) throw new Error('No usable standings groups were returned.');
       const fragment = document.createDocumentFragment();
       groupsToShow.forEach(group => fragment.appendChild(makeTable(group, teams, currentLeague)));
+      renderPlayoffPicture(fragment, snapshot, teams, currentLeague);
       standingsContent.replaceChildren(fragment);
       setStatus(`${currentLeague} standings · ${teams.length} My ${teams.length === 1 ? 'Team' : 'Teams'} highlighted`, 'ok');
       standingsRetry.hidden = true;
