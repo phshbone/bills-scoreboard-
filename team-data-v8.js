@@ -8,6 +8,7 @@
   const MLB_TEAM_IDS = Object.freeze({ nyy: 147, nym: 121, phi: 143 });
   const teamCache = new Map();
   const standingsCache = new Map();
+  const playoffStandingsCache = new Map();
   const playerCardCache = new Map();
   const playerDetailCache = new Map();
 
@@ -211,10 +212,23 @@
     return { live, last: completed[0] || null, next: upcoming[0] || null, completed, upcoming };
   }
 
-  function stat(entry, names) {
+  function standingStatKey(value) {
+    return String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
+
+  function statItem(entry, names) {
     const stats = Array.isArray(entry?.stats) ? entry.stats : [];
-    const wanted = names.map(name => String(name).toLowerCase());
-    const found = stats.find(item => wanted.includes(String(item?.name || '').toLowerCase()) || wanted.includes(String(item?.abbreviation || '').toLowerCase()));
+    const wanted = new Set(names.map(standingStatKey));
+    return stats.find(item =>
+      wanted.has(standingStatKey(item?.name))
+      || wanted.has(standingStatKey(item?.abbreviation))
+      || wanted.has(standingStatKey(item?.displayName))
+      || wanted.has(standingStatKey(item?.type))
+    ) || null;
+  }
+
+  function stat(entry, names) {
+    const found = statItem(entry, names);
     return found?.displayValue ?? found?.value ?? '';
   }
 
@@ -250,6 +264,44 @@
     })) || groups[0] || null;
   }
 
+  function standingPlayoff(entry) {
+    const rawSeed = String(stat(entry, ['playoffseed', 'seed']) ?? '').trim();
+    const seed = /^(?:0|-|—|none|null)$/i.test(rawSeed) ? '' : rawSeed;
+    const clincher = statItem(entry, ['clincher', 'clinch']);
+    const rawSymbol = String(clincher?.displayValue ?? clincher?.value ?? '').trim();
+    const symbol = /^(?:0|-|—|none|null)$/i.test(rawSymbol) ? '' : rawSymbol;
+    // Use the provider's actual description, not the generic displayName
+    // "Clincher", which can exist even when a team has not clinched anything.
+    const description = String(clincher?.description || '').trim();
+    const eliminated = /^e$/i.test(symbol) || /eliminat/i.test(description);
+    const clinched = !eliminated && (
+      Boolean(symbol)
+      || /clinch/i.test(description)
+    );
+
+    if (!seed && !symbol && !description) return null;
+
+    let label = '';
+    let status = description;
+    if (eliminated) {
+      label = 'OUT';
+      if (!status) status = 'Eliminated';
+    } else if (clinched) {
+      label = symbol ? `${symbol} · IN` : 'IN';
+      if (!status) status = 'Clinched playoff berth';
+    } else if (!status && seed) {
+      status = `Playoff seed ${seed}`;
+    }
+
+    return {
+      label,
+      status,
+      seed,
+      clinched,
+      eliminated
+    };
+  }
+
   function standingRow(entry) {
     const t = entry?.team || {};
     const wins = stat(entry, ['wins', 'w']);
@@ -264,7 +316,10 @@
     return {
       id: String(t.id || ''), abbreviation: t.abbreviation || '',
       name: t.shortDisplayName || t.displayName || t.name || t.abbreviation || 'Team',
-      record: summary || '—', pct: pct === '' ? '' : String(pct), gb: gb === '' ? '' : String(gb)
+      record: summary || '—',
+      pct: pct === '' ? '' : String(pct),
+      gb: gb === '' ? '' : String(gb),
+      playoff: standingPlayoff(entry)
     };
   }
 
@@ -274,6 +329,68 @@
     const payload = await fetchJson(endpoint(team, 'standings'));
     standingsCache.set(key, payload);
     return payload;
+  }
+
+  function supportsPlayoffStandings(team) {
+    return ['nfl', 'nba', 'wnba', 'nhl'].includes(String(team?.provider?.league || '').toLowerCase());
+  }
+
+  function playoffStandingsUrl(team, level) {
+    const base = endpoint(team, 'standings');
+    return `${base}?type=0&level=${encodeURIComponent(level)}&sort=playoffseed%3Aasc`;
+  }
+
+  function broadPlayoffGroups(payload) {
+    const candidates = standingGroups(payload)
+      .filter(group => Array.isArray(group?.entries) && group.entries.length);
+    if (!candidates.length) return [];
+
+    const maxEntries = Math.max(...candidates.map(group => group.entries.length));
+    const conferenceLike = /conference|eastern|western|\bafc\b|\bnfc\b|american football|national football/i;
+
+    const broad = candidates.filter(group => {
+      const count = group.entries.length;
+      const label = `${group.name || ''} ${group.parentName || ''}`;
+      return count === maxEntries
+        || (count >= Math.max(2, maxEntries - 1) && conferenceLike.test(label));
+    });
+
+    const seen = new Set();
+    return broad.filter(group => {
+      const signature = group.entries
+        .map(entry => String(entry?.team?.id || entry?.team?.abbreviation || ''))
+        .filter(Boolean)
+        .sort()
+        .join('|');
+      if (!signature || seen.has(signature)) return false;
+      seen.add(signature);
+      return true;
+    }).map(group => ({ ...group, playoff: true }));
+  }
+
+  async function loadPlayoffStandings(team, force) {
+    if (!supportsPlayoffStandings(team)) return { payload: null, groups: [] };
+
+    const key = `${team.provider.sport}/${team.provider.league}`;
+    if (!force && playoffStandingsCache.has(key)) return playoffStandingsCache.get(key);
+
+    let lastError = null;
+    for (const level of [2, 1]) {
+      try {
+        const payload = await fetchJson(playoffStandingsUrl(team, level));
+        const groups = broadPlayoffGroups(payload);
+        if (groups.length) {
+          const result = { payload, groups, level };
+          playoffStandingsCache.set(key, result);
+          return result;
+        }
+      } catch (error) {
+        lastError = error;
+      }
+    }
+
+    if (lastError) throw lastError;
+    return { payload: null, groups: [] };
   }
 
   function mlbTeamId(team) {
@@ -1236,7 +1353,26 @@
     try { standingsPayload = await loadStandings(team, force); }
     catch (error) { standingsError = `standings feed: ${error.message}`; }
 
-    const raw = { teamPayload: null, schedulePayload: null, rosterPayload: null, standingsPayload, errors: {} };
+    let playoffStandingsPayload = null;
+    let playoffGroups = [];
+    let playoffStandingsLevel = null;
+    try {
+      const playoff = await loadPlayoffStandings(team, force);
+      playoffStandingsPayload = playoff.payload;
+      playoffGroups = playoff.groups;
+      playoffStandingsLevel = playoff.level || null;
+    } catch {
+      // Playoff context is supplemental; ordinary standings remain fully usable.
+    }
+
+    const raw = {
+      teamPayload: null,
+      schedulePayload: null,
+      rosterPayload: null,
+      standingsPayload,
+      playoffStandingsPayload,
+      errors: {}
+    };
     entries.forEach(([key, payload, error]) => {
       raw[`${key}Payload`] = payload;
       if (error) raw.errors[key] = error;
@@ -1267,6 +1403,8 @@
       },
       standingGroup: raw.standingsPayload ? standingGroup(raw.standingsPayload, team) : null,
       standingGroups: allStandingGroups,
+      playoffGroups,
+      playoffStandingsLevel,
       errors: raw.errors
     };
     if (normalized.record !== 'Unavailable' || normalized.games || normalized.roster.length || normalized.standingGroup) teamCache.set(team.id, normalized);

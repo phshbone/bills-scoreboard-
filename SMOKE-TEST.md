@@ -736,3 +736,20 @@ Overall pre-merge classification: **PASS WITH REAL-IPHONE TAP-ZONE VERIFICATION 
 - sw.js cache namespace is scoreboard-v11b47-mlb-playoff-picture.
 
 Overall pre-merge classification: **PASS WITH LIVE MLB PROVIDER + REAL-IPHONE VISUAL VERIFICATION REQUIRED**.
+
+
+## Stage 11B48 smoke — multileague playoff context
+### Executed checks
+- team-data-v8.js, global-standings-v10.js, team-page-v8.js, and standings-repair-v6.js parse successfully.
+- Synthetic NFL level=2 standings return two broad 16-team AFC/NFC playoff groups.
+- Synthetic NFL clinched row preserves seed 5, provider symbol x, and provider description "Clinched Playoff Berth".
+- Synthetic eliminated row produces OUT from provider elimination data.
+- Synthetic WNBA level=2 empty response correctly falls back to level=1 and exposes seed 4.
+- Generic clincher displayName="Clincher" with value 0 and no description does not create a false playoff badge.
+- Seed-only rows preserve their seed/status while leaving the visible clinch badge empty.
+- Global playoff tables use Seed as the non-MLB playoff metric.
+- Regular global/team standings are wired to show explicit clinch/elimination markers when present.
+- MLB remains on its dedicated StatsAPI playoff path.
+- sw.js cache namespace is scoreboard-v11b48-multileague-playoff-context.
+
+Overall pre-merge classification: **PASS WITH LIVE PROVIDER + REAL-IPHONE VISUAL VERIFICATION REQUIRED**.
