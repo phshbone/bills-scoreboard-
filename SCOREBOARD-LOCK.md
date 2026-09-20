@@ -537,3 +537,11 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - This fallback never uses career totals and therefore preserves the Stage 11B42 Geno/career safeguard.
 - When used, the snapshot context is "Current season · game log".
 - Players with neither a trustworthy season summary nor meaningful current-season game-log activity remain "Stats unavailable".
+
+
+## Stage 11B46 lock — painted Back rail (2026-09-19)
+- The full-width diamond-plate footer remains visual/anchored metal.
+- Back-to-My-Teams / Back-to-Team / Back-to-Roster remains a real button for accessibility, but has no visible button chrome.
+- The text uses the same stencil/distressed paint treatment as the top navigation.
+- Only the centered 68% of the footer is interactive; the outer ~16% on each side is a dead zone to reduce accidental thumb navigation.
+- The interactive center remains at least 48px tall and retains keyboard focus treatment.
