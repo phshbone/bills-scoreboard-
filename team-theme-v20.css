@@ -865,3 +865,60 @@
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
 }
+
+
+/* Stage 11B46: painted Back rail.
+   The footer plate remains full-width; only the centered ~two-thirds button is
+   interactive so edge/thumb brushes cannot accidentally navigate backward. */
+.team-page[data-team-id] .team-page-bottom-nav {
+  justify-content: center !important;
+}
+
+.team-page[data-team-id] .team-page-bottom-nav #close-data.button {
+  width: 68% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  min-height: 48px !important;
+  margin: 0 auto !important;
+  padding: 0 12px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: "Fakt Slab Stencil Pro Medium", "Stencil Std", "Arial Black", Impact, Haettenschweiler, sans-serif !important;
+  font-size: clamp(.98rem, 4vw, 1.16rem) !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  letter-spacing: .075em !important;
+  text-transform: uppercase;
+  color: transparent !important;
+  background-image:
+    radial-gradient(circle at 13% 29%, rgba(64,72,79,.52) 0 1.3px, transparent 1.8px),
+    radial-gradient(circle at 62% 61%, rgba(74,82,89,.38) 0 1.1px, transparent 1.6px),
+    radial-gradient(circle at 84% 34%, rgba(255,255,255,.30) 0 .7px, transparent 1.1px),
+    linear-gradient(180deg, rgba(247,248,243,.97) 0%, rgba(232,234,227,.95) 58%, rgba(211,215,208,.93) 100%) !important;
+  background-size: 27px 21px, 33px 25px, 31px 23px, auto !important;
+  background-repeat: repeat !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-mask-image: radial-gradient(circle at 7px 8px, transparent 0 1.05px, #000 1.55px);
+  -webkit-mask-size: 23px 19px;
+  mask-image: radial-gradient(circle at 7px 8px, transparent 0 1.05px, #000 1.55px);
+  mask-size: 23px 19px;
+  cursor: pointer;
+}
+
+.team-page[data-team-id] .team-page-bottom-nav #close-data.button:hover {
+  filter: brightness(1.06);
+}
+
+.team-page[data-team-id] .team-page-bottom-nav #close-data.button:active {
+  transform: translateY(1px);
+}
+
+.team-page[data-team-id] .team-page-bottom-nav #close-data.button:focus-visible {
+  outline: 2px dashed rgba(240,242,236,.90) !important;
+  outline-offset: -3px !important;
+}
