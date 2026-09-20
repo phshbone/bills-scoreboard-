@@ -658,3 +658,17 @@ Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RE
 - Real-iPhone verification remains required on Cam Skattebo/Jaxson Dart/Army to confirm the lone Usage cards disappear, Scoring collapses cleanly, and secondary defensive zeros are removed.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION REQUIRED**.
+
+
+## Stage 11B42 smoke — strict football season snapshots
+### Executed checks
+- team-data-v8.js and team-page-v8.js parse successfully.
+- Synthetic Geno-style season response containing 110 GP / 22,383 passing YDS / 124 TD is rejected as current-season data.
+- Rejected football season data yields coreUnavailable=true and keeps the detailed comprehensive section labeled "Career Passing".
+- Synthetic valid 1-GP football season response yields 247 YDS / 2 TD / 1 INT / 92.4 RTG and is accepted as Current season.
+- Roster cards also refuse career fallback and show Stats unavailable when season data cannot be trusted.
+- Player detail explicitly renders "Current season snapshot — Season stats unavailable" rather than a career total under a season label.
+- sw.js cache namespace is scoreboard-v11b42-football-season-source.
+- Approved header/footer/scroller behavior remains unchanged.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE LIVE-DATA VERIFICATION REQUIRED**.
