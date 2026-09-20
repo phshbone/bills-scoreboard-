@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b44-real-plate-top-nav';
+const CACHE = 'scoreboard-v11b45-football-gamelog-fallback';
 const ASSETS = [
   './',
   './index.html',

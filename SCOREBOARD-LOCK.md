@@ -529,3 +529,11 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - A restrained inner border/shadow is retained only to preserve the raised-plate edge; no generated tread or weathering overlay remains.
 - Existing painted/stencil text treatment is preserved.
 - Header artwork above the rail is unchanged.
+
+
+## Stage 11B45 lock — football game-log season fallback (2026-09-19)
+- If ESPN does not provide a usable football current-season summary for a player, the roster card/player snapshot may derive current-season totals from that player's season game log.
+- The game-log fallback is role-aware: QB passing totals, RB rushing/receiving totals, WR/TE receiving totals, defensive tackles/sacks/interceptions/forced fumbles, kicker totals, punter totals, and limited OL appearances when actual player stat rows exist.
+- This fallback never uses career totals and therefore preserves the Stage 11B42 Geno/career safeguard.
+- When used, the snapshot context is "Current season · game log".
+- Players with neither a trustworthy season summary nor meaningful current-season game-log activity remain "Stats unavailable".

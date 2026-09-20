@@ -664,6 +664,128 @@
     });
   }
 
+  function footballGameLogCore(player, events) {
+    const recent = Array.isArray(events) ? events : [];
+    if (!recent.length) return [];
+
+    const sum = aliases => recent.reduce((total, event) => {
+      const value = numberValue(eventStat(event, aliases));
+      return total + (Number.isFinite(value) ? value : 0);
+    }, 0);
+
+    const max = aliases => {
+      const values = recent
+        .map(event => numberValue(eventStat(event, aliases)))
+        .filter(Number.isFinite);
+      return values.length ? Math.max(...values) : NaN;
+    };
+
+    const any = aliases => recent.some(event => {
+      const raw = eventStat(event, aliases);
+      return raw !== '' && raw != null;
+    });
+
+    const format = value => Number.isFinite(value)
+      ? String(Number.isInteger(value) ? value : Math.round(value * 10) / 10)
+      : '—';
+
+    const role = footballRole(player);
+
+    if (role === 'qb') {
+      const yds = sum(['PASSINGYARDS','PASSYDS','YDS']);
+      const td = sum(['PASSINGTOUCHDOWNS','PASSTD','TD']);
+      const interceptions = sum(['INTERCEPTIONS','INT']);
+      const cmp = sum(['PASSINGCOMPLETIONS','CMP']);
+      const att = sum(['PASSINGATTEMPTS','ATT']);
+      const pct = att > 0 ? (cmp / att) * 100 : NaN;
+      if (![yds, td, interceptions, cmp, att].some(value => value > 0) && !any(['INT','INTERCEPTIONS'])) return [];
+      return [
+        { label: 'YDS', value: format(yds) },
+        { label: 'TD', value: format(td) },
+        { label: 'INT', value: format(interceptions) },
+        { label: 'CMP%', value: Number.isFinite(pct) ? `${pct.toFixed(1)}%` : '—' }
+      ];
+    }
+
+    if (role === 'rusher') {
+      const car = sum(['RUSHINGATTEMPTS','RUSHATT','CAR','ATT']);
+      const yds = sum(['RUSHINGYARDS','RUSHYDS','YDS']);
+      const td = sum(['RUSHINGTOUCHDOWNS','RUSHTD','TD']);
+      const rec = sum(['RECEPTIONS','REC']);
+      if (![car, yds, td, rec].some(value => value > 0)) return [];
+      return [
+        { label: 'CAR', value: format(car) },
+        { label: 'YDS', value: format(yds) },
+        { label: 'TD', value: format(td) },
+        { label: 'REC', value: format(rec) }
+      ];
+    }
+
+    if (role === 'receiver') {
+      const rec = sum(['RECEPTIONS','REC']);
+      const yds = sum(['RECEIVINGYARDS','RECYDS','YDS']);
+      const td = sum(['RECEIVINGTOUCHDOWNS','RECTD','TD']);
+      const tgt = sum(['TARGETS','TGT']);
+      if (![rec, yds, td, tgt].some(value => value > 0)) return [];
+      return [
+        { label: 'REC', value: format(rec) },
+        { label: 'YDS', value: format(yds) },
+        { label: 'TD', value: format(td) },
+        { label: 'TGT', value: format(tgt) }
+      ];
+    }
+
+    if (role === 'kicker') {
+      const fgm = sum(['FIELDGOALSMADE','FGM','FG']);
+      const fga = sum(['FIELDGOALATTEMPTS','FGA']);
+      const xpm = sum(['EXTRAPOINTSMADE','XPM','XP']);
+      const pct = fga > 0 ? (fgm / fga) * 100 : NaN;
+      const points = fgm * 3 + xpm;
+      if (![fgm, fga, xpm, points].some(value => value > 0)) return [];
+      return [
+        { label: 'FG%', value: Number.isFinite(pct) ? `${pct.toFixed(1)}%` : '—' },
+        { label: 'FG', value: format(fgm) },
+        { label: 'XP', value: format(xpm) },
+        { label: 'PTS', value: format(points) }
+      ];
+    }
+
+    if (role === 'punter') {
+      const punts = sum(['PUNTS','PUNT']);
+      const yards = sum(['PUNTYARDS','PUNTINGYARDS']);
+      const lng = max(['LONG','LNG']);
+      const in20 = sum(['INSIDE20','IN20']);
+      const avg = punts > 0 && yards > 0 ? yards / punts : NaN;
+      if (![punts, yards, in20].some(value => value > 0) && !Number.isFinite(lng)) return [];
+      return [
+        { label: 'PUNT', value: format(punts) },
+        { label: 'AVG', value: Number.isFinite(avg) ? avg.toFixed(1) : '—' },
+        { label: 'LNG', value: format(lng) },
+        { label: 'IN20', value: format(in20) }
+      ];
+    }
+
+    if (role === 'offensive-line') {
+      // ESPN frequently does not publish useful individual line stats. Count
+      // only game-log rows that actually contain player stat values.
+      const appearances = recent.filter(event => event?.stats instanceof Map && event.stats.size > 0).length;
+      return appearances > 0 ? [{ label: 'GP', value: String(appearances) }] : [];
+    }
+
+    const tackles = sum(['TOTALTACKLES','TACKLES','TOT','TKL']);
+    const sacks = sum(['SACKS','SACK']);
+    const interceptions = sum(['INTERCEPTIONS','INT']);
+    const ff = sum(['FORCEDFUMBLES','FF']);
+    if (![tackles, sacks, interceptions, ff].some(value => value > 0)
+      && !any(['INT','INTERCEPTIONS','SACK','SACKS','FF','FORCEDFUMBLES'])) return [];
+    return [
+      { label: 'TKL', value: format(tackles) },
+      { label: 'SACK', value: format(sacks) },
+      { label: 'INT', value: format(interceptions) },
+      { label: 'FF', value: format(ff) }
+    ];
+  }
+
   function eventStat(event, aliases) {
     for (const alias of aliases) {
       const key = String(alias).trim().toUpperCase().replace(/\s+/g, '');
@@ -976,11 +1098,15 @@
         }
       }
 
-      if (!lastAppearance) {
+      if (!lastAppearance || (team?.sport === 'football' && !meaningfulCore(core))) {
         try {
           const gamelog = await fetchJson(playerEndpoint(team, player, 'gamelog', { season }));
           events = gamelogEvents(gamelog);
-          lastAppearance = appearanceSummary(team, player, events[0]);
+          if (!lastAppearance) lastAppearance = appearanceSummary(team, player, events[0]);
+          if (team?.sport === 'football' && !meaningfulCore(core)) {
+            core = footballGameLogCore(player, events);
+            if (meaningfulCore(core)) coreContext = 'Current season · game log';
+          }
         } catch (error) {
           errors.gamelog = error.message;
         }
@@ -1059,6 +1185,12 @@
       });
 
       const events = gamelogEvents(payloads.gamelog);
+      if (team?.sport === 'football' && !meaningfulCore(core)) {
+        core = footballGameLogCore(player, events);
+        if (meaningfulCore(core)) coreContext = 'Current season · game log';
+      }
+      const resolvedCoreUnavailable = team?.sport === 'football' && !meaningfulCore(core);
+
       return {
         supported: true,
         categories: categories.map(category => {
@@ -1072,7 +1204,7 @@
         }).filter(category => category.stats.length),
         core,
         coreContext,
-        coreUnavailable,
+        coreUnavailable: resolvedCoreUnavailable,
         events,
         lastAppearance: appearanceSummary(team, player, events[0]),
         trend: trendSummary(team, player, events),
