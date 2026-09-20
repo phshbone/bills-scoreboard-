@@ -51,6 +51,24 @@
     return box;
   }
 
+  function gameContextParts(game) {
+    const context = game?.context || {};
+    const parts = [];
+    const broadcasts = Array.isArray(context.broadcast)
+      ? [...new Set(context.broadcast.map(name => String(name || '').trim()).filter(Boolean))]
+      : [];
+    if (broadcasts.length) parts.push(`TV: ${broadcasts.join(' / ')}`);
+    if (context.venue) parts.push(`Venue: ${context.venue}`);
+    return parts;
+  }
+
+  function appendGameContext(target, game, className = 'game-context-line') {
+    const parts = gameContextParts(game);
+    if (!parts.length) return target;
+    target.appendChild(el('div', className, parts.join(' · ')));
+    return target;
+  }
+
   function updateBackLabel() {
     if (view === 'overview') back.textContent = '← Back to My Teams';
     else if (view === 'player') back.textContent = '← Back to Roster';
@@ -770,6 +788,7 @@
     const row = el('article', `game-row ${game.state || ''}`);
     const text = el('div', 'game-row-text');
     text.append(el('div', 'game-row-main', game.main), el('div', 'game-row-sub', game.sub));
+    appendGameContext(text, game);
     row.appendChild(text);
     if (game.state === 'in') row.appendChild(el('span', 'live-pill', 'LIVE'));
     return row;
@@ -936,9 +955,16 @@
       actionLabel: snapshot.standingGroup ? `Open ${currentTeam.league} standings` : '',
       error: snapshot.record === 'Unavailable'
     }));
-    if (snapshot.games?.live) nodes.push(panel('Live now', snapshot.games.live.main, snapshot.games.live.sub, { wide: true, badge: 'LIVE' }));
+    if (snapshot.games?.live) {
+      const liveBox = panel('Live now', snapshot.games.live.main, snapshot.games.live.sub, { wide: true, badge: 'LIVE' });
+      appendGameContext(liveBox, snapshot.games.live, 'data-game-context');
+      nodes.push(liveBox);
+    }
     nodes.push(panel('Last game', snapshot.games?.last?.main || 'Unavailable', snapshot.games?.last?.sub || snapshot.errors.schedule || ''));
-    nodes.push(panel('Next game', snapshot.games?.next?.main || 'Unavailable', snapshot.games?.next?.sub || snapshot.errors.schedule || ''));
+    const nextGame = snapshot.games?.next || null;
+    const nextBox = panel('Next game', nextGame?.main || 'Unavailable', nextGame?.sub || snapshot.errors.schedule || '');
+    if (nextGame) appendGameContext(nextBox, nextGame, 'data-game-context');
+    nodes.push(nextBox);
     nodes.push(panel('Schedule', snapshot.games ? 'Recent + upcoming games' : 'Unavailable', snapshot.games ? 'Open the current schedule.' : snapshot.errors.schedule || '', {
       action: snapshot.games ? () => openDetail('schedule') : null,
       actionLabel: snapshot.games ? `Open ${currentTeam.name} schedule` : '',
