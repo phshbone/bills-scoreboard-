@@ -125,6 +125,9 @@
     if (playoff && league === 'MLB') {
       return { label: 'WCGB', value: row?.extras?.wcgb || '—' };
     }
+    if (playoff) {
+      return { label: 'Seed', value: row?.playoff?.seed || '—' };
+    }
     if (league === 'NHL') {
       const points = entryStat(entry, ['points', 'pts']);
       return { label: 'PTS', value: points || row.pct || '—' };
@@ -161,7 +164,7 @@
       add('HOME', extraValue(row, entry, 'home', ['home', 'homerecord']));
       add('AWAY', extraValue(row, entry, 'away', ['road', 'away', 'roadrecord', 'awayrecord']));
       add('STK', extraValue(row, entry, 'streak', ['streak']));
-    } else if (league === 'WNBA') {
+    } else if (league === 'NBA' || league === 'WNBA') {
       add('GB', firstValue(row.gb, extraValue(row, entry, 'gb', ['gamesbehind', 'gb'])));
       add('HOME', extraValue(row, entry, 'home', ['home', 'homerecord']));
       add('AWAY', extraValue(row, entry, 'away', ['road', 'away', 'roadrecord', 'awayrecord']));
@@ -233,7 +236,7 @@
       }
       nameLine.appendChild(document.createTextNode(row.name || 'Team'));
       if (mine) nameLine.appendChild(el('span', 'my-team-mark', 'MY TEAM'));
-      if (options.playoff && row?.playoff?.label) {
+      if (row?.playoff?.label) {
         const badge = el('span', `playoff-status-mark${row.playoff.eliminated ? ' eliminated' : row.playoff.clinched ? ' clinched' : ''}`, row.playoff.label);
         if (row.playoff.status) badge.title = row.playoff.status;
         nameLine.appendChild(badge);
