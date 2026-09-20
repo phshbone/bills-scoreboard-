@@ -154,12 +154,20 @@
     const competition = event?.competitions?.[0] || {};
     const attendanceRaw = competition?.attendance ?? event?.attendance;
     const attendance = Number.isFinite(Number(attendanceRaw)) && Number(attendanceRaw) > 0 ? Number(attendanceRaw) : null;
+    const broadcast = Array.isArray(competition?.broadcasts)
+      ? [...new Set(
+          competition.broadcasts
+            .flatMap(item => item?.names || [])
+            .map(name => String(name || '').trim())
+            .filter(Boolean)
+        )]
+      : [];
     return {
       venue: competition?.venue?.fullName || event?.venue?.fullName || '',
       attendance,
       capacity: null,
       weather: null,
-      broadcast: Array.isArray(competition?.broadcasts) ? competition.broadcasts.flatMap(item => item?.names || []).filter(Boolean) : []
+      broadcast
     };
   }
 
