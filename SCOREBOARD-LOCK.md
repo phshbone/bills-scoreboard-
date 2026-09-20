@@ -568,3 +568,10 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - NBA secondary standings context now receives the same GB / HOME / AWAY / L10 / STK treatment already used for WNBA.
 - NCAA/Army does not use this generic playoff loader.
 - MLB continues to use the Stage 11B47 MLB StatsAPI Wild Card implementation rather than the generic ESPN playoff loader.
+
+
+## Stage 11B49 lock — playoff scope hardening (2026-09-19)
+- NFL, NBA, and NHL prefer provider conference-level playoff standings and explicitly prefer conference groups when ESPN also returns a larger league-wide parent table.
+- WNBA prefers the provider's league-wide playoff-seed table first; conference-level data is only a fallback.
+- Conference group selection is based on provider group identity/name and de-duplicates identical team sets.
+- No change is made to MLB's dedicated StatsAPI Wild Card path or NCAA standings.
