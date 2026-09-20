@@ -212,3 +212,25 @@
     height: 52px;
   }
 }
+
+
+/* Stage 11B43: provider-supplied TV / venue context. */
+.data-game-context,
+.game-context-line {
+  margin-top: 7px;
+  color: var(--team-muted, #647284);
+  font-family: "Arial Narrow", "Aptos Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .025em;
+  line-height: 1.35;
+}
+
+.data-game-context {
+  padding-top: 7px;
+  border-top: 1px solid color-mix(in srgb, var(--team-rule, rgba(80,100,120,.28)) 42%, transparent);
+}
+
+.game-context-line {
+  font-size: .75rem;
+}

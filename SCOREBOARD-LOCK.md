@@ -510,3 +510,12 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Comprehensive football stat sections remain available below and are labeled Career when their source is the unscoped career stats response.
 - A conservative football season sanity gate rejects categories marked Career/Postseason/Playoff and impossible regular-season totals such as >25 GP or obviously career-scale passing/rushing/receiving totals.
 - Baseball, basketball, hockey behavior is unchanged.
+
+
+## Stage 11B43 lock — TV / venue game context (2026-09-19)
+- Game broadcast and venue context comes only from the existing provider schedule payload; no stations, streaming services, or venues are guessed.
+- Duplicate broadcast names are consolidated before display.
+- Team Overview shows provider TV/venue context on Live Now and Next Game when present.
+- Schedule rows show provider TV/venue context when present.
+- If the provider supplies neither broadcast nor venue, no placeholder line is rendered.
+- Existing score/state/date logic is unchanged.

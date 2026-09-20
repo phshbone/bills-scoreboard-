@@ -672,3 +672,16 @@ Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION RE
 - Approved header/footer/scroller behavior remains unchanged.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE LIVE-DATA VERIFICATION REQUIRED**.
+
+
+## Stage 11B43 smoke — TV / venue context
+### Executed checks
+- team-data-v8.js and team-page-v8.js parse successfully.
+- Synthetic game context with CBS + duplicate CBS + Paramount+ normalizes to CBS / Paramount+ and preserves MetLife Stadium.
+- Team Overview wiring is present for Live Now and Next Game context.
+- Schedule-row wiring is present for every returned game.
+- team-page-v5.css brace balance is zero.
+- No placeholders are emitted when provider context is absent.
+- sw.js cache namespace is scoreboard-v11b43-tv-venue-context.
+
+Overall pre-merge classification: **PASS WITH LIVE-DATA VISUAL VERIFICATION REQUIRED**.
