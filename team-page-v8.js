@@ -589,7 +589,16 @@
     detailContent.replaceChildren();
     detailContent.appendChild(renderPlayerHero(player));
 
-    if (Array.isArray(details.core) && details.core.length) {
+    if (details.coreUnavailable) {
+      const core = el('section', 'player-core-panel player-core-unavailable');
+      core.appendChild(el('div', 'detail-group-title', 'Current season snapshot'));
+      core.appendChild(el(
+        'div',
+        'player-season-unavailable',
+        'Season stats unavailable'
+      ));
+      detailContent.appendChild(core);
+    } else if (Array.isArray(details.core) && details.core.length) {
       const core = el('section', 'player-core-panel');
       const context = details.coreContext === 'Career' ? 'Career snapshot' : 'Current season snapshot';
       core.appendChild(el('div', 'detail-group-title', context));
