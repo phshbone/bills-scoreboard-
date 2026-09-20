@@ -236,6 +236,16 @@
       LNG: 'Longest punt',
       IN20: 'Punts inside the 20-yard line',
       TB: 'Touchbacks'
+    }),
+    Scoring: Object.freeze({
+      PASS: 'Passing touchdowns',
+      RUSH: 'Rushing touchdowns',
+      REC: 'Receiving touchdowns',
+      RET: 'Return touchdowns',
+      TD: 'Total touchdowns scored',
+      '2PT': 'Two-point conversions',
+      PAT: 'Extra points made',
+      PTS: 'Points scored'
     })
   });
 
@@ -293,10 +303,11 @@
     }
 
     if (sport === 'football') {
-      // Generic labels such as YDS, TD, ATT and AVG mean different things in
-      // different football categories. Use the provider's category first, then
-      // use abbreviations only for the category-specific refinements.
-      if (inSet('GP','GS','SNAP','SNAPS')) return 'Usage';
+      // Generic labels such as YDS, TD, ATT, AVG and GP change meaning by
+      // football source category. Bind the category first so GP folds into a
+      // player's actual Passing/Rushing/Receiving/Defense group instead of
+      // becoming a wasteful one-stat Usage card.
+      if (/scor/i.test(category)) return 'Scoring';
       if (/receiv/i.test(category)) return 'Receiving';
       if (/rush/i.test(category)) return 'Rushing';
       if (/pass/i.test(category)) return 'Passing';
@@ -309,6 +320,7 @@
         if (inSet('SACK','QBHT','HUR','FF','FR')) return 'Pressure & turnovers';
         return 'Tackling';
       }
+      if (inSet('GP','GS','SNAP','SNAPS')) return 'Usage';
 
       if (inSet('CMP','CMP%','QBR','RTG','Y/A','AY/A')) return 'Passing';
       if (inSet('CAR','RUSH','RUSHYDS','YPC','RUSHTD')) return 'Rushing';
@@ -337,7 +349,7 @@
         ? ['Record','Goaltending','Workload','Other goaltending']
         : ['Usage','Scoring','Shooting & special teams','Physical & discipline','Faceoffs','Other'];
     }
-    if (sport === 'football') return ['Usage','Passing','Rushing','Receiving','Tackling','Pressure & turnovers','Pass defense','Kicking','Punting','Other'];
+    if (sport === 'football') return ['Passing','Rushing','Receiving','Tackling','Pressure & turnovers','Pass defense','Kicking','Punting','Usage','Scoring','Other'];
     return ['Other'];
   }
 
@@ -347,6 +359,55 @@
     const numbers = text.replace(/,/g, '').match(/-?\d+(?:\.\d+)?/g);
     if (!numbers?.length) return true;
     return numbers.some(value => Number(value) !== 0);
+  }
+
+  function footballDetailRole(player) {
+    const position = String(player?.position || '').toUpperCase();
+    if (position === 'QB') return 'qb';
+    if (['RB','HB','FB'].includes(position)) return 'rusher';
+    if (['WR','TE'].includes(position)) return 'receiver';
+    if (['K','PK'].includes(position)) return 'kicker';
+    if (position === 'P') return 'punter';
+    if (['LT','RT','OT','LG','RG','OG','G','C','OL'].includes(position)) return 'offensive-line';
+    return 'defense';
+  }
+
+  function footballKeepZeroGroup(player, groupTitle) {
+    const role = footballDetailRole(player);
+    if (role === 'qb') return ['Passing','Rushing'].includes(groupTitle);
+    if (role === 'rusher') return ['Rushing','Receiving'].includes(groupTitle);
+    if (role === 'receiver') return ['Receiving','Rushing'].includes(groupTitle);
+    if (role === 'kicker') return groupTitle === 'Kicking';
+    if (role === 'punter') return groupTitle === 'Punting';
+    if (role === 'offensive-line') return groupTitle === 'Usage';
+    return ['Tackling','Pressure & turnovers','Pass defense'].includes(groupTitle);
+  }
+
+  function footballStatIdentity(groupTitle, item) {
+    const key = statKey(item);
+    if (groupTitle === 'Passing' && key === 'TD') return 'touchdown:passing';
+    if (groupTitle === 'Rushing' && key === 'TD') return 'touchdown:rushing';
+    if (groupTitle === 'Receiving' && key === 'TD') return 'touchdown:receiving';
+    if (groupTitle === 'Scoring') {
+      if (key === 'PASS') return 'touchdown:passing';
+      if (key === 'RUSH') return 'touchdown:rushing';
+      if (key === 'REC') return 'touchdown:receiving';
+      if (key === 'RET') return 'touchdown:return';
+      if (key === 'TD') return 'touchdown:total';
+    }
+    return `${groupTitle}:${key}`;
+  }
+
+  function footballCategoryPriority(category) {
+    const name = String(category?.name || '').toLowerCase();
+    if (/pass/.test(name)) return 10;
+    if (/rush/.test(name)) return 20;
+    if (/receiv/.test(name)) return 30;
+    if (/defen|tack|sack|interception|fumble/.test(name)) return 40;
+    if (/kick|field goal|extra point/.test(name)) return 50;
+    if (/punt/.test(name)) return 60;
+    if (/scor/.test(name)) return 90;
+    return 70;
   }
 
   function semanticGroups(player, category) {
@@ -381,16 +442,30 @@
     semanticGroups(player, category).forEach(groupData => {
       let stats = groupData.stats;
 
-      // Football feeds repeat GP/GS and can repeat other values across offense,
-      // defense and special-team categories. Show each semantic stat once.
+      // Football feeds can repeat the same concept in multiple source
+      // categories. Scoring also repeats passing/rushing/receiving touchdowns.
+      // Keep the earlier football-specific group and let Scoring summarize only
+      // what adds new information.
       if (currentTeam?.sport === 'football' && seenFootballStats) {
         stats = stats.filter(item => {
-          const key = `${groupData.title}:${statKey(item)}`;
-          if (seenFootballStats.has(key)) return false;
-          seenFootballStats.add(key);
+          const identity = footballStatIdentity(groupData.title, item);
+          if (seenFootballStats.has(identity)) return false;
+          seenFootballStats.add(identity);
           return true;
         });
-        if (!stats.some(statHasActivity)) return;
+
+        // Primary position groups retain meaningful zeros (for example a QB
+        // with 0 INT). Secondary/off-position groups show only actual activity,
+        // so an RB's Defense panel can show 1 FR without 0 SACK and 0 FF.
+        if (!footballKeepZeroGroup(player, groupData.title)) {
+          stats = stats.filter(statHasActivity);
+        }
+
+        // A stray generic Usage category should not consume an entire card for
+        // non-linemen. In normal category-scoped feeds GP is already folded into
+        // Passing/Rushing/Receiving/Defense by bucketForStat above.
+        if (groupData.title === 'Usage' && footballDetailRole(player) !== 'offensive-line') return;
+        if (!stats.length || !stats.some(statHasActivity)) return;
       }
 
       const group = el('section', 'player-stat-group');
@@ -542,7 +617,10 @@
     if (Array.isArray(details.categories) && details.categories.length) {
       const groups = el('div', 'player-season-groups player-semantic-groups');
       const seenFootballStats = currentTeam?.sport === 'football' ? new Set() : null;
-      details.categories.forEach(category => {
+      const categories = currentTeam?.sport === 'football'
+        ? [...details.categories].sort((a, b) => footballCategoryPriority(a) - footballCategoryPriority(b))
+        : details.categories;
+      categories.forEach(category => {
         groups.appendChild(renderSemanticCategory(player, category, details.glossary || {}, seenFootballStats));
       });
       if (groups.childNodes.length) detailContent.appendChild(groups);
