@@ -699,3 +699,16 @@ Overall pre-merge classification: **PASS WITH LIVE-DATA VISUAL VERIFICATION REQU
 - Team-page header/footer/player/schedule data files are untouched by this stage.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE VISUAL VERIFICATION REQUIRED**.
+
+
+## Stage 11B45 smoke — football game-log season fallback
+### Executed checks
+- team-data-v8.js parses successfully.
+- Synthetic RB with two games and no season-summary block aggregates to 33 CAR / 163 YDS / 1 TD / 7 REC.
+- Synthetic WR aggregates to 12 REC / 167 YDS / 1 TD / 18 TGT.
+- Synthetic LB aggregates to 14 TKL / 1 SACK / 1 INT / 1 FF.
+- All three are labeled Current season · game log.
+- No career fallback is introduced; the Stage 11B42 strict football season guard remains in place.
+- sw.js cache namespace is scoreboard-v11b45-football-gamelog-fallback.
+
+Overall pre-merge classification: **PASS WITH EAGLES REAL-DATA VERIFICATION REQUIRED**.
