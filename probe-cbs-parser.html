@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Scoreboard CBS Parser Probe</title>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color-scheme:dark}
+body{margin:0;background:#08111f;color:#eef4ff;padding:24px}
+main{max-width:780px;margin:0 auto}
+h1{font-size:24px;margin:0 0 8px}
+p{color:#b8c5d8;line-height:1.45}
+.card{margin:16px 0;padding:16px;border:1px solid #32445d;border-radius:12px;background:#0d1929}
+.name{font-size:20px;font-weight:800}
+.status{margin-top:8px;white-space:pre-wrap;word-break:break-word;color:#cbd7e8}
+.pass{color:#7be0a5}.fail{color:#ff9a9a}.wait{color:#ffd479}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
+th,td{padding:7px 6px;border-bottom:1px solid #26364c;text-align:right}
+th:first-child,td:first-child{text-align:left}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+</style>
+</head>
+<body>
+<main>
+<h1>CBS football parser probe</h1>
+<p>This tests whether Scoreboard can do more than merely read CBS HTML: it parses the CBS 2026-27 regular-season game-log table, extracts QB passing rows, and calculates current-season totals. No API key, proxy, login, cookies, or production Scoreboard code is used.</p>
+<div id="results"></div>
+<script>
+const PLAYERS=[
+  {name:'Jameis Winston',url:'https://www.cbssports.com/nfl/players/1998197/jameis-winston/game-log/'},
+  {name:'Jaxson Dart',url:'https://www.cbssports.com/nfl/players/26694019/jaxson-dart/game-log/'}
+];
+
+const clean=s=>String(s||'').replace(/\s+/g,' ').trim();
+const num=s=>{
+  const n=Number(String(s||'').replace(/,/g,'').trim());
+  return Number.isFinite(n)?n:NaN;
+};
+const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+
+function passerRating(cmp,att,yds,td,intc){
+  if(!att) return null;
+  const a=clamp(((cmp/att)-0.3)*5,0,2.375);
+  const b=clamp(((yds/att)-3)*0.25,0,2.375);
+  const c=clamp((td/att)*20,0,2.375);
+  const d=clamp(2.375-(intc/att)*25,0,2.375);
+  return ((a+b+c+d)/6*100).toFixed(1);
+}
+
+function parseCbsQbGameLog(html){
+  const doc=new DOMParser().parseFromString(html,'text/html');
+  const tables=[...doc.querySelectorAll('table')];
+  const table=tables.find(t=>{
+    const text=clean(t.textContent).toLowerCase();
+    return text.includes('passing yards') && text.includes('completion percentage') && text.includes('interceptions thrown');
+  });
+  if(!table) throw new Error('CBS passing game-log table not found');
+
+  const rows=[];
+  for(const tr of table.querySelectorAll('tr')){
+    const cells=[...tr.querySelectorAll('th,td')].map(c=>clean(c.textContent));
+    if(cells.length<14) continue;
+    if(!/^[A-Z][a-z]{2}\s+\d{1,2},\s+\d{4}$/.test(cells[0])) continue;
+    const row={
+      date:cells[0],opponent:cells[1],result:cells[2],
+      cmp:num(cells[4]),att:num(cells[6]),yds:num(cells[7]),
+      td:num(cells[9]),int:num(cells[10]),rate:num(cells[13])
+    };
+    if([row.cmp,row.att,row.yds,row.td,row.int].some(Number.isNaN)) continue;
+    rows.push(row);
+  }
+
+  const seen=new Set();
+  const unique=rows.filter(r=>{
+    const k=[r.date,r.opponent,r.result,r.cmp,r.att,r.yds,r.td,r.int].join('|');
+    if(seen.has(k)) return false;
+    seen.add(k); return true;
+  });
+  if(!unique.length) throw new Error('No CBS 2026 game rows parsed');
+
+  const totals=unique.reduce((a,r)=>({
+    cmp:a.cmp+r.cmp,att:a.att+r.att,yds:a.yds+r.yds,td:a.td+r.td,int:a.int+r.int
+  }),{cmp:0,att:0,yds:0,td:0,int:0});
+  totals.rate=passerRating(totals.cmp,totals.att,totals.yds,totals.td,totals.int);
+  return {rows:unique,totals};
+}
+
+function makeCard(player){
+  const card=document.createElement('section');
+  card.className='card';
+  card.innerHTML='<div class="name"></div><div class="status wait">Fetching and parsing…</div>';
+  card.querySelector('.name').textContent=player.name;
+  return card;
+}
+
+async function run(player,card){
+  const status=card.querySelector('.status');
+  try{
+    const start=performance.now();
+    const res=await fetch(player.url,{cache:'no-store',credentials:'omit',redirect:'follow'});
+    const html=await res.text();
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const parsed=parseCbsQbGameLog(html);
+    const ms=Math.round(performance.now()-start);
+    const t=parsed.totals;
+    status.className='status pass';
+    status.textContent=[
+      'PASS · HTTP '+res.status+' · '+ms+' ms',
+      'Parsed '+parsed.rows.length+' regular-season game row'+(parsed.rows.length===1?'':'s'),
+      'Season totals: '+t.cmp+'/'+t.att+' · '+t.yds+' YDS · '+t.td+' TD · '+t.int+' INT · '+t.rate+' RTG'
+    ].join('\n');
+
+    const table=document.createElement('table');
+    table.innerHTML='<thead><tr><th>Date</th><th>Opp</th><th>C/A</th><th>YDS</th><th>TD</th><th>INT</th><th>RTG</th></tr></thead>';
+    const body=document.createElement('tbody');
+    parsed.rows.forEach(r=>{
+      const tr=document.createElement('tr');
+      [r.date,r.opponent,r.cmp+'/'+r.att,r.yds,r.td,r.int,Number.isFinite(r.rate)?r.rate:'—'].forEach((v,i)=>{
+        const td=document.createElement('td');td.textContent=v;tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+    table.appendChild(body);
+    card.appendChild(table);
+  }catch(err){
+    status.className='status fail';
+    status.textContent='FAIL\n'+String(err&&err.message||err);
+  }
+}
+
+(async()=>{
+  const out=document.getElementById('results');
+  for(const p of PLAYERS){
+    const card=makeCard(p);out.appendChild(card);await run(p,card);
+  }
+})();
+</script>
+</main>
+</body>
+</html>
