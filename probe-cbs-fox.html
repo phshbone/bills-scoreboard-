@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Scoreboard CBS/FOX Probe</title>
+<style>
+  :root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color-scheme:dark}
+  body{margin:0;background:#08111f;color:#eef4ff;padding:24px}
+  main{max-width:760px;margin:0 auto}
+  h1{font-size:24px;margin:0 0 8px}
+  p{color:#b8c5d8;line-height:1.45}
+  button{font:inherit;font-weight:700;padding:12px 16px;border-radius:10px;border:1px solid #61718a;background:#17253a;color:#fff}
+  .test{margin:16px 0;padding:14px;border:1px solid #32445d;border-radius:12px;background:#0d1929}
+  .name{font-weight:800}
+  .status{margin-top:8px;white-space:pre-wrap;word-break:break-word;color:#cbd7e8}
+  .pass{color:#7be0a5}.fail{color:#ff9a9a}.wait{color:#ffd479}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+</style>
+</head>
+<body>
+<main>
+<h1>CBS / FOX direct-fetch probe</h1>
+<p>This page makes ordinary browser <code>fetch()</code> requests from the Scoreboard GitHub Pages origin. It sends no API key, login, cookies, proxy, or bypass. A readable response means the provider is technically usable from the static app; a CORS/403/429 result means it is not reliable enough for direct use.</p>
+<button id="run">Run test</button>
+<div id="results"></div>
+<script>
+const TESTS=[
+  {
+    name:'CBS — Jameis Winston game log',
+    url:'https://www.cbssports.com/nfl/players/1998197/jameis-winston/game-log/',
+    checks:[
+      ['Sep 21 present',/Sep\s+21,\s+2026/i],
+      ['111 passing yards present',/(?:\b111\b[\s\S]{0,120}(?:Passing Yards|YDS)|(?:Passing Yards|YDS)[\s\S]{0,120}\b111\b)/i],
+      ['Winston present',/Jameis Winston/i]
+    ]
+  },
+  {
+    name:'CBS — Jaxson Dart game log',
+    url:'https://www.cbssports.com/nfl/players/26694019/jaxson-dart/game-log/',
+    checks:[
+      ['Dart present',/Jaxson Dart/i],
+      ['2026 season present',/2026/i]
+    ]
+  },
+  {
+    name:'FOX — Jameis Winston game log',
+    url:'https://www.foxsports.com/nfl/jameis-winston-player-game-log?season=2026',
+    checks:[
+      ['Winston present',/JAMEIS WINSTON/i],
+      ['2026 season present',/2026/i]
+    ]
+  },
+  {
+    name:'FOX — Jaxson Dart game log',
+    url:'https://www.foxsports.com/nfl/jaxson-dart-player-game-log?season=2026',
+    checks:[
+      ['Dart present',/JAXSON DART/i],
+      ['2026 season present',/2026/i]
+    ]
+  }
+];
+
+function card(t){
+  const d=document.createElement('section');
+  d.className='test';
+  d.innerHTML='<div class="name"></div><div class="status wait">Waiting…</div>';
+  d.querySelector('.name').textContent=t.name;
+  return d;
+}
+
+async function runOne(test, node){
+  const s=node.querySelector('.status');
+  s.className='status wait';
+  s.textContent='Fetching…';
+  const started=performance.now();
+  try{
+    const res=await fetch(test.url,{cache:'no-store',credentials:'omit',redirect:'follow'});
+    const elapsed=Math.round(performance.now()-started);
+    const text=await res.text();
+    const checks=test.checks.map(([label,re])=>({label,pass:re.test(text)}));
+    const passed=checks.filter(x=>x.pass).length;
+    s.className='status '+(res.ok && passed ? 'pass':'fail');
+    s.textContent=[
+      'HTTP '+res.status+' '+res.statusText+' · '+elapsed+' ms',
+      'Content-Type: '+(res.headers.get('content-type')||'unknown'),
+      'Readable bytes: '+text.length,
+      ...checks.map(x=>(x.pass?'PASS ':'FAIL ')+x.label),
+      '',
+      res.ok ? 'Browser could read this response.' : 'Provider returned a non-OK response.'
+    ].join('\n');
+  }catch(err){
+    s.className='status fail';
+    s.textContent='FETCH FAILED\n'+String(err && (err.stack||err.message||err))+'\n\nTypical causes: CORS policy, network blocking, or provider anti-bot rules.';
+  }
+}
+
+async function run(){
+  const out=document.getElementById('results');
+  out.replaceChildren();
+  document.getElementById('run').disabled=true;
+  for(const t of TESTS){
+    const n=card(t);out.appendChild(n);await runOne(t,n);
+  }
+  document.getElementById('run').disabled=false;
+}
+document.getElementById('run').addEventListener('click',run);
+run();
+</script>
+</main>
+</body>
+</html>
