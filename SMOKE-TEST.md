@@ -763,3 +763,19 @@ Overall pre-merge classification: **PASS WITH LIVE PROVIDER + REAL-IPHONE VISUAL
 - sw.js cache namespace is scoreboard-v11b49-playoff-scope-hardening.
 
 Overall pre-merge classification: **PASS WITH LIVE PROVIDER VERIFICATION REQUIRED**.
+
+
+## Stage 11B50 smoke — CBS-primary NFL player season stats
+### Evidence
+- Real-iPhone preflight probes from the production GitHub Pages origin returned HTTP 200/readable HTML for CBS and FOX with no API key, proxy, login, or cookies.
+- The isolated CBS parser probe correctly produced Jameis Winston's 2026 line (11/27, 111 YDS, 0 TD, 1 INT, 37.7 RTG) and Jaxson Dart's two-game totals (26/34, 250 YDS, 3 TD, 0 INT, 125.9 RTG).
+- CBS's current Giants team-statistics page independently exposes those same current-season Winston and Dart values in its Passing table.
+- team-data-v8.js parses successfully after switching production NFL cards to a single CBS team-statistics snapshot.
+- sw.js parses successfully and uses cache namespace scoreboard-v11b50-cbs-nfl-player-stats.
+- CBS mappings are limited to the app's NFL teams: Giants, Jets, Eagles.
+- CBS direct fetch explicitly omits credentials and requires no embedded key.
+- CBS is attempted before the ESPN player-stat fallback.
+- The production adapter uses a two-minute CBS team snapshot cache; it does not issue one CBS profile fetch per roster card.
+- Existing ESPN schedule/live/standings/team-roster wiring and MLB StatsAPI wiring remain present and unchanged.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE NFL ROSTER VERIFICATION REQUIRED**.

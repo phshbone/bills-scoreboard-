@@ -575,3 +575,15 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - WNBA prefers the provider's league-wide playoff-seed table first; conference-level data is only a fallback.
 - Conference group selection is based on provider group identity/name and de-duplicates identical team sets.
 - No change is made to MLB's dedicated StatsAPI Wild Card path or NCAA standings.
+
+
+## Stage 11B50 lock — CBS-primary NFL player season stats (2026-09-22)
+- NFL rich roster cards for the configured Giants, Jets, and Eagles prefer the public CBS Sports team-statistics page for current-season core player statistics.
+- One CBS team-statistics snapshot supplies the roster's passing, rushing, receiving, defense, kicking, and punting rows; the app does not fetch a separate CBS page for every visible player card.
+- CBS rows are matched to the existing roster by normalized player name; no CBS player IDs are hard-coded into the app.
+- CBS requests use ordinary browser fetch with no API key, login, cookie credentials, proxy, or bypass.
+- The CBS team-statistics snapshot is cached for two minutes, allowing frequent refresh without refetching the same large page for every player.
+- ESPN remains the failure fallback for NFL player statistics and continues to supply the existing expanded/career player-detail categories when available.
+- NFL roster identity, jersey numbers, headshots, schedules, live scores, standings, and all non-NFL sports data paths remain unchanged.
+- MLB StatsAPI behavior remains unchanged.
+- A CBS HTML/CORS/availability or player-row failure must degrade to the existing ESPN path rather than blanking the roster.
