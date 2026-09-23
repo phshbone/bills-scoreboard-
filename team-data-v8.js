@@ -12,15 +12,13 @@
     nyj: 'NYJ/new-york-jets',
     phi: 'PHI/philadelphia-eagles'
   });
-  const CBS_CACHE_MS = 5 * 60 * 1000;
-  const CBS_ROSTER_CACHE_MS = 30 * 60 * 1000;
+  const CBS_CACHE_MS = 2 * 60 * 1000;
   const teamCache = new Map();
   const standingsCache = new Map();
   const playoffStandingsCache = new Map();
   const playerCardCache = new Map();
   const playerDetailCache = new Map();
-  const cbsRosterCache = new Map();
-  const cbsPlayerCache = new Map();
+  const cbsTeamStatsCache = new Map();
 
   function endpoint(team, resource = '') {
     const p = team.provider;
@@ -1181,10 +1179,10 @@
       && Boolean(CBS_NFL_TEAMS[String(team?.provider?.team || '').toLowerCase()]);
   }
 
-  function cbsTeamRosterUrl(team) {
+  function cbsTeamStatsUrl(team) {
     const key = String(team?.provider?.team || '').toLowerCase();
     const path = CBS_NFL_TEAMS[key];
-    return path ? CBS + '/nfl/teams/' + path + '/roster/' : '';
+    return path ? CBS + '/nfl/teams/' + path + '/stats/' : '';
   }
 
   function cbsNameKey(value) {
@@ -1214,93 +1212,104 @@
     return new DOMParser().parseFromString(String(html || ''), 'text/html');
   }
 
-  function cbsProfileUrlFromHref(href) {
-    try {
-      const url = new URL(href, CBS);
-      const match = url.pathname.match(/^\/nfl\/players\/(\d+)\/([^/]+)\//i);
-      return match ? CBS + '/nfl/players/' + match[1] + '/' + match[2] + '/' : '';
-    } catch {
-      return '';
-    }
-  }
-
-  async function cbsRosterProfiles(team, force = false) {
-    const url = cbsTeamRosterUrl(team);
-    if (!url) throw new Error('CBS roster mapping unavailable');
-    const cached = cbsRosterCache.get(url);
-    if (!force && cached && Date.now() - cached.loadedAt < CBS_ROSTER_CACHE_MS) return cached.profiles;
-
-    const html = await fetchText(url);
-    const doc = cbsDocument(html);
-    const profiles = [];
-    const seen = new Set();
-    [...doc.querySelectorAll('a[href*="/nfl/players/"]')].forEach(anchor => {
-      const profileUrl = cbsProfileUrlFromHref(anchor.getAttribute('href') || '');
-      if (!profileUrl || seen.has(profileUrl)) return;
-      const row = anchor.closest('tr');
-      const text = [anchor.textContent, row?.textContent].filter(Boolean).join(' ');
-      profiles.push({ url: profileUrl, text: cbsNameKey(text) });
-      seen.add(profileUrl);
-    });
-    if (!profiles.length) throw new Error('CBS roster player links unavailable');
-    cbsRosterCache.set(url, { loadedAt: Date.now(), profiles });
-    return profiles;
-  }
-
-  async function cbsPlayerProfileUrl(team, player, force = false) {
-    const target = cbsNameKey(player?.name);
-    if (!target) throw new Error('Player name unavailable');
-    const tokens = target.split(' ').filter(Boolean);
-    const profiles = await cbsRosterProfiles(team, force);
-    const match = profiles.find(item => item.text === target)
-      || profiles.find(item => item.text.includes(target))
-      || profiles.find(item => tokens.length > 1 && tokens.every(token => item.text.includes(token)));
-    if (!match) throw new Error('Player not found on CBS roster');
-    return match.url;
-  }
-
   function cbsHeaderKey(value) {
     const text = String(value || '').replace(/\s+/g, ' ').trim();
     const match = text.match(/^([A-Z0-9%/+.-]{1,10})\b/);
     return String(match?.[1] || text).toUpperCase();
   }
 
-  function cbsRegularSeasonSummary(html) {
-    const doc = cbsDocument(html);
-    const tables = [...doc.querySelectorAll('table')];
-    for (const table of tables) {
-      const rows = [...table.querySelectorAll('tr')];
-      const regular = rows.find(row => {
-        const first = row.querySelector('th,td');
-        return /^regular season$/i.test(String(first?.textContent || '').replace(/\s+/g, ' ').trim());
-      });
-      if (!regular) continue;
-
-      const values = [...regular.querySelectorAll('th,td')].map(cell => String(cell.textContent || '').replace(/\s+/g, ' ').trim());
-      const headerRows = [...table.querySelectorAll('thead tr')];
-      let header = headerRows[headerRows.length - 1] || null;
-      if (!header || header.querySelectorAll('th,td').length !== values.length) {
-        header = rows.find(row => row !== regular && row.querySelectorAll('th,td').length === values.length) || header;
-      }
-      const labels = header ? [...header.querySelectorAll('th,td')].map(cell => String(cell.textContent || '').replace(/\s+/g, ' ').trim()) : [];
-      if (!labels.length || labels.length !== values.length) continue;
-
-      const stats = {};
-      labels.forEach((label, index) => {
-        if (index === 0) return;
-        const key = cbsHeaderKey(label);
-        if (key) stats[key] = values[index] || '—';
-      });
-      if (Object.keys(stats).length) return { stats };
-    }
-    throw new Error('CBS regular-season summary unavailable');
+  function cbsStatsTableKind(labels) {
+    const text = labels.join(' ').toLowerCase();
+    if (/pass attempts/.test(text) && /passer rating/.test(text)) return 'passing';
+    if (/rushing attempts/.test(text) && /rushing yards/.test(text)) return 'rushing';
+    if (/receptions/.test(text) && /receiving yards/.test(text)) return 'receiving';
+    if (/total tackles/.test(text) && /sacks/.test(text)) return 'defense';
+    if (/field goals/.test(text) || /extra points/.test(text)) return 'kicking';
+    if (/punts/.test(text) && /punt/.test(text)) return 'punting';
+    return '';
   }
 
-  function cbsCoreStats(player, summary) {
-    const stats = summary?.stats || {};
+  function cbsParseTeamStats(html) {
+    const doc = cbsDocument(html);
+    const tables = [];
+
+    [...doc.querySelectorAll('table')].forEach(table => {
+      const rows = [...table.querySelectorAll('tr')];
+      if (rows.length < 2) return;
+
+      const headerRows = [...table.querySelectorAll('thead tr')];
+      let header = headerRows[headerRows.length - 1] || rows[0];
+      const labels = [...header.querySelectorAll('th,td')]
+        .map(cell => String(cell.textContent || '').replace(/\s+/g, ' ').trim());
+      if (!labels.length) return;
+
+      const kind = cbsStatsTableKind(labels);
+      if (!kind) return;
+
+      const parsedRows = [];
+      rows.forEach(row => {
+        if (row === header) return;
+        const cells = [...row.querySelectorAll('th,td')]
+          .map(cell => String(cell.textContent || '').replace(/\s+/g, ' ').trim());
+        if (cells.length !== labels.length || !cells[0]) return;
+        const firstKey = cbsNameKey(cells[0]);
+        if (!firstKey || firstKey === 'team' || firstKey === 'opponents') return;
+
+        const stats = {};
+        labels.forEach((label, index) => {
+          if (index === 0) return;
+          const key = cbsHeaderKey(label);
+          if (key) stats[key] = cells[index] || '—';
+        });
+        parsedRows.push({ nameText: firstKey, stats });
+      });
+
+      if (parsedRows.length) tables.push({ kind, rows: parsedRows });
+    });
+
+    if (!tables.length) throw new Error('CBS team stats tables unavailable');
+    return tables;
+  }
+
+  async function cbsTeamStats(team, force = false) {
+    const url = cbsTeamStatsUrl(team);
+    if (!url) throw new Error('CBS team stats mapping unavailable');
+    const cached = cbsTeamStatsCache.get(url);
+    if (!force && cached && Date.now() - cached.loadedAt < CBS_CACHE_MS) return cached.tables;
+
+    const tables = cbsParseTeamStats(await fetchText(url));
+    cbsTeamStatsCache.set(url, { loadedAt: Date.now(), tables });
+    return tables;
+  }
+
+  function cbsRoleTableKind(player) {
+    const role = footballRole(player);
+    if (role === 'qb') return 'passing';
+    if (role === 'rusher') return 'rushing';
+    if (role === 'receiver') return 'receiving';
+    if (role === 'kicker') return 'kicking';
+    if (role === 'punter') return 'punting';
+    if (role === 'offensive-line') return '';
+    return 'defense';
+  }
+
+  function cbsFindPlayerStats(tables, player) {
+    const kind = cbsRoleTableKind(player);
+    if (!kind) return null;
+    const target = cbsNameKey(player?.name);
+    const tokens = target.split(' ').filter(Boolean);
+    const table = (tables || []).find(item => item.kind === kind);
+    if (!table) return null;
+    return table.rows.find(row => row.nameText.includes(target))
+      || table.rows.find(row => tokens.length > 1 && tokens.every(token => row.nameText.includes(token)))
+      || null;
+  }
+
+  function cbsCoreStats(player, stats) {
+    const source = stats || {};
     const value = (...keys) => {
       for (const key of keys) {
-        const found = stats[String(key).toUpperCase()];
+        const found = source[String(key).toUpperCase()];
         if (found != null && String(found).trim() !== '') return String(found);
       }
       return '—';
@@ -1348,116 +1357,24 @@
     ];
   }
 
-  function cbsGameLogRows(html) {
-    const doc = cbsDocument(html);
-    const currentYear = String(new Date().getFullYear());
-    const datePattern = new RegExp('^[A-Z][a-z]{2}\\s+\\d{1,2},\\s+' + currentYear + '$');
-    const tables = [...doc.querySelectorAll('table')];
-    for (const table of tables) {
-      const rows = [...table.querySelectorAll('tr')];
-      const dataRows = rows.filter(row => {
-        const first = row.querySelector('th,td');
-        const text = String(first?.textContent || '').replace(/\s+/g, ' ').trim();
-        return datePattern.test(text);
-      });
-      if (!dataRows.length) continue;
-      const firstCells = [...dataRows[0].querySelectorAll('th,td')];
-      const headerRows = [...table.querySelectorAll('thead tr')];
-      let header = headerRows[headerRows.length - 1] || null;
-      if (!header || header.querySelectorAll('th,td').length !== firstCells.length) {
-        header = rows.find(row => row !== dataRows[0] && row.querySelectorAll('th,td').length === firstCells.length) || header;
-      }
-      if (!header) continue;
-      const labels = [...header.querySelectorAll('th,td')].map(cell => String(cell.textContent || '').replace(/\s+/g, ' ').trim());
-      if (labels.length !== firstCells.length) continue;
-
-      return dataRows.map(row => {
-        const cells = [...row.querySelectorAll('th,td')].map(cell => String(cell.textContent || '').replace(/\s+/g, ' ').trim());
-        const entries = labels.map((label, index) => ({ label, value: cells[index] || '' }));
-        return { date: cells[0] || '', opponent: cells[1] || '', result: cells[2] || '', entries };
-      });
-    }
-    return [];
-  }
-
-  function cbsEntryValue(row, pattern) {
-    const found = (row?.entries || []).find(entry => pattern.test(String(entry?.label || '')));
-    return String(found?.value || '').trim();
-  }
-
-  function cbsLastAppearance(player, row) {
-    if (!row) return null;
-    const role = footballRole(player);
-    const pieces = [row.opponent, row.result].filter(Boolean);
-    const add = (pattern, suffix) => {
-      const value = cbsEntryValue(row, pattern);
-      if (value && value !== '—' && value !== '--') pieces.push(value + ' ' + suffix);
-    };
-
-    if (role === 'qb') {
-      add(/Passing Yards/i, 'YDS');
-      add(/Touchdown Passes/i, 'TD');
-      add(/Interceptions Thrown/i, 'INT');
-    } else if (role === 'rusher') {
-      add(/Rushing Yards/i, 'RUSH YDS');
-      add(/Rushing Touchdowns/i, 'RUSH TD');
-      add(/Receptions/i, 'REC');
-      add(/Receiving Yards/i, 'REC YDS');
-    } else if (role === 'receiver') {
-      add(/Receptions/i, 'REC');
-      add(/Receiving Yards/i, 'YDS');
-      add(/Receiving Touchdowns/i, 'TD');
-    } else if (role === 'defense') {
-      add(/Total Tackles/i, 'TKL');
-      add(/Sacks/i, 'SACK');
-      add(/Forced Fumbles/i, 'FF');
-      add(/Interceptions(?! Thrown)/i, 'INT');
-    } else if (role === 'kicker') {
-      add(/Field Goals Made/i, 'FG');
-      add(/Extra Points Made/i, 'XP');
-    } else if (role === 'punter') {
-      add(/Punts/i, 'PUNT');
-      add(/Punting Average|Average Yards per Punt/i, 'AVG');
-    }
-
-    const text = pieces.filter(Boolean).join(' · ');
-    return text ? { label: row.date || 'Last game', text } : null;
-  }
-
   async function loadCbsNflPlayerCard(team, player, force = false) {
     if (!isCbsNflTeam(team)) throw new Error('CBS NFL source not configured for this team');
-    const profileUrl = await cbsPlayerProfileUrl(team, player, force);
-    const cached = cbsPlayerCache.get(profileUrl);
-    if (!force && cached && Date.now() - cached.loadedAt < CBS_CACHE_MS) return cached.data;
+    const row = cbsFindPlayerStats(await cbsTeamStats(team, force), player);
+    if (!row) throw new Error('CBS current-season player row unavailable');
 
-    const results = await Promise.allSettled([
-      fetchText(profileUrl),
-      fetchText(profileUrl + 'game-log/')
-    ]);
-    if (results[0].status !== 'fulfilled') throw results[0].reason;
-
-    const summary = cbsRegularSeasonSummary(results[0].value);
-    const core = cbsCoreStats(player, summary);
+    const core = cbsCoreStats(player, row.stats);
     if (!meaningfulCore(core)) throw new Error('CBS current-season stats unavailable');
 
-    let lastAppearance = null;
-    if (results[1].status === 'fulfilled') {
-      const rows = cbsGameLogRows(results[1].value);
-      lastAppearance = cbsLastAppearance(player, rows[0]);
-    }
-
-    const data = {
+    return {
       supported: true,
       core,
       coreContext: 'Current season · CBS',
       coreUnavailable: false,
-      lastAppearance,
+      lastAppearance: null,
       trend: '',
       errors: {},
       source: 'CBS Sports'
     };
-    cbsPlayerCache.set(profileUrl, { loadedAt: Date.now(), data });
-    return data;
   }
 
   async function loadPlayerCard(team, player, force = false) {
