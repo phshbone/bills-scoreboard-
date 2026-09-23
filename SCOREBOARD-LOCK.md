@@ -578,12 +578,12 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 
 
 ## Stage 11B50 lock — CBS-primary NFL player season stats (2026-09-22)
-- NFL rich roster cards for the configured Giants, Jets, and Eagles now prefer public CBS Sports player pages for current-season player statistics.
-- CBS player identity is resolved from each CBS team roster page by normalized player name; no CBS player IDs are hard-coded into the app.
+- NFL rich roster cards for the configured Giants, Jets, and Eagles prefer the public CBS Sports team-statistics page for current-season core player statistics.
+- One CBS team-statistics snapshot supplies the roster's passing, rushing, receiving, defense, kicking, and punting rows; the app does not fetch a separate CBS page for every visible player card.
+- CBS rows are matched to the existing roster by normalized player name; no CBS player IDs are hard-coded into the app.
 - CBS requests use ordinary browser fetch with no API key, login, cookie credentials, proxy, or bypass.
-- CBS player/profile data is cached for five minutes; CBS roster-link discovery is cached for thirty minutes so ordinary roster scrolling does not repeatedly refetch the same index.
-- Current-season core stats are parsed from the CBS player's Regular Season summary table. The most recent CBS game-log row is used for the roster-card recent line when available.
-- ESPN remains a failure fallback for NFL player statistics and continues to supply the existing expanded/career detail categories when available.
+- The CBS team-statistics snapshot is cached for two minutes, allowing frequent refresh without refetching the same large page for every player.
+- ESPN remains the failure fallback for NFL player statistics and continues to supply the existing expanded/career player-detail categories when available.
 - NFL roster identity, jersey numbers, headshots, schedules, live scores, standings, and all non-NFL sports data paths remain unchanged.
 - MLB StatsAPI behavior remains unchanged.
-- A CBS HTML/CORS/availability failure must degrade to the existing ESPN path rather than blanking the roster.
+- A CBS HTML/CORS/availability or player-row failure must degrade to the existing ESPN path rather than blanking the roster.
