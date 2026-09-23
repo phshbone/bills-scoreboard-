@@ -6,11 +6,21 @@
   const MLB_ROSTER = 'https://statsapi.mlb.com/api/v1/teams';
   const PLAYER_WEB = 'https://site.web.api.espn.com/apis/common/v3/sports';
   const MLB_TEAM_IDS = Object.freeze({ nyy: 147, nym: 121, phi: 143 });
+  const CBS = 'https://www.cbssports.com';
+  const CBS_NFL_TEAMS = Object.freeze({
+    nyg: 'NYG/new-york-giants',
+    nyj: 'NYJ/new-york-jets',
+    phi: 'PHI/philadelphia-eagles'
+  });
+  const CBS_CACHE_MS = 5 * 60 * 1000;
+  const CBS_ROSTER_CACHE_MS = 30 * 60 * 1000;
   const teamCache = new Map();
   const standingsCache = new Map();
   const playoffStandingsCache = new Map();
   const playerCardCache = new Map();
   const playerDetailCache = new Map();
+  const cbsRosterCache = new Map();
+  const cbsPlayerCache = new Map();
 
   function endpoint(team, resource = '') {
     const p = team.provider;
@@ -1166,7 +1176,300 @@
     return statCategories(payload);
   }
 
+  function isCbsNflTeam(team) {
+    return String(team?.provider?.league || '').toLowerCase() === 'nfl'
+      && Boolean(CBS_NFL_TEAMS[String(team?.provider?.team || '').toLowerCase()]);
+  }
+
+  function cbsTeamRosterUrl(team) {
+    const key = String(team?.provider?.team || '').toLowerCase();
+    const path = CBS_NFL_TEAMS[key];
+    return path ? CBS + '/nfl/teams/' + path + '/roster/' : '';
+  }
+
+  function cbsNameKey(value) {
+    return String(value || '')
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/\b(jr|sr|ii|iii|iv)\b/g, '')
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim()
+      .replace(/\s+/g, ' ');
+  }
+
+  async function fetchText(url) {
+    const response = await fetch(url, {
+      headers: { Accept: 'text/html,application/xhtml+xml' },
+      cache: 'no-store',
+      credentials: 'omit',
+      redirect: 'follow'
+    });
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    return response.text();
+  }
+
+  function cbsDocument(html) {
+    if (typeof DOMParser !== 'function') throw new Error('DOMParser unavailable');
+    return new DOMParser().parseFromString(String(html || ''), 'text/html');
+  }
+
+  function cbsProfileUrlFromHref(href) {
+    try {
+      const url = new URL(href, CBS);
+      const match = url.pathname.match(/^\/nfl\/players\/(\d+)\/([^/]+)\//i);
+      return match ? CBS + '/nfl/players/' + match[1] + '/' + match[2] + '/' : '';
+    } catch {
+      return '';
+    }
+  }
+
+  async function cbsRosterProfiles(team, force = false) {
+    const url = cbsTeamRosterUrl(team);
+    if (!url) throw new Error('CBS roster mapping unavailable');
+    const cached = cbsRosterCache.get(url);
+    if (!force && cached && Date.now() - cached.loadedAt < CBS_ROSTER_CACHE_MS) return cached.profiles;
+
+    const html = await fetchText(url);
+    const doc = cbsDocument(html);
+    const profiles = [];
+    const seen = new Set();
+    [...doc.querySelectorAll('a[href*="/nfl/players/"]')].forEach(anchor => {
+      const profileUrl = cbsProfileUrlFromHref(anchor.getAttribute('href') || '');
+      if (!profileUrl || seen.has(profileUrl)) return;
+      const row = anchor.closest('tr');
+      const text = [anchor.textContent, row?.textContent].filter(Boolean).join(' ');
+      profiles.push({ url: profileUrl, text: cbsNameKey(text) });
+      seen.add(profileUrl);
+    });
+    if (!profiles.length) throw new Error('CBS roster player links unavailable');
+    cbsRosterCache.set(url, { loadedAt: Date.now(), profiles });
+    return profiles;
+  }
+
+  async function cbsPlayerProfileUrl(team, player, force = false) {
+    const target = cbsNameKey(player?.name);
+    if (!target) throw new Error('Player name unavailable');
+    const tokens = target.split(' ').filter(Boolean);
+    const profiles = await cbsRosterProfiles(team, force);
+    const match = profiles.find(item => item.text === target)
+      || profiles.find(item => item.text.includes(target))
+      || profiles.find(item => tokens.length > 1 && tokens.every(token => item.text.includes(token)));
+    if (!match) throw new Error('Player not found on CBS roster');
+    return match.url;
+  }
+
+  function cbsHeaderKey(value) {
+    const text = String(value || '').replace(/\s+/g, ' ').trim();
+    const match = text.match(/^([A-Z0-9%/+.-]{1,10})\b/);
+    return String(match?.[1] || text).toUpperCase();
+  }
+
+  function cbsRegularSeasonSummary(html) {
+    const doc = cbsDocument(html);
+    const tables = [...doc.querySelectorAll('table')];
+    for (const table of tables) {
+      const rows = [...table.querySelectorAll('tr')];
+      const regular = rows.find(row => {
+        const first = row.querySelector('th,td');
+        return /^regular season$/i.test(String(first?.textContent || '').replace(/\s+/g, ' ').trim());
+      });
+      if (!regular) continue;
+
+      const values = [...regular.querySelectorAll('th,td')].map(cell => String(cell.textContent || '').replace(/\s+/g, ' ').trim());
+      const headerRows = [...table.querySelectorAll('thead tr')];
+      let header = headerRows[headerRows.length - 1] || null;
+      if (!header || header.querySelectorAll('th,td').length !== values.length) {
+        header = rows.find(row => row !== regular && row.querySelectorAll('th,td').length === values.length) || header;
+      }
+      const labels = header ? [...header.querySelectorAll('th,td')].map(cell => String(cell.textContent || '').replace(/\s+/g, ' ').trim()) : [];
+      if (!labels.length || labels.length !== values.length) continue;
+
+      const stats = {};
+      labels.forEach((label, index) => {
+        if (index === 0) return;
+        const key = cbsHeaderKey(label);
+        if (key) stats[key] = values[index] || '—';
+      });
+      if (Object.keys(stats).length) return { stats };
+    }
+    throw new Error('CBS regular-season summary unavailable');
+  }
+
+  function cbsCoreStats(player, summary) {
+    const stats = summary?.stats || {};
+    const value = (...keys) => {
+      for (const key of keys) {
+        const found = stats[String(key).toUpperCase()];
+        if (found != null && String(found).trim() !== '') return String(found);
+      }
+      return '—';
+    };
+    const item = (label, ...keys) => ({ label, value: value(...keys) });
+    const role = footballRole(player);
+
+    if (role === 'qb') return [
+      item('YDS', 'YDS'),
+      item('TD', 'TD'),
+      item('INT', 'INT'),
+      item('RTG', 'RATE', 'RTG')
+    ];
+    if (role === 'rusher') return [
+      item('YDS', 'YDS'),
+      item('TD', 'TD'),
+      item('ATT', 'ATT', 'CAR'),
+      item('AVG', 'AVG')
+    ];
+    if (role === 'receiver') return [
+      item('REC', 'REC'),
+      item('YDS', 'YDS'),
+      item('TD', 'TD'),
+      item('AVG', 'AVG')
+    ];
+    if (role === 'kicker') return [
+      item('FGM', 'FGM', 'FG'),
+      item('FGA', 'FGA'),
+      item('FG%', 'FG%', 'PCT'),
+      item('LNG', 'LNG', 'LONG')
+    ];
+    if (role === 'punter') return [
+      item('PUNT', 'PUNT', 'PUNTS'),
+      item('AVG', 'AVG'),
+      item('LNG', 'LNG', 'LONG'),
+      item('IN20', 'IN20')
+    ];
+    if (role === 'offensive-line') return [];
+
+    return [
+      item('TKL', 'CMB', 'TOT', 'TKL'),
+      item('SACK', 'SCK', 'SACK'),
+      item('FF', 'FUM', 'FF'),
+      item('INT', 'INT')
+    ];
+  }
+
+  function cbsGameLogRows(html) {
+    const doc = cbsDocument(html);
+    const currentYear = String(new Date().getFullYear());
+    const datePattern = new RegExp('^[A-Z][a-z]{2}\\s+\\d{1,2},\\s+' + currentYear + '$');
+    const tables = [...doc.querySelectorAll('table')];
+    for (const table of tables) {
+      const rows = [...table.querySelectorAll('tr')];
+      const dataRows = rows.filter(row => {
+        const first = row.querySelector('th,td');
+        const text = String(first?.textContent || '').replace(/\s+/g, ' ').trim();
+        return datePattern.test(text);
+      });
+      if (!dataRows.length) continue;
+      const firstCells = [...dataRows[0].querySelectorAll('th,td')];
+      const headerRows = [...table.querySelectorAll('thead tr')];
+      let header = headerRows[headerRows.length - 1] || null;
+      if (!header || header.querySelectorAll('th,td').length !== firstCells.length) {
+        header = rows.find(row => row !== dataRows[0] && row.querySelectorAll('th,td').length === firstCells.length) || header;
+      }
+      if (!header) continue;
+      const labels = [...header.querySelectorAll('th,td')].map(cell => String(cell.textContent || '').replace(/\s+/g, ' ').trim());
+      if (labels.length !== firstCells.length) continue;
+
+      return dataRows.map(row => {
+        const cells = [...row.querySelectorAll('th,td')].map(cell => String(cell.textContent || '').replace(/\s+/g, ' ').trim());
+        const entries = labels.map((label, index) => ({ label, value: cells[index] || '' }));
+        return { date: cells[0] || '', opponent: cells[1] || '', result: cells[2] || '', entries };
+      });
+    }
+    return [];
+  }
+
+  function cbsEntryValue(row, pattern) {
+    const found = (row?.entries || []).find(entry => pattern.test(String(entry?.label || '')));
+    return String(found?.value || '').trim();
+  }
+
+  function cbsLastAppearance(player, row) {
+    if (!row) return null;
+    const role = footballRole(player);
+    const pieces = [row.opponent, row.result].filter(Boolean);
+    const add = (pattern, suffix) => {
+      const value = cbsEntryValue(row, pattern);
+      if (value && value !== '—' && value !== '--') pieces.push(value + ' ' + suffix);
+    };
+
+    if (role === 'qb') {
+      add(/Passing Yards/i, 'YDS');
+      add(/Touchdown Passes/i, 'TD');
+      add(/Interceptions Thrown/i, 'INT');
+    } else if (role === 'rusher') {
+      add(/Rushing Yards/i, 'RUSH YDS');
+      add(/Rushing Touchdowns/i, 'RUSH TD');
+      add(/Receptions/i, 'REC');
+      add(/Receiving Yards/i, 'REC YDS');
+    } else if (role === 'receiver') {
+      add(/Receptions/i, 'REC');
+      add(/Receiving Yards/i, 'YDS');
+      add(/Receiving Touchdowns/i, 'TD');
+    } else if (role === 'defense') {
+      add(/Total Tackles/i, 'TKL');
+      add(/Sacks/i, 'SACK');
+      add(/Forced Fumbles/i, 'FF');
+      add(/Interceptions(?! Thrown)/i, 'INT');
+    } else if (role === 'kicker') {
+      add(/Field Goals Made/i, 'FG');
+      add(/Extra Points Made/i, 'XP');
+    } else if (role === 'punter') {
+      add(/Punts/i, 'PUNT');
+      add(/Punting Average|Average Yards per Punt/i, 'AVG');
+    }
+
+    const text = pieces.filter(Boolean).join(' · ');
+    return text ? { label: row.date || 'Last game', text } : null;
+  }
+
+  async function loadCbsNflPlayerCard(team, player, force = false) {
+    if (!isCbsNflTeam(team)) throw new Error('CBS NFL source not configured for this team');
+    const profileUrl = await cbsPlayerProfileUrl(team, player, force);
+    const cached = cbsPlayerCache.get(profileUrl);
+    if (!force && cached && Date.now() - cached.loadedAt < CBS_CACHE_MS) return cached.data;
+
+    const results = await Promise.allSettled([
+      fetchText(profileUrl),
+      fetchText(profileUrl + 'game-log/')
+    ]);
+    if (results[0].status !== 'fulfilled') throw results[0].reason;
+
+    const summary = cbsRegularSeasonSummary(results[0].value);
+    const core = cbsCoreStats(player, summary);
+    if (!meaningfulCore(core)) throw new Error('CBS current-season stats unavailable');
+
+    let lastAppearance = null;
+    if (results[1].status === 'fulfilled') {
+      const rows = cbsGameLogRows(results[1].value);
+      lastAppearance = cbsLastAppearance(player, rows[0]);
+    }
+
+    const data = {
+      supported: true,
+      core,
+      coreContext: 'Current season · CBS',
+      coreUnavailable: false,
+      lastAppearance,
+      trend: '',
+      errors: {},
+      source: 'CBS Sports'
+    };
+    cbsPlayerCache.set(profileUrl, { loadedAt: Date.now(), data });
+    return data;
+  }
+
   async function loadPlayerCard(team, player, force = false) {
+    let cbsFailure = '';
+    if (isCbsNflTeam(team)) {
+      try {
+        return await loadCbsNflPlayerCard(team, player, force);
+      } catch (error) {
+        cbsFailure = error?.message || 'CBS player stats unavailable';
+      }
+    }
+
     const id = espnPlayerId(player);
     if (!id) {
       return {
@@ -1175,11 +1478,14 @@
         coreContext: '',
         lastAppearance: null,
         trend: '',
-        errors: { player: 'Detailed ESPN player data is unavailable for this roster-only entry.' }
+        errors: {
+          player: 'Detailed player data is unavailable for this roster-only entry.',
+          ...(cbsFailure ? { cbs: cbsFailure } : {})
+        }
       };
     }
 
-    const key = `${team.provider.sport}/${team.provider.league}/${id}`;
+    const key = team.provider.sport + '/' + team.provider.league + '/' + id;
     if (!force && playerCardCache.has(key)) return playerCardCache.get(key);
 
     const promise = (async () => {
@@ -1189,13 +1495,10 @@
       let events = [];
       let lastAppearance = null;
       const errors = {};
+      if (cbsFailure) errors.cbs = cbsFailure;
 
       try {
         const overview = await fetchJson(playerEndpoint(team, player, 'overview'));
-        // Football athlete overviews can expose career totals even while the
-        // app is asking for a current-season card. Use overview only for recent
-        // game context; current-season football core stats must come from the
-        // season-scoped stats request below.
         if (team?.sport !== 'football') {
           core = coreStats(team, player, overviewCategories(overview));
         }
@@ -1205,8 +1508,6 @@
         errors.overview = error.message;
       }
 
-      // Basketball and hockey overview responses can carry the player shell but
-      // omit the stat snapshot. Fall back to the season-scoped stats endpoint.
       if (!meaningfulCore(core)) {
         try {
           const seasonStats = await fetchJson(playerEndpoint(team, player, 'stats', { season, seasontype: 2 }));
@@ -1216,8 +1517,6 @@
         }
       }
 
-      // Never substitute career totals into a football season card. For other
-      // sports retain the explicitly labeled career fallback used previously.
       if (!meaningfulCore(core) && team?.sport !== 'football') {
         try {
           const allStats = await fetchJson(playerEndpoint(team, player, 'stats'));
@@ -1261,8 +1560,33 @@
   }
 
   async function loadPlayerDetails(team, player, force = false) {
+    let cbsSnapshot = null;
+    let cbsFailure = '';
+    if (isCbsNflTeam(team)) {
+      try {
+        cbsSnapshot = await loadCbsNflPlayerCard(team, player, force);
+      } catch (error) {
+        cbsFailure = error?.message || 'CBS player stats unavailable';
+      }
+    }
+
     const id = espnPlayerId(player);
     if (!id) {
+      if (cbsSnapshot && meaningfulCore(cbsSnapshot.core)) {
+        return {
+          supported: true,
+          categories: [],
+          core: cbsSnapshot.core,
+          coreContext: cbsSnapshot.coreContext,
+          coreUnavailable: false,
+          events: [],
+          lastAppearance: cbsSnapshot.lastAppearance,
+          trend: cbsSnapshot.trend || '',
+          glossary: {},
+          errors: {},
+          source: 'CBS Sports'
+        };
+      }
       return {
         supported: false,
         categories: [],
@@ -1272,12 +1596,28 @@
         lastAppearance: null,
         trend: '',
         glossary: {},
-        errors: { player: 'Detailed ESPN player data is unavailable for this roster-only entry.' }
+        errors: {
+          player: 'Detailed player data is unavailable for this roster-only entry.',
+          ...(cbsFailure ? { cbs: cbsFailure } : {})
+        }
       };
     }
 
-    const key = `${team.provider.sport}/${team.provider.league}/${id}`;
-    if (!force && playerDetailCache.has(key)) return playerDetailCache.get(key);
+    const key = team.provider.sport + '/' + team.provider.league + '/' + id;
+    if (!force && playerDetailCache.has(key)) {
+      const cached = await playerDetailCache.get(key);
+      if (cbsSnapshot && meaningfulCore(cbsSnapshot.core)) {
+        return {
+          ...cached,
+          core: cbsSnapshot.core,
+          coreContext: cbsSnapshot.coreContext,
+          coreUnavailable: false,
+          lastAppearance: cbsSnapshot.lastAppearance || cached.lastAppearance,
+          source: 'CBS Sports'
+        };
+      }
+      return cached;
+    }
 
     const promise = (async () => {
       const season = seasonForTeam(team);
@@ -1292,6 +1632,7 @@
       }));
       const payloads = Object.fromEntries(results.map(([resource, payload]) => [resource, payload]));
       const errors = Object.fromEntries(results.filter(([, , error]) => error).map(([resource, , error]) => [resource, error]));
+      if (cbsFailure) errors.cbs = cbsFailure;
 
       const comprehensiveCategories = statCategories(payloads.stats);
       const seasonCategories = seasonSnapshotCategories(team, payloads.seasonStats);
@@ -1302,7 +1643,6 @@
         core = coreStats(team, player, categories);
         if (meaningfulCore(core)) coreContext = 'Career';
       }
-      const coreUnavailable = team?.sport === 'football' && !meaningfulCore(core);
 
       const glossaryItems = [
         ...(Array.isArray(payloads.stats?.glossary) ? payloads.stats.glossary : []),
@@ -1320,6 +1660,15 @@
         core = footballGameLogCore(player, events);
         if (meaningfulCore(core)) coreContext = 'Current season · game log';
       }
+
+      let lastAppearance = appearanceSummary(team, player, events[0]);
+      let source = 'ESPN public JSON';
+      if (cbsSnapshot && meaningfulCore(cbsSnapshot.core)) {
+        core = cbsSnapshot.core;
+        coreContext = cbsSnapshot.coreContext;
+        lastAppearance = cbsSnapshot.lastAppearance || lastAppearance;
+        source = 'CBS Sports';
+      }
       const resolvedCoreUnavailable = team?.sport === 'football' && !meaningfulCore(core);
 
       return {
@@ -1329,7 +1678,7 @@
           const name = team?.sport === 'football'
             && comprehensiveCategories.includes(category)
             && !/career|postseason|playoff/i.test(rawName)
-              ? `Career ${rawName}`
+              ? 'Career ' + rawName
               : rawName;
           return { name, stats: categoryPairs(category) };
         }).filter(category => category.stats.length),
@@ -1337,10 +1686,11 @@
         coreContext,
         coreUnavailable: resolvedCoreUnavailable,
         events,
-        lastAppearance: appearanceSummary(team, player, events[0]),
-        trend: trendSummary(team, player, events),
+        lastAppearance,
+        trend: cbsSnapshot?.trend || trendSummary(team, player, events),
         glossary,
-        errors
+        errors,
+        source
       };
     })();
 
