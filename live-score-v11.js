@@ -171,11 +171,11 @@
     return response.json();
   }
 
-  function localDateKey() {
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const d = String(now.getDate()).padStart(2, '0');
+  function localDateKey(date = new Date()) {
+    const value = date instanceof Date ? date : new Date(date);
+    const y = value.getFullYear();
+    const m = String(value.getMonth() + 1).padStart(2, '0');
+    const d = String(value.getDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
   }
 
@@ -199,6 +199,15 @@
     return '';
   }
 
+  function mlbRhe(game, side) {
+    const line = game?.linescore?.teams?.[side] || {};
+    const score = game?.teams?.[side]?.score;
+    return {
+      r: String(line.runs ?? score ?? '—'),
+      h: String(line.hits ?? '—'),
+      e: String(line.errors ?? '—')
+    };
+  }
   function parseMlbGame(game, team) {
     if (!game) return null;
     const targetId = mlbTeamId(team);
@@ -229,18 +238,23 @@
 
     return {
       state,
-      detail: detailParts.filter(Boolean).join(' · '),
+      detail: cleanDetail(detailParts.filter(Boolean).join(' · ')),
       mineName: mine?.team?.name || team.name,
       mineScore: String(mine?.score ?? '—'),
       otherName: other?.team?.name || 'Opponent',
       otherScore: String(other?.score ?? '—'),
       battingSide: mlbBattingSide(team, game, mineSide),
+      possessionName: '',
+      periods: [],
+      rhe: {
+        mine: mlbRhe(game, mineSide),
+        other: mlbRhe(game, mineSide === 'away' ? 'home' : 'away')
+      },
       source: 'MLB StatsAPI'
     };
   }
 
-  async function fetchMlbSchedule() {
-    const date = localDateKey();
+  async function fetchMlbSchedule(date = localDateKey()) {
     if (mlbCache.payload && mlbCache.date === date && Date.now() - mlbCache.loadedAt < MLB_CACHE_MS) return mlbCache.payload;
     const url = `${MLB_SCHEDULE}?sportId=1&date=${encodeURIComponent(date)}&hydrate=linescore,team`;
     const response = await fetch(url, { headers: { Accept: 'application/json' }, cache: 'no-store' });
