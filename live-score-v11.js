@@ -557,7 +557,9 @@
     const overlay = ensureOverlay();
     overlay.hidden = false;
     overlay.querySelector('#live-score-heading').textContent = activeTeam.name;
-    overlay.querySelector('#live-score-status').textContent = mode === 'live' ? 'LIVE' : 'FINAL';
+    const status = overlay.querySelector('#live-score-status');
+    status.textContent = mode === 'live' ? 'LIVE' : 'FINAL';
+    status.className = `live-score-status ${mode === 'live' ? 'is-live' : 'is-final'}`;
     renderLoading(mode === 'live' ? 'Updating live scoreboard…' : 'Loading final scoreboard…');
     overlay.querySelector('#live-score-close')?.focus();
     return true;
