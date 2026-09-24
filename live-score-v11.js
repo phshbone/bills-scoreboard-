@@ -14,6 +14,8 @@
   const dataGrid = document.getElementById('data-grid');
   let refreshTimer = null;
   let activeTeam = null;
+  let returnTrigger = null;
+  let overlayMode = 'live';
   let mlbCache = { date: '', loadedAt: 0, payload: null };
 
   function el(tag, className = '', text = '') {
