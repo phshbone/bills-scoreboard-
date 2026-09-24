@@ -67,6 +67,72 @@
     return String(score?.displayValue ?? score?.value ?? score ?? '—');
   }
 
+  function cleanDetail(value) {
+    const text = String(value || '').replace(/\s+/g, ' ').trim();
+    if (!text) return '';
+    const bits = text.split(/\s*[·|]\s*/).map(bit => bit.trim()).filter(Boolean);
+    if (bits.length <= 1) return text;
+    const seen = new Set();
+    const compact = [];
+    bits.forEach(bit => {
+      const key = bit.toLowerCase();
+      if (seen.has(key)) return;
+      seen.add(key);
+      compact.push(bit);
+    });
+    return compact.join(' · ');
+  }
+
+  function periodLabel(team, index) {
+    if (team?.sport === 'hockey') {
+      if (index < 3) return String(index + 1);
+      if (index === 3) return 'OT';
+      return `${index - 2}OT`;
+    }
+    if (team?.sport === 'football' || team?.sport === 'basketball') {
+      if (index < 4) return String(index + 1);
+      if (index === 4) return 'OT';
+      return `${index - 3}OT`;
+    }
+    return String(index + 1);
+  }
+
+  function lineScoreValue(entry) {
+    return String(entry?.displayValue ?? entry?.value ?? entry ?? '—');
+  }
+
+  function periodBreakdown(team, mine, other) {
+    if (team?.sport === 'baseball') return [];
+    const mineLines = Array.isArray(mine?.linescores) ? mine.linescores : [];
+    const otherLines = Array.isArray(other?.linescores) ? other.linescores : [];
+    const count = Math.max(mineLines.length, otherLines.length);
+    if (!count) return [];
+    return Array.from({ length: count }, (_, index) => ({
+      label: periodLabel(team, index),
+      mine: lineScoreValue(mineLines[index]),
+      other: lineScoreValue(otherLines[index])
+    }));
+  }
+
+  function possessionName(competition, competitors) {
+    const raw = competition?.situation?.possession
+      ?? competition?.situation?.possessionTeam?.id
+      ?? competition?.situation?.possessionTeam?.uid
+      ?? '';
+    const key = String(raw || '').toLowerCase();
+    if (!key) return '';
+    const found = competitors.find(competitor => {
+      const ids = [
+        competitor?.id,
+        competitor?.uid,
+        competitor?.team?.id,
+        competitor?.team?.uid,
+        competitor?.team?.abbreviation
+      ].map(value => String(value || '').toLowerCase()).filter(Boolean);
+      return ids.includes(key);
+    });
+    return found?.team?.shortDisplayName || found?.team?.displayName || found?.team?.abbreviation || '';
+  }
   function baseballBattingSide(team, event, competitors, mine, detail) {
     if (team?.sport !== 'baseball' || eventState(event) !== 'in') return '';
     const state = String(detail || '').trim().toLowerCase();
