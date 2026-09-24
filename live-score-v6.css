@@ -89,3 +89,89 @@
   .live-score-body { padding-inline: 18px; }
   .live-score-actions { padding: 0 18px max(14px, env(safe-area-inset-bottom)); }
 }
+
+
+.final-score-trigger {
+  cursor: pointer;
+}
+.final-score-trigger::after {
+  content: 'Tap for final scoreboard';
+  display: block;
+  margin-top: 12px;
+  color: #52677f;
+  font-size: .86rem;
+  font-weight: 900;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+}
+.final-score-trigger:focus-visible {
+  outline: 3px solid rgba(82, 103, 127, .52);
+  outline-offset: 2px;
+}
+
+.live-score-status.is-final {
+  color: #d9e4f1;
+  border-color: rgba(173,193,220,.28);
+  background: rgba(173,193,220,.08);
+}
+.live-score-possession {
+  margin-top: 7px;
+  color: #c8d6e8;
+  font-size: .9rem;
+  font-weight: 800;
+}
+.live-score-breakdown-wrap {
+  margin-top: 14px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.live-score-breakdown {
+  width: 100%;
+  min-width: 320px;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  color: #dce7f4;
+}
+.live-score-breakdown th,
+.live-score-breakdown td {
+  padding: 7px 8px;
+  border-top: 1px solid rgba(173,193,220,.12);
+  text-align: center;
+  white-space: nowrap;
+}
+.live-score-breakdown thead th {
+  color: #92a4bb;
+  font-size: .74rem;
+  font-weight: 900;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.live-score-breakdown tbody th {
+  max-width: 155px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  font-size: .82rem;
+  font-weight: 850;
+}
+.live-score-breakdown tbody td {
+  font-size: .88rem;
+  font-weight: 800;
+}
+.live-score-breakdown .live-score-total {
+  color: #fff;
+  font-weight: 950;
+}
+.live-score-rhe {
+  min-width: 260px;
+}
+
+@media (max-width: 560px) {
+  .live-score-breakdown th,
+  .live-score-breakdown td {
+    padding-inline: 6px;
+  }
+  .live-score-breakdown tbody th {
+    max-width: 120px;
+  }
+}
