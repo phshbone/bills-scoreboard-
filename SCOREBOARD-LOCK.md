@@ -608,3 +608,14 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - If the event-summary request fails, omits linescores, or changes shape, the app falls back to the already-working final score from the team schedule.
 - MLB remains on the MLB StatsAPI final-game path with R/H/E and is not routed through this hydration step.
 - No play-by-play, scoring-play feed, box-score expansion, provider migration, standings, roster, or team-page layout change is introduced here.
+
+
+## Stage 11B53 lock — full CBS NFL player-stat detail (2026-09-24)
+- The CBS adapter is our application code, not a CBS-supplied API adapter. Stage 11B53 removes the earlier one-category/four-stat limitation from the expanded NFL player view.
+- For configured CBS-primary NFL teams, the adapter now captures every current CBS team-stat category presently exposed on the team stats page: Passing, Rushing, Receiving, Defense, Scoring, Punt Returns, Kickoff Returns, Kicking, and Punting.
+- Every factual stat column/value for a matched player is preserved in order and rendered in the expanded player page using Scoreboard's own layout.
+- CBS explanatory prose/site presentation is not copied; only stat abbreviations and factual values are rendered.
+- The compact roster card still shows up to four useful headline values, preferring the player's primary statistical category and falling back to any CBS category in which the player appears.
+- A successful CBS fetch with no player statistical row is treated as "No recorded stats yet" rather than falling through to potentially misleading ESPN career data.
+- ESPN remains a network/parser failure fallback only when the CBS team-stat page itself cannot be used.
+- No changes are made to NFL roster identity/headshots, schedules, live scores, standings, non-NFL providers, or MLB StatsAPI behavior.

@@ -85,3 +85,62 @@ body.team-page-open {
   position: fixed;
   inset: 0;
 }
+
+
+.player-raw-groups {
+  display: grid;
+  gap: 16px;
+}
+.player-raw-stat-group {
+  overflow: hidden;
+}
+.player-raw-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+.player-raw-stat {
+  min-width: 0;
+  padding: 10px 8px;
+  border: 1px solid rgba(48, 72, 98, .18);
+  border-radius: 10px;
+  background: rgba(255,255,255,.36);
+  text-align: center;
+}
+.player-raw-stat-value,
+.player-raw-stat-label {
+  display: block;
+}
+.player-raw-stat-value {
+  color: #17324f;
+  font-size: 1.05rem;
+  font-weight: 950;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+.player-raw-stat-label {
+  margin-top: 4px;
+  color: #5f7082;
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: .04em;
+  line-height: 1.15;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 560px) {
+  .player-raw-stat-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .player-raw-stat {
+    padding-inline: 6px;
+  }
+}
+
+@media (max-width: 390px) {
+  .player-raw-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

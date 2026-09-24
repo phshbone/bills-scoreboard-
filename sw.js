@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b52-final-period-hydration';
+const CACHE = 'scoreboard-v11b53-cbs-full-player-stats';
 const ASSETS = [
   './',
   './index.html',
