@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b51-live-final-scoreboard';
+const CACHE = 'scoreboard-v11b52-final-period-hydration';
 const ASSETS = [
   './',
   './index.html',

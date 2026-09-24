@@ -170,6 +170,26 @@
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return response.json();
   }
+  function summaryUrl(team, eventId) {
+    const p = team?.provider || {};
+    return `${SITE}/${p.sport}/${p.league}/summary?event=${encodeURIComponent(String(eventId || ''))}`;
+  }
+
+  async function fetchEventSummary(team, eventId) {
+    if (!eventId) throw new Error('Missing event id');
+    const response = await fetch(summaryUrl(team, eventId), {
+      headers: { Accept: 'application/json' },
+      cache: 'no-store'
+    });
+    if (!response.ok) throw new Error(`Summary HTTP ${response.status}`);
+    return response.json();
+  }
+
+  function parseSummaryGame(payload, team) {
+    const header = payload?.header;
+    if (!header?.competitions?.length) return null;
+    return parseEvent(header, team);
+  }
 
   function localDateKey(date = new Date()) {
     const value = date instanceof Date ? date : new Date(date);
@@ -341,14 +361,25 @@
         const mlbGame = parseMlbGame(mlbGameForTeam(mlbPayload, team), team);
         if (mlbGame?.state === 'post') return mlbGame;
       } catch {
-        // Fall through to the schedule event.
+        // Fall through to the generic completed-event path.
       }
     }
 
     const rawEvent = eventById(snapshot?.raw?.schedulePayload, last.id);
-    const parsed = parseEvent(rawEvent, team);
-    if (parsed?.state === 'post') return parsed;
-    return parseNormalizedLast(last, team);
+    const scheduleGame = parseEvent(rawEvent, team);
+    const baseGame = scheduleGame?.state === 'post' ? scheduleGame : parseNormalizedLast(last, team);
+
+    if (last.id) {
+      try {
+        const summary = await fetchEventSummary(team, last.id);
+        const hydrated = parseSummaryGame(summary, team);
+        if (hydrated?.state === 'post' && hydrated.periods?.length) return hydrated;
+      } catch {
+        // A completed score still renders even if richer period data is unavailable.
+      }
+    }
+
+    return baseGame;
   }
   function ensureOverlay() {
     let overlay = document.getElementById('live-score-overlay');
@@ -637,7 +668,10 @@
     containsTeam,
     parseEvent,
     parseMlbGame,
+    summaryUrl,
+    parseSummaryGame,
     fetchScoreboard,
+    fetchEventSummary,
     fetchCurrentGame,
     fetchFinalGame
   });

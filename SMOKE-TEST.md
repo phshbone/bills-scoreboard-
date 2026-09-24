@@ -792,3 +792,15 @@ Overall pre-merge classification: **PASS WITH REAL-IPHONE NFL ROSTER VERIFICATIO
 - The generic live provider path remains unchanged for non-MLB sports; no provider migration is bundled into this stage.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE LIVE/FINAL VISUAL VERIFICATION REQUIRED**.
+
+
+## Stage 11B52 smoke — final-game period-score hydration
+### Executed static checks
+- live-score-v11.js parses successfully with event-summary URL, fetch, parser, and guarded FINAL hydration logic.
+- The summary request is keyed by the existing completed schedule event ID and uses the same public sports host already used by the app.
+- Hydration is accepted only when the returned event is completed and contains one or more normalized period lines.
+- Existing schedule-derived final score remains the fallback, so a summary/CORS/provider failure cannot blank the FINAL scoreboard.
+- MLB final handling remains on MLB StatsAPI and is unchanged.
+- sw.js parses successfully and uses cache namespace scoreboard-v11b52-final-period-hydration.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE PERIOD-TABLE VERIFICATION REQUIRED**.
