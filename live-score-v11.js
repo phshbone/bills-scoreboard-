@@ -150,7 +150,7 @@
     const mine = competitors.find(competitor => competitorMatches(competitor, team));
     const other = competitors.find(competitor => competitor !== mine) || competitors[0];
     const statusType = competition.status?.type || event.status?.type || {};
-    const detail = statusType.shortDetail || statusType.detail || '';
+    const detail = cleanDetail(statusType.shortDetail || statusType.detail || '');
     return {
       state: eventState(event),
       detail,
@@ -158,7 +158,10 @@
       mineScore: scoreValue(mine),
       otherName: other?.team?.shortDisplayName || other?.team?.displayName || other?.team?.abbreviation || 'Opponent',
       otherScore: scoreValue(other),
-      battingSide: baseballBattingSide(team, event, competitors, mine, detail)
+      battingSide: baseballBattingSide(team, event, competitors, mine, detail),
+      possessionName: possessionName(competition, competitors),
+      periods: periodBreakdown(team, mine, other),
+      source: 'ESPN public JSON'
     };
   }
 
