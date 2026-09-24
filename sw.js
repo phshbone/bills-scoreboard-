@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b50-cbs-nfl-player-stats';
+const CACHE = 'scoreboard-v11b51-live-final-scoreboard';
 const ASSETS = [
   './',
   './index.html',

@@ -14,6 +14,8 @@
   const dataGrid = document.getElementById('data-grid');
   let refreshTimer = null;
   let activeTeam = null;
+  let returnTrigger = null;
+  let overlayMode = 'live';
   let mlbCache = { date: '', loadedAt: 0, payload: null };
 
   function el(tag, className = '', text = '') {
@@ -65,6 +67,72 @@
     return String(score?.displayValue ?? score?.value ?? score ?? '—');
   }
 
+  function cleanDetail(value) {
+    const text = String(value || '').replace(/\s+/g, ' ').trim();
+    if (!text) return '';
+    const bits = text.split(/\s*[·|]\s*/).map(bit => bit.trim()).filter(Boolean);
+    if (bits.length <= 1) return text;
+    const seen = new Set();
+    const compact = [];
+    bits.forEach(bit => {
+      const key = bit.toLowerCase();
+      if (seen.has(key)) return;
+      seen.add(key);
+      compact.push(bit);
+    });
+    return compact.join(' · ');
+  }
+
+  function periodLabel(team, index) {
+    if (team?.sport === 'hockey') {
+      if (index < 3) return String(index + 1);
+      if (index === 3) return 'OT';
+      return `${index - 2}OT`;
+    }
+    if (team?.sport === 'football' || team?.sport === 'basketball') {
+      if (index < 4) return String(index + 1);
+      if (index === 4) return 'OT';
+      return `${index - 3}OT`;
+    }
+    return String(index + 1);
+  }
+
+  function lineScoreValue(entry) {
+    return String(entry?.displayValue ?? entry?.value ?? entry ?? '—');
+  }
+
+  function periodBreakdown(team, mine, other) {
+    if (team?.sport === 'baseball') return [];
+    const mineLines = Array.isArray(mine?.linescores) ? mine.linescores : [];
+    const otherLines = Array.isArray(other?.linescores) ? other.linescores : [];
+    const count = Math.max(mineLines.length, otherLines.length);
+    if (!count) return [];
+    return Array.from({ length: count }, (_, index) => ({
+      label: periodLabel(team, index),
+      mine: lineScoreValue(mineLines[index]),
+      other: lineScoreValue(otherLines[index])
+    }));
+  }
+
+  function possessionName(competition, competitors) {
+    const raw = competition?.situation?.possession
+      ?? competition?.situation?.possessionTeam?.id
+      ?? competition?.situation?.possessionTeam?.uid
+      ?? '';
+    const key = String(raw || '').toLowerCase();
+    if (!key) return '';
+    const found = competitors.find(competitor => {
+      const ids = [
+        competitor?.id,
+        competitor?.uid,
+        competitor?.team?.id,
+        competitor?.team?.uid,
+        competitor?.team?.abbreviation
+      ].map(value => String(value || '').toLowerCase()).filter(Boolean);
+      return ids.includes(key);
+    });
+    return found?.team?.shortDisplayName || found?.team?.displayName || found?.team?.abbreviation || '';
+  }
   function baseballBattingSide(team, event, competitors, mine, detail) {
     if (team?.sport !== 'baseball' || eventState(event) !== 'in') return '';
     const state = String(detail || '').trim().toLowerCase();
@@ -82,7 +150,7 @@
     const mine = competitors.find(competitor => competitorMatches(competitor, team));
     const other = competitors.find(competitor => competitor !== mine) || competitors[0];
     const statusType = competition.status?.type || event.status?.type || {};
-    const detail = statusType.shortDetail || statusType.detail || '';
+    const detail = cleanDetail(statusType.shortDetail || statusType.detail || '');
     return {
       state: eventState(event),
       detail,
@@ -90,7 +158,10 @@
       mineScore: scoreValue(mine),
       otherName: other?.team?.shortDisplayName || other?.team?.displayName || other?.team?.abbreviation || 'Opponent',
       otherScore: scoreValue(other),
-      battingSide: baseballBattingSide(team, event, competitors, mine, detail)
+      battingSide: baseballBattingSide(team, event, competitors, mine, detail),
+      possessionName: possessionName(competition, competitors),
+      periods: periodBreakdown(team, mine, other),
+      source: 'ESPN public JSON'
     };
   }
 
@@ -100,11 +171,11 @@
     return response.json();
   }
 
-  function localDateKey() {
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const d = String(now.getDate()).padStart(2, '0');
+  function localDateKey(date = new Date()) {
+    const value = date instanceof Date ? date : new Date(date);
+    const y = value.getFullYear();
+    const m = String(value.getMonth() + 1).padStart(2, '0');
+    const d = String(value.getDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
   }
 
@@ -128,6 +199,15 @@
     return '';
   }
 
+  function mlbRhe(game, side) {
+    const line = game?.linescore?.teams?.[side] || {};
+    const score = game?.teams?.[side]?.score;
+    return {
+      r: String(line.runs ?? score ?? '—'),
+      h: String(line.hits ?? '—'),
+      e: String(line.errors ?? '—')
+    };
+  }
   function parseMlbGame(game, team) {
     if (!game) return null;
     const targetId = mlbTeamId(team);
@@ -158,18 +238,23 @@
 
     return {
       state,
-      detail: detailParts.filter(Boolean).join(' · '),
+      detail: cleanDetail(detailParts.filter(Boolean).join(' · ')),
       mineName: mine?.team?.name || team.name,
       mineScore: String(mine?.score ?? '—'),
       otherName: other?.team?.name || 'Opponent',
       otherScore: String(other?.score ?? '—'),
       battingSide: mlbBattingSide(team, game, mineSide),
+      possessionName: '',
+      periods: [],
+      rhe: {
+        mine: mlbRhe(game, mineSide),
+        other: mlbRhe(game, mineSide === 'away' ? 'home' : 'away')
+      },
       source: 'MLB StatsAPI'
     };
   }
 
-  async function fetchMlbSchedule() {
-    const date = localDateKey();
+  async function fetchMlbSchedule(date = localDateKey()) {
     if (mlbCache.payload && mlbCache.date === date && Date.now() - mlbCache.loadedAt < MLB_CACHE_MS) return mlbCache.payload;
     const url = `${MLB_SCHEDULE}?sportId=1&date=${encodeURIComponent(date)}&hydrate=linescore,team`;
     const response = await fetch(url, { headers: { Accept: 'application/json' }, cache: 'no-store' });
@@ -213,6 +298,58 @@
     return espnGame;
   }
 
+  function eventById(payload, id) {
+    const key = String(id || '');
+    if (!key || !Array.isArray(payload?.events)) return null;
+    return payload.events.find(event => String(event?.id || event?.competitions?.[0]?.id || '') === key) || null;
+  }
+
+  function parseNormalizedLast(last, team) {
+    if (!last) return null;
+    const parts = String(last.main || '').split(/\s*·\s*/).filter(Boolean);
+    const parseTeamScore = value => {
+      const match = String(value || '').trim().match(/^(.*\S)\s+(-?\d+(?:\.\d+)?)$/);
+      return match ? { name: match[1].trim(), score: match[2] } : null;
+    };
+    const mine = parseTeamScore(parts[0]);
+    const other = parseTeamScore(parts[1]);
+    if (!mine || !other) return null;
+    return {
+      state: 'post',
+      detail: 'Final',
+      mineName: mine.name || team.name,
+      mineScore: mine.score,
+      otherName: other.name || 'Opponent',
+      otherScore: other.score,
+      battingSide: '',
+      possessionName: '',
+      periods: [],
+      source: 'Schedule'
+    };
+  }
+
+  async function fetchFinalGame(team) {
+    const snapshot = await window.ScoreboardData?.load?.(team, false);
+    const last = snapshot?.games?.last || null;
+    if (!last) return null;
+
+    if (team?.league === 'MLB' || team?.sport === 'baseball') {
+      try {
+        const timestamp = Number(last.date);
+        const date = Number.isFinite(timestamp) ? localDateKey(new Date(timestamp)) : localDateKey();
+        const mlbPayload = await fetchMlbSchedule(date);
+        const mlbGame = parseMlbGame(mlbGameForTeam(mlbPayload, team), team);
+        if (mlbGame?.state === 'post') return mlbGame;
+      } catch {
+        // Fall through to the schedule event.
+      }
+    }
+
+    const rawEvent = eventById(snapshot?.raw?.schedulePayload, last.id);
+    const parsed = parseEvent(rawEvent, team);
+    if (parsed?.state === 'post') return parsed;
+    return parseNormalizedLast(last, team);
+  }
   function ensureOverlay() {
     let overlay = document.getElementById('live-score-overlay');
     if (overlay) return overlay;
@@ -226,7 +363,7 @@
 
     const card = el('section', 'live-score-card');
     const top = el('div', 'live-score-top');
-    const heading = el('h3', 'live-score-title', 'Live score');
+    const heading = el('h3', 'live-score-title', 'Scoreboard');
     heading.id = 'live-score-heading';
     const status = el('span', 'live-score-status', 'LIVE');
     status.id = 'live-score-status';
@@ -252,9 +389,12 @@
     return overlay;
   }
 
-  function renderLoading() {
-    const body = ensureOverlay().querySelector('#live-score-body');
-    body.replaceChildren(el('div', 'live-score-detail', 'Updating score…'));
+  function renderLoading(label = 'Updating scoreboard…') {
+    const overlay = ensureOverlay();
+    const body = overlay.querySelector('#live-score-body');
+    const refresh = overlay.querySelector('#live-score-refresh');
+    refresh.hidden = overlayMode !== 'live';
+    body.replaceChildren(el('div', 'live-score-detail', label));
   }
 
   function batIcon() {
@@ -275,25 +415,106 @@
     return line;
   }
 
+  function breakdownTable(game) {
+    if (game?.rhe) {
+      const wrap = el('div', 'live-score-breakdown-wrap');
+      const table = el('table', 'live-score-breakdown live-score-rhe');
+      table.setAttribute('aria-label', 'Runs hits and errors');
+      const head = document.createElement('thead');
+      const hr = document.createElement('tr');
+      ['', 'R', 'H', 'E'].forEach(label => {
+        const cell = document.createElement('th');
+        cell.textContent = label;
+        hr.appendChild(cell);
+      });
+      head.appendChild(hr);
+      const body = document.createElement('tbody');
+      [[game.mineName, game.rhe.mine], [game.otherName, game.rhe.other]].forEach(([name, stats]) => {
+        const row = document.createElement('tr');
+        [name, stats?.r ?? '—', stats?.h ?? '—', stats?.e ?? '—'].forEach((value, index) => {
+          const cell = index === 0 ? document.createElement('th') : document.createElement('td');
+          cell.textContent = value;
+          row.appendChild(cell);
+        });
+        body.appendChild(row);
+      });
+      table.append(head, body);
+      wrap.appendChild(table);
+      return wrap;
+    }
+
+    if (!Array.isArray(game?.periods) || !game.periods.length) return null;
+    const wrap = el('div', 'live-score-breakdown-wrap');
+    const table = el('table', 'live-score-breakdown');
+    table.setAttribute('aria-label', 'Scoring by period');
+    const head = document.createElement('thead');
+    const hr = document.createElement('tr');
+    hr.appendChild(document.createElement('th'));
+    game.periods.forEach(period => {
+      const cell = document.createElement('th');
+      cell.textContent = period.label;
+      hr.appendChild(cell);
+    });
+    const totalHead = document.createElement('th');
+    totalHead.textContent = 'T';
+    hr.appendChild(totalHead);
+    head.appendChild(hr);
+    const body = document.createElement('tbody');
+    [{ name: game.mineName, total: game.mineScore, side: 'mine' }, { name: game.otherName, total: game.otherScore, side: 'other' }].forEach(teamRow => {
+      const row = document.createElement('tr');
+      const name = document.createElement('th');
+      name.textContent = teamRow.name;
+      row.appendChild(name);
+      game.periods.forEach(period => {
+        const cell = document.createElement('td');
+        cell.textContent = period[teamRow.side] ?? '—';
+        row.appendChild(cell);
+      });
+      const total = document.createElement('td');
+      total.className = 'live-score-total';
+      total.textContent = teamRow.total;
+      row.appendChild(total);
+      body.appendChild(row);
+    });
+    table.append(head, body);
+    wrap.appendChild(table);
+    return wrap;
+  }
+
   function renderGame(game) {
     const overlay = ensureOverlay();
     const body = overlay.querySelector('#live-score-body');
     const status = overlay.querySelector('#live-score-status');
     const heading = overlay.querySelector('#live-score-heading');
-    heading.textContent = activeTeam?.name || 'Live score';
+    const refresh = overlay.querySelector('#live-score-refresh');
+    heading.textContent = activeTeam?.name || 'Scoreboard';
 
     if (!game) {
       status.textContent = '—';
-      body.replaceChildren(el('div', 'live-score-detail live-score-error', 'No current game was returned.'));
+      status.className = 'live-score-status is-final';
+      refresh.hidden = true;
+      body.replaceChildren(el('div', 'live-score-detail live-score-error', 'No game was returned.'));
       return;
     }
 
-    status.textContent = game.state === 'in' ? 'LIVE' : 'FINAL';
-    const mine = scoreLine(game.mineName, game.mineScore, game.battingSide === 'mine');
-    const other = scoreLine(game.otherName, game.otherScore, game.battingSide === 'other');
-    const detail = el('div', 'live-score-detail', game.detail || (game.state === 'post' ? 'Final' : 'In progress'));
-    const updated = el('div', 'live-score-updated', `Updated ${new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit', second: '2-digit' }).format(new Date())}`);
-    body.replaceChildren(mine, other, detail, updated);
+    const isLive = game.state === 'in';
+    status.textContent = isLive ? 'LIVE' : 'FINAL';
+    status.className = `live-score-status ${isLive ? 'is-live' : 'is-final'}`;
+    refresh.hidden = !isLive;
+    const nodes = [
+      scoreLine(game.mineName, game.mineScore, game.battingSide === 'mine'),
+      scoreLine(game.otherName, game.otherScore, game.battingSide === 'other'),
+      el('div', 'live-score-detail', game.detail || (isLive ? 'In progress' : 'Final'))
+    ];
+    if (game.possessionName && isLive && activeTeam?.sport === 'football') {
+      nodes.push(el('div', 'live-score-possession', `Possession: ${game.possessionName}`));
+    }
+    const breakdown = breakdownTable(game);
+    if (breakdown) nodes.push(breakdown);
+    if (isLive) {
+      nodes.push(el('div', 'live-score-updated', `Updated ${new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit', second: '2-digit' }).format(new Date())}`));
+    }
+    body.replaceChildren(...nodes);
   }
 
   async function refreshScore() {
@@ -308,6 +529,16 @@
     }
   }
 
+  async function loadFinalScore() {
+    if (!activeTeam) return;
+    try {
+      renderGame(await fetchFinalGame(activeTeam));
+    } catch (error) {
+      const body = ensureOverlay().querySelector('#live-score-body');
+      body.replaceChildren(el('div', 'live-score-detail live-score-error', `Final score temporarily unavailable. ${error.message}`));
+    }
+  }
+
   function startTimer() {
     stopTimer();
     refreshTimer = window.setInterval(refreshScore, 30000);
@@ -318,15 +549,34 @@
     refreshTimer = null;
   }
 
-  function openOverlay() {
+  function showOverlay(trigger, mode) {
     activeTeam = currentTeam();
-    if (!activeTeam) return;
+    if (!activeTeam) return false;
+    returnTrigger = trigger instanceof HTMLElement ? trigger : null;
+    overlayMode = mode;
     const overlay = ensureOverlay();
     overlay.hidden = false;
-    renderLoading();
+    overlay.querySelector('#live-score-heading').textContent = activeTeam.name;
+    const status = overlay.querySelector('#live-score-status');
+    status.textContent = mode === 'live' ? 'LIVE' : 'FINAL';
+    status.className = `live-score-status ${mode === 'live' ? 'is-live' : 'is-final'}`;
+    renderLoading(mode === 'live' ? 'Updating live scoreboard…' : 'Loading final scoreboard…');
+    overlay.querySelector('#live-score-close')?.focus();
+    return true;
+  }
+
+  function openLiveOverlay(event) {
+    const trigger = event?.currentTarget instanceof HTMLElement ? event.currentTarget : null;
+    if (!showOverlay(trigger, 'live')) return;
     refreshScore();
     startTimer();
-    overlay.querySelector('#live-score-close')?.focus();
+  }
+
+  function openFinalOverlay(event) {
+    const trigger = event?.currentTarget instanceof HTMLElement ? event.currentTarget : null;
+    if (!showOverlay(trigger, 'final')) return;
+    stopTimer();
+    loadFinalScore();
   }
 
   function closeOverlay() {
@@ -334,32 +584,45 @@
     const overlay = document.getElementById('live-score-overlay');
     if (overlay) overlay.hidden = true;
     activeTeam = null;
-    document.querySelector('.live-score-trigger')?.focus();
+    overlayMode = 'live';
+    const trigger = returnTrigger;
+    returnTrigger = null;
+    if (trigger?.isConnected) trigger.focus();
   }
 
-  function decorateLivePanel() {
-    if (!dataGrid || teamPage?.hidden) return;
-    dataGrid.querySelectorAll('.data-panel').forEach(panel => {
-      const label = panel.querySelector('.data-label')?.textContent?.trim().toLowerCase();
-      if (label !== 'live now' || panel.dataset.liveScoreReady === 'true') return;
-      panel.dataset.liveScoreReady = 'true';
-      panel.classList.add('live-score-trigger');
-      panel.tabIndex = 0;
-      panel.setAttribute('role', 'button');
-      panel.setAttribute('aria-label', 'Open live score');
-      panel.addEventListener('click', openOverlay);
-      panel.addEventListener('keydown', event => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          openOverlay();
-        }
-      });
+  function bindPanel(panel, type) {
+    const readyKey = type === 'live' ? 'liveScoreReady' : 'finalScoreReady';
+    if (panel.dataset[readyKey] === 'true') return;
+    panel.dataset[readyKey] = 'true';
+    panel.classList.add(type === 'live' ? 'live-score-trigger' : 'final-score-trigger');
+    panel.tabIndex = 0;
+    panel.setAttribute('role', 'button');
+    panel.setAttribute('aria-label', type === 'live' ? 'Open live scoreboard' : 'Open final scoreboard');
+    const handler = type === 'live' ? openLiveOverlay : openFinalOverlay;
+    panel.addEventListener('click', handler);
+    panel.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        handler(event);
+      }
     });
   }
 
-  const observer = new MutationObserver(decorateLivePanel);
+  function decorateScorePanels() {
+    if (!dataGrid || teamPage?.hidden) return;
+    dataGrid.querySelectorAll('.data-panel').forEach(panel => {
+      const label = panel.querySelector('.data-label')?.textContent?.trim().toLowerCase();
+      if (label === 'live now') bindPanel(panel, 'live');
+      if (label === 'last game') {
+        const value = panel.querySelector('.data-value')?.textContent?.trim().toLowerCase() || '';
+        if (value && value !== 'unavailable') bindPanel(panel, 'final');
+      }
+    });
+  }
+
+  const observer = new MutationObserver(decorateScorePanels);
   if (dataGrid) observer.observe(dataGrid, { childList: true, subtree: true });
-  decorateLivePanel();
+  decorateScorePanels();
 
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && !document.getElementById('live-score-overlay')?.hidden) {
@@ -373,7 +636,9 @@
     eventState,
     containsTeam,
     parseEvent,
+    parseMlbGame,
     fetchScoreboard,
-    fetchCurrentGame
+    fetchCurrentGame,
+    fetchFinalGame
   });
 })();
