@@ -120,7 +120,7 @@
     return wrap;
   }
 
-  function renderCoreStats(target, core) {
+  function renderCoreStats(target, core, emptyText = 'Stats unavailable') {
     target.replaceChildren();
     const useful = Array.isArray(core) && core.some(item => {
       const value = String(item?.value ?? '').trim();
@@ -128,7 +128,7 @@
     });
     if (!useful) {
       target.classList.add('roster-season-stats-unavailable');
-      target.textContent = 'Stats unavailable';
+      target.textContent = emptyText;
       return;
     }
     target.classList.remove('roster-season-stats-unavailable');
@@ -526,6 +526,25 @@
     return fragment;
   }
 
+  function renderRawStatCategory(category) {
+    const group = el('section', 'player-stat-group player-raw-stat-group');
+    const head = el('div', 'player-stat-group-head');
+    head.appendChild(el('div', 'detail-group-title', category?.name || 'Statistics'));
+    group.appendChild(head);
+
+    const grid = el('div', 'player-raw-stat-grid');
+    (Array.isArray(category?.stats) ? category.stats : []).forEach(item => {
+      const stat = el('div', 'player-raw-stat');
+      stat.append(
+        el('strong', 'player-raw-stat-value', String(item?.value ?? '—')),
+        el('span', 'player-raw-stat-label', String(item?.label || item?.name || ''))
+      );
+      grid.appendChild(stat);
+    });
+    group.appendChild(grid);
+    return group;
+  }
+
   async function hydrateRosterCard(row, player) {
     if (!row?.isConnected || row.dataset.statsState === 'loading' || row.dataset.statsState === 'ready') return;
     row.dataset.statsState = 'loading';
@@ -537,7 +556,7 @@
     try {
       const details = await window.ScoreboardData.loadPlayerCard(currentTeam, player);
       if (!row.isConnected) return;
-      renderCoreStats(season, details.core);
+      renderCoreStats(season, details.core, details.noRecordedStats ? 'No recorded stats yet' : 'Stats unavailable');
       if (context) {
         const career = details.coreContext === 'Career';
         context.hidden = !career;
@@ -613,7 +632,7 @@
       core.appendChild(el(
         'div',
         'player-season-unavailable',
-        'Season stats unavailable'
+        details.noRecordedStats ? 'No recorded CBS stats yet' : 'Season stats unavailable'
       ));
       detailContent.appendChild(core);
     } else if (Array.isArray(details.core) && details.core.length) {
@@ -642,23 +661,30 @@
     }
 
     if (Array.isArray(details.categories) && details.categories.length) {
-      const groups = el('div', 'player-season-groups player-semantic-groups');
-      const seenFootballStats = currentTeam?.sport === 'football' ? new Set() : null;
-      const categories = currentTeam?.sport === 'football'
-        ? [...details.categories].sort((a, b) => footballCategoryPriority(a) - footballCategoryPriority(b))
-        : details.categories;
-      categories.forEach(category => {
-        groups.appendChild(renderSemanticCategory(player, category, details.glossary || {}, seenFootballStats));
-      });
+      const rawMode = details.categoryMode === 'raw';
+      const groups = el('div', rawMode ? 'player-season-groups player-raw-groups' : 'player-season-groups player-semantic-groups');
+      if (rawMode) {
+        details.categories.forEach(category => groups.appendChild(renderRawStatCategory(category)));
+      } else {
+        const seenFootballStats = currentTeam?.sport === 'football' ? new Set() : null;
+        const categories = currentTeam?.sport === 'football'
+          ? [...details.categories].sort((a, b) => footballCategoryPriority(a) - footballCategoryPriority(b))
+          : details.categories;
+        categories.forEach(category => {
+          groups.appendChild(renderSemanticCategory(player, category, details.glossary || {}, seenFootballStats));
+        });
+      }
       if (groups.childNodes.length) detailContent.appendChild(groups);
     }
 
     if (!details.core?.length && !details.categories?.length) {
       detailContent.appendChild(panel(
         'Player stats',
-        'Unavailable',
-        details.errors?.stats || details.errors?.player || 'No detailed statistics were returned for this player.',
-        { wide: true, error: true }
+        details.noRecordedStats ? 'No recorded stats yet' : 'Unavailable',
+        details.noRecordedStats
+          ? 'CBS does not list a current-season statistical row for this player yet.'
+          : (details.errors?.stats || details.errors?.player || 'No detailed statistics were returned for this player.'),
+        { wide: true, error: !details.noRecordedStats }
       ));
     }
   }
