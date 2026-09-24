@@ -298,6 +298,58 @@
     return espnGame;
   }
 
+  function eventById(payload, id) {
+    const key = String(id || '');
+    if (!key || !Array.isArray(payload?.events)) return null;
+    return payload.events.find(event => String(event?.id || event?.competitions?.[0]?.id || '') === key) || null;
+  }
+
+  function parseNormalizedLast(last, team) {
+    if (!last) return null;
+    const parts = String(last.main || '').split(/\s*·\s*/).filter(Boolean);
+    const parseTeamScore = value => {
+      const match = String(value || '').trim().match(/^(.*\S)\s+(-?\d+(?:\.\d+)?)$/);
+      return match ? { name: match[1].trim(), score: match[2] } : null;
+    };
+    const mine = parseTeamScore(parts[0]);
+    const other = parseTeamScore(parts[1]);
+    if (!mine || !other) return null;
+    return {
+      state: 'post',
+      detail: 'Final',
+      mineName: mine.name || team.name,
+      mineScore: mine.score,
+      otherName: other.name || 'Opponent',
+      otherScore: other.score,
+      battingSide: '',
+      possessionName: '',
+      periods: [],
+      source: 'Schedule'
+    };
+  }
+
+  async function fetchFinalGame(team) {
+    const snapshot = await window.ScoreboardData?.load?.(team, false);
+    const last = snapshot?.games?.last || null;
+    if (!last) return null;
+
+    if (team?.league === 'MLB' || team?.sport === 'baseball') {
+      try {
+        const timestamp = Number(last.date);
+        const date = Number.isFinite(timestamp) ? localDateKey(new Date(timestamp)) : localDateKey();
+        const mlbPayload = await fetchMlbSchedule(date);
+        const mlbGame = parseMlbGame(mlbGameForTeam(mlbPayload, team), team);
+        if (mlbGame?.state === 'post') return mlbGame;
+      } catch {
+        // Fall through to the schedule event.
+      }
+    }
+
+    const rawEvent = eventById(snapshot?.raw?.schedulePayload, last.id);
+    const parsed = parseEvent(rawEvent, team);
+    if (parsed?.state === 'post') return parsed;
+    return parseNormalizedLast(last, team);
+  }
   function ensureOverlay() {
     let overlay = document.getElementById('live-score-overlay');
     if (overlay) return overlay;
