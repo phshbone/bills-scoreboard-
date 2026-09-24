@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b53-cbs-full-player-stats';
+const CACHE = 'scoreboard-v11b54-cbs-stat-label-fidelity';
 const ASSETS = [
   './',
   './index.html',
