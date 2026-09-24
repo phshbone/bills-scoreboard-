@@ -1551,7 +1551,7 @@
 
     const id = espnPlayerId(player);
     if (!id) {
-      if (cbsSnapshot && meaningfulCore(cbsSnapshot.core)) {
+      if (cbsSnapshot) {
         return {
           supported: true,
           categories: cbsSnapshot.categories || [],
@@ -1587,7 +1587,7 @@
     const key = team.provider.sport + '/' + team.provider.league + '/' + id;
     if (!force && playerDetailCache.has(key)) {
       const cached = await playerDetailCache.get(key);
-      if (cbsSnapshot && meaningfulCore(cbsSnapshot.core)) {
+      if (cbsSnapshot) {
         return {
           ...cached,
           categories: cbsSnapshot.categories || [],
@@ -1647,7 +1647,7 @@
 
       let lastAppearance = appearanceSummary(team, player, events[0]);
       let source = 'ESPN public JSON';
-      if (cbsSnapshot && meaningfulCore(cbsSnapshot.core)) {
+      if (cbsSnapshot) {
         core = cbsSnapshot.core;
         coreContext = cbsSnapshot.coreContext;
         lastAppearance = cbsSnapshot.lastAppearance || lastAppearance;
