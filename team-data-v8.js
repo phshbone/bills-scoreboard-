@@ -1214,8 +1214,8 @@
 
   function cbsHeaderKey(value) {
     const text = String(value || '').replace(/\s+/g, ' ').trim();
-    const match = text.match(/^([A-Z0-9%/+.-]{1,10})\b/);
-    return String(match?.[1] || text).toUpperCase();
+    if (!text) return '';
+    return String(text.split(' ')[0] || '').toUpperCase();
   }
 
   function cbsStatsTableKind(labels) {
