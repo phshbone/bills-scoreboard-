@@ -817,3 +817,11 @@ Overall pre-merge classification: **PASS WITH REAL-IPHONE PERIOD-TABLE VERIFICAT
 - CBS's current Giants team page exposes Passing, Rushing, Receiving, Defense, Scoring, Punt Returns, Kickoff Returns, Kicking, and Punting, matching the production category map.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE GIANTS ROSTER/PLAYER-DETAIL VERIFICATION REQUIRED**.
+
+
+## Stage 11B54 smoke — CBS stat-label fidelity
+- team-data-v8.js parses successfully after replacing the word-boundary header parser with first-token preservation.
+- sw.js parses successfully and uses cache namespace scoreboard-v11b54-cbs-stat-label-fidelity.
+- The label parser now preserves punctuation-bearing CBS abbreviations instead of collapsing TGT% to TGT, FD% to FD, 10+ to 10, or 25+ to 25.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE LABEL VERIFICATION REQUIRED**.
