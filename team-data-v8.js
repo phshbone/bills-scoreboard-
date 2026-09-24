@@ -1554,10 +1554,12 @@
       if (cbsSnapshot && meaningfulCore(cbsSnapshot.core)) {
         return {
           supported: true,
-          categories: [],
+          categories: cbsSnapshot.categories || [],
+          categoryMode: cbsSnapshot.categoryMode || 'raw',
           core: cbsSnapshot.core,
           coreContext: cbsSnapshot.coreContext,
-          coreUnavailable: false,
+          coreUnavailable: cbsSnapshot.coreUnavailable,
+          noRecordedStats: cbsSnapshot.noRecordedStats,
           events: [],
           lastAppearance: cbsSnapshot.lastAppearance,
           trend: cbsSnapshot.trend || '',
@@ -1588,9 +1590,12 @@
       if (cbsSnapshot && meaningfulCore(cbsSnapshot.core)) {
         return {
           ...cached,
+          categories: cbsSnapshot.categories || [],
+          categoryMode: cbsSnapshot.categoryMode || 'raw',
           core: cbsSnapshot.core,
           coreContext: cbsSnapshot.coreContext,
-          coreUnavailable: false,
+          coreUnavailable: cbsSnapshot.coreUnavailable,
+          noRecordedStats: cbsSnapshot.noRecordedStats,
           lastAppearance: cbsSnapshot.lastAppearance || cached.lastAppearance,
           source: 'CBS Sports'
         };
@@ -1652,18 +1657,22 @@
 
       return {
         supported: true,
-        categories: categories.map(category => {
-          const rawName = category?.displayName || category?.name || 'Statistics';
-          const name = team?.sport === 'football'
-            && comprehensiveCategories.includes(category)
-            && !/career|postseason|playoff/i.test(rawName)
-              ? 'Career ' + rawName
-              : rawName;
-          return { name, stats: categoryPairs(category) };
-        }).filter(category => category.stats.length),
+        categories: cbsSnapshot?.categories?.length
+          ? cbsSnapshot.categories
+          : categories.map(category => {
+              const rawName = category?.displayName || category?.name || 'Statistics';
+              const name = team?.sport === 'football'
+                && comprehensiveCategories.includes(category)
+                && !/career|postseason|playoff/i.test(rawName)
+                  ? 'Career ' + rawName
+                  : rawName;
+              return { name, stats: categoryPairs(category) };
+            }).filter(category => category.stats.length),
+        categoryMode: cbsSnapshot?.categories?.length ? (cbsSnapshot.categoryMode || 'raw') : 'semantic',
         core,
         coreContext,
-        coreUnavailable: resolvedCoreUnavailable,
+        coreUnavailable: cbsSnapshot ? cbsSnapshot.coreUnavailable : resolvedCoreUnavailable,
+        noRecordedStats: cbsSnapshot?.noRecordedStats || false,
         events,
         lastAppearance,
         trend: cbsSnapshot?.trend || trendSummary(team, player, events),
