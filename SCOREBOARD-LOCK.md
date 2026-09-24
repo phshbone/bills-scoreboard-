@@ -599,3 +599,12 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Final-game lookup uses the already-loaded team schedule event when available; MLB also attempts the game's StatsAPI date so final R/H/E can be shown.
 - Live-status detail strings are compacted to remove duplicate identical fragments before display.
 - This stage does not change sports providers, schedules, standings, rosters, news, team-page layout, or provider-routing priorities.
+
+
+## Stage 11B52 lock — final-game period-score hydration (2026-09-24)
+- Completed non-MLB games now attempt a richer event-summary fetch by the existing schedule event ID before rendering the FINAL mini scoreboard.
+- The richer summary is used only when it returns a completed event with explicit period/quarter linescores.
+- Football, basketball/WNBA, and hockey retain the existing normalized quarter/period table renderer from Stage 11B51; Stage 11B52 only supplies the missing completed-game linescore data.
+- If the event-summary request fails, omits linescores, or changes shape, the app falls back to the already-working final score from the team schedule.
+- MLB remains on the MLB StatsAPI final-game path with R/H/E and is not routed through this hydration step.
+- No play-by-play, scoring-play feed, box-score expansion, provider migration, standings, roster, or team-page layout change is introduced here.
