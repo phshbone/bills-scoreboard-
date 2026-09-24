@@ -804,3 +804,16 @@ Overall pre-merge classification: **PASS WITH REAL-IPHONE LIVE/FINAL VISUAL VERI
 - sw.js parses successfully and uses cache namespace scoreboard-v11b52-final-period-hydration.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE PERIOD-TABLE VERIFICATION REQUIRED**.
+
+
+## Stage 11B53 smoke — full CBS NFL player-stat detail
+### Executed static checks
+- team-data-v8.js parses successfully after the CBS parser was expanded to all nine current team-stat categories.
+- team-page-v8.js parses successfully with a raw CBS category renderer that preserves all returned stat values instead of semantic filtering/deduplication.
+- team-page-v8.css remains structurally balanced with responsive raw-stat grids.
+- sw.js parses successfully and uses cache namespace scoreboard-v11b53-cbs-full-player-stats.
+- The expanded player view uses CBS categories whenever the CBS team page was successfully parsed, including the zero-row case; ESPN detail categories do not substitute merely because a CBS player has no recorded stat row.
+- The compact roster card still limits itself to four headline values; the expanded player view is the complete scrolling stat surface.
+- CBS's current Giants team page exposes Passing, Rushing, Receiving, Defense, Scoring, Punt Returns, Kickoff Returns, Kicking, and Punting, matching the production category map.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE GIANTS ROSTER/PLAYER-DETAIL VERIFICATION REQUIRED**.
