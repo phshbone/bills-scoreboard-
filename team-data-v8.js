@@ -1657,8 +1657,8 @@
 
       return {
         supported: true,
-        categories: cbsSnapshot?.categories?.length
-          ? cbsSnapshot.categories
+        categories: cbsSnapshot
+          ? (cbsSnapshot.categories || [])
           : categories.map(category => {
               const rawName = category?.displayName || category?.name || 'Statistics';
               const name = team?.sport === 'football'
@@ -1668,7 +1668,7 @@
                   : rawName;
               return { name, stats: categoryPairs(category) };
             }).filter(category => category.stats.length),
-        categoryMode: cbsSnapshot?.categories?.length ? (cbsSnapshot.categoryMode || 'raw') : 'semantic',
+        categoryMode: cbsSnapshot ? (cbsSnapshot.categoryMode || 'raw') : 'semantic',
         core,
         coreContext,
         coreUnavailable: cbsSnapshot ? cbsSnapshot.coreUnavailable : resolvedCoreUnavailable,
