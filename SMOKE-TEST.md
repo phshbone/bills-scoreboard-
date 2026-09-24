@@ -779,3 +779,16 @@ Overall pre-merge classification: **PASS WITH LIVE PROVIDER VERIFICATION REQUIRE
 - Existing ESPN schedule/live/standings/team-roster wiring and MLB StatsAPI wiring remain present and unchanged.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE NFL ROSTER VERIFICATION REQUIRED**.
+
+
+## Stage 11B51 smoke — reusable live/final mini scoreboard
+### Executed static checks
+- live-score-v11.js parses successfully after adding normalized period, possession, MLB R/H/E, live/final overlay, and Last Game trigger logic.
+- sw.js parses successfully and uses cache namespace scoreboard-v11b51-live-final-scoreboard.
+- live-score-v6.css remains structurally balanced after adding final-score trigger and compact scoring-table styles.
+- Existing live-score trigger behavior remains present and Last Game receives an independent final-score trigger only when a completed game is available.
+- LIVE mode retains Refresh and 30-second polling; FINAL mode hides Refresh and does not start polling.
+- MLB live fallback remains wired to MLB StatsAPI and can now request a historical game date for the Last Game final scoreboard.
+- The generic live provider path remains unchanged for non-MLB sports; no provider migration is bundled into this stage.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE LIVE/FINAL VISUAL VERIFICATION REQUIRED**.
