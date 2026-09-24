@@ -1224,9 +1224,26 @@
     if (/rushing attempts/.test(text) && /rushing yards/.test(text)) return 'rushing';
     if (/receptions/.test(text) && /receiving yards/.test(text)) return 'receiving';
     if (/total tackles/.test(text) && /sacks/.test(text)) return 'defense';
+    if (/total touchdowns/.test(text) && /total points/.test(text)) return 'scoring';
+    if (/punt returns/.test(text) && /fair catches/.test(text)) return 'punt-returns';
+    if (/kickoff returns/.test(text) && /kickoff return yards/.test(text)) return 'kickoff-returns';
     if (/field goals/.test(text) || /extra points/.test(text)) return 'kicking';
-    if (/punts/.test(text) && /punt/.test(text)) return 'punting';
+    if (/punts/.test(text) && /punting yards/.test(text)) return 'punting';
     return '';
+  }
+
+  function cbsStatsTableName(kind) {
+    return ({
+      passing: 'Passing',
+      rushing: 'Rushing',
+      receiving: 'Receiving',
+      defense: 'Defense',
+      scoring: 'Scoring',
+      'punt-returns': 'Punt Returns',
+      'kickoff-returns': 'Kickoff Returns',
+      kicking: 'Kicking',
+      punting: 'Punting'
+    })[kind] || 'Statistics';
   }
 
   function cbsParseTeamStats(html) {
@@ -1256,15 +1273,19 @@
         if (!firstKey || firstKey === 'team' || firstKey === 'opponents') return;
 
         const stats = {};
+        const statsList = [];
         labels.forEach((label, index) => {
           if (index === 0) return;
           const key = cbsHeaderKey(label);
-          if (key) stats[key] = cells[index] || '—';
+          if (!key) return;
+          const value = cells[index] || '—';
+          stats[key] = value;
+          statsList.push({ label: key, value });
         });
-        parsedRows.push({ nameText: firstKey, stats });
+        parsedRows.push({ nameText: firstKey, stats, statsList });
       });
 
-      if (parsedRows.length) tables.push({ kind, rows: parsedRows });
+      if (parsedRows.length) tables.push({ kind, name: cbsStatsTableName(kind), rows: parsedRows });
     });
 
     if (!tables.length) throw new Error('CBS team stats tables unavailable');
@@ -1293,20 +1314,47 @@
     return 'defense';
   }
 
-  function cbsFindPlayerStats(tables, player) {
-    const kind = cbsRoleTableKind(player);
-    if (!kind) return null;
+  function cbsRowMatchesPlayer(row, player) {
     const target = cbsNameKey(player?.name);
+    if (!target) return false;
     const tokens = target.split(' ').filter(Boolean);
-    const table = (tables || []).find(item => item.kind === kind);
-    if (!table) return null;
-    return table.rows.find(row => row.nameText.includes(target))
-      || table.rows.find(row => tokens.length > 1 && tokens.every(token => row.nameText.includes(token)))
-      || null;
+    return row?.nameText?.includes(target)
+      || (tokens.length > 1 && tokens.every(token => row?.nameText?.includes(token)));
   }
 
-  function cbsCoreStats(player, stats) {
-    const source = stats || {};
+  function cbsFindPlayerCategories(tables, player) {
+    const categories = [];
+    (tables || []).forEach(table => {
+      const row = (table.rows || []).find(item => cbsRowMatchesPlayer(item, player));
+      if (!row) return;
+      categories.push({
+        kind: table.kind,
+        name: table.name || cbsStatsTableName(table.kind),
+        stats: Array.isArray(row.statsList) ? row.statsList.map(item => ({ ...item })) : [],
+        statMap: { ...(row.stats || {}) }
+      });
+    });
+    return categories;
+  }
+
+  function cbsValueHasActivity(value) {
+    const text = String(value ?? '').trim();
+    if (!text || text === '—' || text === '--') return false;
+    const numeric = Number.parseFloat(text.replace(/,/g, ''));
+    if (Number.isFinite(numeric)) return numeric !== 0;
+    return !/^0(?:[-/.]0+)*$/.test(text);
+  }
+
+  function cbsGenericCore(category) {
+    const all = Array.isArray(category?.stats) ? category.stats : [];
+    const production = all.filter(item => !['GP','GS'].includes(String(item.label || '').toUpperCase()) && cbsValueHasActivity(item.value));
+    const participation = all.filter(item => ['GP','GS'].includes(String(item.label || '').toUpperCase()) && String(item.value || '').trim() !== '—');
+    const remaining = all.filter(item => !production.includes(item) && !participation.includes(item) && String(item.value || '').trim() !== '—');
+    return [...production, ...participation, ...remaining].slice(0, 4).map(item => ({ label: item.label, value: item.value }));
+  }
+
+  function cbsCoreStats(player, category) {
+    const source = category?.statMap || {};
     const value = (...keys) => {
       for (const key of keys) {
         const found = source[String(key).toUpperCase()];
@@ -1316,60 +1364,74 @@
     };
     const item = (label, ...keys) => ({ label, value: value(...keys) });
     const role = footballRole(player);
+    const preferredKind = cbsRoleTableKind(player);
+    let core = [];
 
-    if (role === 'qb') return [
-      item('YDS', 'YDS'),
-      item('TD', 'TD'),
-      item('INT', 'INT'),
-      item('RTG', 'RATE', 'RTG')
-    ];
-    if (role === 'rusher') return [
-      item('YDS', 'YDS'),
-      item('TD', 'TD'),
-      item('ATT', 'ATT', 'CAR'),
-      item('AVG', 'AVG')
-    ];
-    if (role === 'receiver') return [
-      item('REC', 'REC'),
-      item('YDS', 'YDS'),
-      item('TD', 'TD'),
-      item('AVG', 'AVG')
-    ];
-    if (role === 'kicker') return [
-      item('FGM', 'FGM', 'FG'),
-      item('FGA', 'FGA'),
-      item('FG%', 'FG%', 'PCT'),
-      item('LNG', 'LNG', 'LONG')
-    ];
-    if (role === 'punter') return [
-      item('PUNT', 'PUNT', 'PUNTS'),
-      item('AVG', 'AVG'),
-      item('LNG', 'LNG', 'LONG'),
-      item('IN20', 'IN20')
-    ];
-    if (role === 'offensive-line') return [];
+    if (category?.kind === preferredKind) {
+      if (role === 'qb') core = [
+        item('YDS', 'YDS'),
+        item('TD', 'TD'),
+        item('INT', 'INT'),
+        item('RTG', 'RATE', 'RTG')
+      ];
+      else if (role === 'rusher') core = [
+        item('YDS', 'YDS'),
+        item('TD', 'TD'),
+        item('ATT', 'ATT', 'CAR'),
+        item('AVG', 'AVG')
+      ];
+      else if (role === 'receiver') core = [
+        item('REC', 'REC'),
+        item('YDS', 'YDS'),
+        item('TD', 'TD'),
+        item('AVG', 'AVG')
+      ];
+      else if (role === 'kicker') core = [
+        item('FG', 'FGM-A', 'FGM', 'FG'),
+        item('FG%', 'FG%', 'PCT'),
+        item('LNG', 'LNG', 'LONG'),
+        item('XP', 'XPM-A', 'XP')
+      ];
+      else if (role === 'punter') core = [
+        item('PUNT', 'PUNTS', 'PUNT'),
+        item('AVG', 'PAVG', 'AVG'),
+        item('LNG', 'LNG', 'LONG'),
+        item('IN20', 'IN20')
+      ];
+      else if (role === 'defense') core = [
+        item('TKL', 'CMB', 'TOT', 'TKL'),
+        item('SACK', 'SCK', 'SACK'),
+        item('FF', 'FUM', 'FF'),
+        item('INT', 'INT')
+      ];
+    }
 
-    return [
-      item('TKL', 'CMB', 'TOT', 'TKL'),
-      item('SACK', 'SCK', 'SACK'),
-      item('FF', 'FUM', 'FF'),
-      item('INT', 'INT')
-    ];
+    return meaningfulCore(core) ? core : cbsGenericCore(category);
+  }
+
+  function cbsPrimaryCategory(categories, player) {
+    const preferredKind = cbsRoleTableKind(player);
+    return (categories || []).find(category => category.kind === preferredKind)
+      || (categories || []).find(category => (category.stats || []).some(item => cbsValueHasActivity(item.value)))
+      || categories?.[0]
+      || null;
   }
 
   async function loadCbsNflPlayerCard(team, player, force = false) {
     if (!isCbsNflTeam(team)) throw new Error('CBS NFL source not configured for this team');
-    const row = cbsFindPlayerStats(await cbsTeamStats(team, force), player);
-    if (!row) throw new Error('CBS current-season player row unavailable');
-
-    const core = cbsCoreStats(player, row.stats);
-    if (!meaningfulCore(core)) throw new Error('CBS current-season stats unavailable');
+    const categories = cbsFindPlayerCategories(await cbsTeamStats(team, force), player);
+    const primary = cbsPrimaryCategory(categories, player);
+    const core = primary ? cbsCoreStats(player, primary) : [];
+    const hasCategories = categories.length > 0;
 
     return {
       supported: true,
       core,
       coreContext: 'Current season · CBS',
-      coreUnavailable: false,
+      coreUnavailable: !meaningfulCore(core),
+      noRecordedStats: !hasCategories,
+      categories: categories.map(category => ({ name: category.name, stats: category.stats })),
+      categoryMode: 'raw',
       lastAppearance: null,
       trend: '',
       errors: {},
