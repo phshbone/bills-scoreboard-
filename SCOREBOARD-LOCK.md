@@ -619,3 +619,9 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - A successful CBS fetch with no player statistical row is treated as "No recorded stats yet" rather than falling through to potentially misleading ESPN career data.
 - ESPN remains a network/parser failure fallback only when the CBS team-stat page itself cannot be used.
 - No changes are made to NFL roster identity/headshots, schedules, live scores, standings, non-NFL providers, or MLB StatsAPI behavior.
+
+
+## Stage 11B54 lock — CBS stat-label fidelity (2026-09-24)
+- Preserve CBS stat abbreviations exactly as the first header token, including trailing punctuation such as %, +, /, and hyphens.
+- This corrects labels including TGT%, FD%, 10+, 25+, 50+, FGM-A, XPM-A, PTS/G, and 2-PT.
+- No stat values, category selection, provider routing, roster behavior, or player-detail layout changes are introduced.
