@@ -587,3 +587,15 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - NFL roster identity, jersey numbers, headshots, schedules, live scores, standings, and all non-NFL sports data paths remain unchanged.
 - MLB StatsAPI behavior remains unchanged.
 - A CBS HTML/CORS/availability or player-row failure must degrade to the existing ESPN path rather than blanking the roster.
+
+
+## Stage 11B51 lock — reusable live/final mini scoreboard (2026-09-24)
+- The existing live-score overlay is now a reusable compact scoreboard rather than a two-line score-only panel.
+- Live games retain manual refresh plus the existing 30-second refresh timer; completed games do not continue polling.
+- NFL/NCAA football, NBA/WNBA, and NHL show provider period scoring when the underlying event exposes competitor linescores. Regulation periods are labeled compactly, with overtime columns added as needed.
+- MLB live/final scoreboards prefer MLB StatsAPI where available and show a compact R/H/E table plus the existing batting-team indicator.
+- Football may show a possession line when the provider supplies an explicit possession team; no play-by-play or last-play text is introduced.
+- The Team page Last Game card is tappable and opens the same scoreboard component in FINAL mode. FINAL mode is frozen and does not show or run the Refresh control.
+- Final-game lookup uses the already-loaded team schedule event when available; MLB also attempts the game's StatsAPI date so final R/H/E can be shown.
+- Live-status detail strings are compacted to remove duplicate identical fragments before display.
+- This stage does not change sports providers, schedules, standings, rosters, news, team-page layout, or provider-routing priorities.
