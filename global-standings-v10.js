@@ -17,6 +17,8 @@
   const teamGrid = document.getElementById('team-grid');
   if (!pageTitle || !headerActions || !swipeHint || !newsScreen || !myTeamsScreen || !standingsScreen || !standingsTabs || !standingsContent || !standingsStatus || !standingsRetry || !standingsModeSwitch || !scoresModeButton || !standingsModeButton || !teamGrid) return;
 
+  const LEAGUE_ORDER = Object.freeze(['MLB', 'NFL', 'NCAA', 'NHL', 'NBA', 'WNBA']);
+
   let currentScreen = 'teams';
   let currentLeague = '';
   let currentMode = 'standings';
@@ -35,14 +37,22 @@
     return Array.isArray(window.SCOREBOARD_ACTIVE_TEAMS) ? [...window.SCOREBOARD_ACTIVE_TEAMS] : [];
   }
 
+  function libraryTeams() {
+    return Array.isArray(window.SCOREBOARD_TEAMS) ? [...window.SCOREBOARD_TEAMS] : [];
+  }
+
   function leagueGroups() {
-    const groups = new Map();
+    const groups = new Map(LEAGUE_ORDER.map(league => [league, []]));
     activeTeams().forEach(team => {
       if (!team?.league) return;
       if (!groups.has(team.league)) groups.set(team.league, []);
       groups.get(team.league).push(team);
     });
     return groups;
+  }
+
+  function representativeTeam(league, active = []) {
+    return active[0] || libraryTeams().find(team => team?.league === league) || null;
   }
 
   function preferredLeague(groups) {
@@ -330,17 +340,13 @@
       fragment.appendChild(button);
     });
     standingsTabs.replaceChildren(fragment);
-    if (!groups.size) {
-      standingsContent.replaceChildren(el('div', 'global-standings-empty', 'Add a team to My Teams to make league standings available.'));
-      setStatus('');
-    }
   }
 
   async function loadCurrentLeague(force = false) {
     const groups = leagueGroups();
     currentLeague = preferredLeague(groups);
     const teams = groups.get(currentLeague) || [];
-    if (!currentLeague || !teams.length) return;
+    if (!currentLeague) return;
 
     if (currentMode === 'scores') {
       ++loadToken;
@@ -358,7 +364,13 @@
 
     window.ScoreboardDailyScores?.stop?.();
     standingsRetry.textContent = 'Retry';
-    const representative = teams[0];
+    const representative = representativeTeam(currentLeague, teams);
+    if (!representative) {
+      standingsContent.replaceChildren(el('div', 'global-standings-empty', 'Standings are not configured for this league.'));
+      setStatus('');
+      standingsRetry.hidden = true;
+      return;
+    }
     const token = ++loadToken;
     setStatus(`Loading ${currentLeague} standings…`, 'loading');
     standingsRetry.hidden = true;
