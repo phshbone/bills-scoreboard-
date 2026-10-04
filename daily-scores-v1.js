@@ -103,13 +103,22 @@
       .filter(row => row !== headerRow)
       .map(row => [...row.querySelectorAll('th,td')].map(cell => clean(cell.textContent)))
       .filter(cells => cells.length > Math.max(awayIndex, homeIndex))
-      .map(cells => ({
-        away: cells[awayIndex] || '',
-        home: cells[homeIndex] || '',
-        result: resultIndex >= 0 ? (cells[resultIndex] || '') : '',
-        time: timeIndex >= 0 ? (cells[timeIndex] || '') : '',
-        venue: venueIndex >= 0 ? (cells[venueIndex] || '') : ''
-      }))
+      .map(cells => {
+        let result = resultIndex >= 0 ? (cells[resultIndex] || '') : '';
+        let time = timeIndex >= 0 ? (cells[timeIndex] || '') : '';
+        const liveScoreInTime = /\b[A-Z][A-Z0-9.]{1,7}\s+\d+.*\b[A-Z][A-Z0-9.]{1,7}\s+\d+/i.test(time);
+        if (!result && liveScoreInTime) {
+          result = time;
+          time = '';
+        }
+        return {
+          away: cells[awayIndex] || '',
+          home: cells[homeIndex] || '',
+          result,
+          time,
+          venue: venueIndex >= 0 ? (cells[venueIndex] || '') : ''
+        };
+      })
       .filter(game => game.away && game.home);
   }
 
