@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b54-cbs-stat-label-fidelity';
+const CACHE = 'scoreboard-v11b55-daily-scoreboard';
 const ASSETS = [
   './',
   './index.html',
@@ -17,6 +17,7 @@ const ASSETS = [
   './home-score-overlay-v9.css',
   './mlb-depth-chart-v9.css',
   './global-standings-v10.css',
+  './daily-scores-v1.css',
   './sports-news-v11.css',
   './team-theme-v12.css',
   './team-theme-v13.css',
@@ -45,6 +46,7 @@ const ASSETS = [
   './home-score-rail-v8.js',
   './news-sources-v12.js',
   './sports-news-v11.js',
+  './daily-scores-v1.js',
   './global-standings-v10.js',
   './desktop-nav-v11.js',
   './swipe-repair-v11.js',
