@@ -45,6 +45,10 @@
       <img class="app-brand-banner" src="./assets/scoreboard-header.webp?v=11b8b" alt="Bills Scoreboard Sports Page" width="1536" height="512" />
       <div class="header-title-row">
         <h1 id="page-title">MY TEAMS</h1>
+        <div class="standings-mode-switch" id="standings-mode-switch" hidden aria-label="Standings page view">
+          <button class="standings-mode-button" id="standings-mode-scores" type="button" data-standings-mode="scores" aria-pressed="false">Scores</button>
+          <button class="standings-mode-button active" id="standings-mode-standings" type="button" data-standings-mode="standings" aria-pressed="true">Standings</button>
+        </div>
         <nav class="desktop-top-nav" id="desktop-top-nav" aria-label="Scoreboard sections">
           <button class="desktop-nav-button" type="button" data-screen="news">News</button>
           <button class="desktop-nav-button" type="button" data-screen="teams" aria-current="page">My Teams</button>
