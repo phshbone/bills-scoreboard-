@@ -638,3 +638,13 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - The Scores view refreshes once per minute while visible; leaving the view or switching back to Standings stops the timer.
 - The app renders CBS factual schedule/result data in Scoreboard's own design. CBS pages, ads, article UI, and popups are not embedded.
 - This stage does not alter team-page live score overlays, standings providers, roster providers, or league-tab membership.
+
+
+## Stage 11B56 lock — daily scoreboard team matching + permanent league tabs (2026-10-04)
+- Daily-score My Team badges are determined from the CBS team-name field only. The result/score string is no longer used as an identity signal.
+- Team-name matching is normalized for punctuation and common CBS abbreviations such as N.Y. Giants and L.A. Rams.
+- The top-level league tabs are now a permanent six-league set: MLB, NFL, NCAA, NHL, NBA, and WNBA.
+- Removing the last My Team from a league no longer removes that league's Scores or Standings tab.
+- Scores mode works with zero active My Teams in a league and simply omits My Team highlighting.
+- Standings mode may use a hidden library team only as the technical representative needed to obtain league-wide standings; only active My Teams are highlighted.
+- This stage does not change CBS schedule parsing, the one-minute Scores refresh, team-page live scores, rosters, or standings data normalization.

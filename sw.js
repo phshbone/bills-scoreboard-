@@ -1,4 +1,4 @@
-const CACHE = 'scoreboard-v11b55-daily-scoreboard';
+const CACHE = 'scoreboard-v11b56-scoreboard-team-match-tabs';
 const ASSETS = [
   './',
   './index.html',

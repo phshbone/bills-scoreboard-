@@ -152,31 +152,43 @@
     return { kind: 'upcoming', label: clean(game?.time) || 'UPCOMING' };
   }
 
+  function normalizedName(value) {
+    return clean(value)
+      .toLowerCase()
+      .replace(/&/g, ' and ')
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim()
+      .replace(/\s+/g, ' ');
+  }
+
   function teamAliases(team) {
     const aliases = new Set();
-    const full = clean(team?.name).toLowerCase();
+    const full = normalizedName(team?.name);
     if (full) {
       aliases.add(full);
-      full.split(/[^a-z0-9]+/).filter(word => word.length >= 4 && !['new','york','philadelphia'].includes(word)).forEach(word => aliases.add(word));
+      full
+        .split(' ')
+        .filter(word => word.length >= 4 && !['new', 'york', 'los', 'angeles'].includes(word))
+        .forEach(word => aliases.add(word));
     }
-    const provider = clean(team?.provider?.team).toLowerCase();
+    const provider = normalizedName(team?.provider?.team);
     if (provider) aliases.add(provider);
     return [...aliases];
   }
 
-  function sideMatchesMyTeam(name, game, teams) {
-    const side = clean(name).toLowerCase();
-    const result = clean(game?.result).toLowerCase();
+  function sideMatchesMyTeam(name, teams) {
+    const side = normalizedName(name);
+    if (!side) return false;
     return teams.some(team => teamAliases(team).some(alias => {
       if (!alias) return false;
-      return side.includes(alias) || alias.includes(side) || (alias.length <= 4 && result.includes(alias));
+      return side === alias || side.includes(alias);
     }));
   }
 
   function renderGame(game, teams) {
     const card = el('section', 'daily-score-card');
-    const awayMine = sideMatchesMyTeam(game.away, game, teams);
-    const homeMine = sideMatchesMyTeam(game.home, game, teams);
+    const awayMine = sideMatchesMyTeam(game.away, teams);
+    const homeMine = sideMatchesMyTeam(game.home, teams);
     if (awayMine || homeMine) card.classList.add('my-team-daily-score');
 
     const state = stateFor(game);
