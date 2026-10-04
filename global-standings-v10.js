@@ -11,11 +11,15 @@
   const standingsContent = document.getElementById('global-standings-content');
   const standingsStatus = document.getElementById('global-standings-status');
   const standingsRetry = document.getElementById('global-standings-retry');
+  const standingsModeSwitch = document.getElementById('standings-mode-switch');
+  const scoresModeButton = document.getElementById('standings-mode-scores');
+  const standingsModeButton = document.getElementById('standings-mode-standings');
   const teamGrid = document.getElementById('team-grid');
-  if (!pageTitle || !headerActions || !swipeHint || !newsScreen || !myTeamsScreen || !standingsScreen || !standingsTabs || !standingsContent || !standingsStatus || !standingsRetry || !teamGrid) return;
+  if (!pageTitle || !headerActions || !swipeHint || !newsScreen || !myTeamsScreen || !standingsScreen || !standingsTabs || !standingsContent || !standingsStatus || !standingsRetry || !standingsModeSwitch || !scoresModeButton || !standingsModeButton || !teamGrid) return;
 
   let currentScreen = 'teams';
   let currentLeague = '';
+  let currentMode = 'standings';
   let loadToken = 0;
   const scrollByScreen = { news: 0, teams: 0, standings: 0 };
   let touchStart = null;
@@ -286,6 +290,23 @@
     standingsStatus.textContent = message;
   }
 
+  function renderModeSwitch() {
+    const scores = currentMode === 'scores';
+    scoresModeButton.classList.toggle('active', scores);
+    standingsModeButton.classList.toggle('active', !scores);
+    scoresModeButton.setAttribute('aria-pressed', String(scores));
+    standingsModeButton.setAttribute('aria-pressed', String(!scores));
+  }
+
+  function setMode(mode, force = false) {
+    const next = mode === 'scores' ? 'scores' : 'standings';
+    if (!force && next === currentMode) return;
+    currentMode = next;
+    renderModeSwitch();
+    window.ScoreboardDailyScores?.stop?.();
+    if (currentScreen === 'standings') loadCurrentLeague(false);
+  }
+
   function renderTabs() {
     const groups = leagueGroups();
     currentLeague = preferredLeague(groups);
@@ -317,6 +338,23 @@
     currentLeague = preferredLeague(groups);
     const teams = groups.get(currentLeague) || [];
     if (!currentLeague || !teams.length) return;
+
+    if (currentMode === 'scores') {
+      ++loadToken;
+      window.ScoreboardDailyScores?.stop?.();
+      if (!window.ScoreboardDailyScores?.activate) {
+        standingsContent.replaceChildren(el('div', 'global-standings-error', 'Daily scoreboard module is unavailable.'));
+        setStatus('Daily scoreboard module unavailable.', 'bad');
+        standingsRetry.hidden = false;
+        return;
+      }
+      standingsRetry.textContent = 'Refresh';
+      await window.ScoreboardDailyScores.activate(currentLeague, teams, force);
+      return;
+    }
+
+    window.ScoreboardDailyScores?.stop?.();
+    standingsRetry.textContent = 'Retry';
     const representative = teams[0];
     const token = ++loadToken;
     setStatus(`Loading ${currentLeague} standings…`, 'loading');
@@ -324,7 +362,7 @@
     standingsContent.replaceChildren(el('div', 'global-standings-loading', 'Connecting to standings data…'));
     try {
       const snapshot = await window.ScoreboardData.load(representative, force);
-      if (token !== loadToken || currentScreen !== 'standings') return;
+      if (token !== loadToken || currentScreen !== 'standings' || currentMode !== 'standings') return;
       const groupsToShow = displayGroups(snapshot, currentLeague);
       if (!groupsToShow.length) throw new Error('No usable standings groups were returned.');
       const fragment = document.createDocumentFragment();
@@ -334,7 +372,7 @@
       setStatus(`${currentLeague} standings · ${teams.length} My ${teams.length === 1 ? 'Team' : 'Teams'} highlighted`, 'ok');
       standingsRetry.hidden = true;
     } catch (error) {
-      if (token !== loadToken || currentScreen !== 'standings') return;
+      if (token !== loadToken || currentScreen !== 'standings' || currentMode !== 'standings') return;
       standingsContent.replaceChildren(el('div', 'global-standings-error', 'Standings are temporarily unavailable for this league.'));
       setStatus(error?.message || 'Standings feed unavailable.', 'bad');
       standingsRetry.hidden = false;
@@ -362,8 +400,16 @@
     swipeHint.hidden = !teams;
 
     pageTitle.textContent = news ? 'SPORTS NEWS' : standings ? 'STANDINGS' : 'MY TEAMS';
-    document.title = news ? 'scoreboard · sports news' : standings ? 'scoreboard · standings' : 'scoreboard · my teams';
+    pageTitle.classList.toggle('screen-title-accessible', standings);
+    standingsModeSwitch.hidden = !standings;
+    renderModeSwitch();
+    document.title = news
+      ? 'scoreboard · sports news'
+      : standings
+        ? (currentMode === 'scores' ? 'scoreboard · scores' : 'scoreboard · standings')
+        : 'scoreboard · my teams';
 
+    if (!standings) window.ScoreboardDailyScores?.stop?.();
     if (news) window.ScoreboardNews?.activate?.();
     if (standings) {
       renderTabs();
@@ -381,7 +427,7 @@
     if (depthChart && !depthChart.hidden) return true;
     let node = target instanceof Element ? target : null;
     while (node && node !== document.body) {
-      if (node.matches('input, textarea, select, [contenteditable="true"], .standings-league-tabs')) return true;
+      if (node.matches('input, textarea, select, [contenteditable="true"], .standings-league-tabs, .standings-mode-switch')) return true;
       const style = getComputedStyle(node);
       if ((style.overflowX === 'auto' || style.overflowX === 'scroll') && node.scrollWidth > node.clientWidth + 4) return true;
       node = node.parentElement;
@@ -421,6 +467,8 @@
     else if (currentScreen === 'news' && dx < 0) showScreen('teams');
   }
 
+  scoresModeButton.addEventListener('click', () => setMode('scores'));
+  standingsModeButton.addEventListener('click', () => setMode('standings'));
   standingsRetry.addEventListener('click', () => loadCurrentLeague(true));
   document.addEventListener('touchstart', beginSwipe, { passive: true });
   document.addEventListener('touchend', finishSwipe, { passive: true });
@@ -436,12 +484,16 @@
   window.ScoreboardTopLevel = Object.freeze({
     show: showScreen,
     current: () => currentScreen,
+    standingsMode: () => currentMode,
+    setStandingsMode: setMode,
     supportsNews: true
   });
   currentScreen = 'teams';
   newsScreen.hidden = true;
   myTeamsScreen.hidden = false;
   standingsScreen.hidden = true;
+  standingsModeSwitch.hidden = true;
+  renderModeSwitch();
   headerActions.hidden = false;
   swipeHint.hidden = false;
 })();
