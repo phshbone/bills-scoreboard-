@@ -304,7 +304,10 @@
     currentMode = next;
     renderModeSwitch();
     window.ScoreboardDailyScores?.stop?.();
-    if (currentScreen === 'standings') loadCurrentLeague(false);
+    if (currentScreen === 'standings') {
+      document.title = currentMode === 'scores' ? 'scoreboard · scores' : 'scoreboard · standings';
+      loadCurrentLeague(false);
+    }
   }
 
   function renderTabs() {
