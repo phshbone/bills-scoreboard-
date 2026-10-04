@@ -840,3 +840,15 @@ Overall pre-merge classification: **PASS WITH REAL-IPHONE LABEL VERIFICATION REQ
 - Current public CBS pages were verified to expose date-grouped schedule/result tables for the supported leagues, including live NFL result strings and dated MLB/NHL/WNBA schedules.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE CBS SCHEDULE-PARSER VERIFICATION REQUIRED**.
+
+
+## Stage 11B56 smoke — daily scoreboard team matching + permanent league tabs
+- daily-scores-v1.js parses successfully after removing score-string-based team matching.
+- global-standings-v10.js parses successfully with the permanent six-league tab set and library representative fallback.
+- sw.js parses successfully and uses cache namespace scoreboard-v11b56-scoreboard-team-match-tabs.
+- My Team matching no longer references the game result string.
+- Scores mode no longer requires an active My Team for the selected league.
+- Standings mode can load from a library representative while preserving active-team-only highlighting.
+- The permanent tab set contains MLB, NFL, NCAA, NHL, NBA, and WNBA.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE MY-TEAM BADGE AND WNBA-TAB VERIFICATION REQUIRED**.
