@@ -625,3 +625,16 @@ Deep game-strategy analysis combining play-by-play, statistical context, manager
 - Preserve CBS stat abbreviations exactly as the first header token, including trailing punctuation such as %, +, /, and hyphens.
 - This corrects labels including TGT%, FD%, 10+, 25+, 50+, FGM-A, XPM-A, PTS/G, and 2-PT.
 - No stat values, category selection, provider routing, roster behavior, or player-detail layout changes are introduced.
+
+
+## Stage 11B55 lock — daily Scores / Standings switch (2026-10-04)
+- The existing Standings swipe page now has two large text touch targets built into the metal title strip: SCORES on the left and STANDINGS on the right.
+- The existing league tabs remain unchanged and control whichever mode is active.
+- STANDINGS remains the default mode and retains the existing standings behavior.
+- SCORES loads the current local calendar day's league slate from public CBS Sports schedule pages with no API key, login, cookies, proxy, or embedded CBS UI.
+- Date-specific CBS schedule routes are used for MLB, NHL, NBA, and WNBA. NFL and FBS NCAA use the current CBS weekly schedule page and filter to the exact local date heading.
+- Completed, live, and upcoming rows are shown. CBS live score strings surfaced inside a Time/TV column are detected and promoted to live results.
+- My Teams are highlighted inside daily score cards when the CBS row can be matched to a configured team.
+- The Scores view refreshes once per minute while visible; leaving the view or switching back to Standings stops the timer.
+- The app renders CBS factual schedule/result data in Scoreboard's own design. CBS pages, ads, article UI, and popups are not embedded.
+- This stage does not alter team-page live score overlays, standings providers, roster providers, or league-tab membership.

@@ -1,0 +1,233 @@
+
+.standings-mode-switch[hidden] {
+  display: none !important;
+}
+
+.standings-mode-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: min(100%, 360px);
+  min-width: 0;
+  margin-right: auto;
+}
+
+.standings-mode-button {
+  min-height: 42px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: rgba(236,238,232,.62);
+  font-family: "Fakt Slab Stencil Pro Medium", "Stencil Std", "Arial Black", Impact, Haettenschweiler, sans-serif;
+  font-size: clamp(1.12rem, 3.2vw, 1.42rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: .075em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.standings-mode-button:first-child { text-align: left; }
+.standings-mode-button:last-child { text-align: right; }
+
+.standings-mode-button.active,
+.standings-mode-button[aria-pressed="true"] {
+  color: #eceee8;
+}
+
+.standings-mode-button:active {
+  transform: translateY(1px);
+}
+
+.standings-mode-button:focus-visible {
+  outline: 2px dashed rgba(240,242,236,.90);
+  outline-offset: -2px;
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .standings-mode-button {
+    color: transparent;
+    background-image:
+      radial-gradient(circle at 13% 29%, rgba(64,72,79,.52) 0 1.3px, transparent 1.8px),
+      radial-gradient(circle at 62% 61%, rgba(74,82,89,.38) 0 1.1px, transparent 1.6px),
+      linear-gradient(180deg, rgba(190,194,190,.72) 0%, rgba(155,162,164,.68) 100%);
+    background-size: 27px 21px, 33px 25px, auto;
+    background-repeat: repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  .standings-mode-button.active,
+  .standings-mode-button[aria-pressed="true"] {
+    background-image:
+      radial-gradient(circle at 13% 29%, rgba(64,72,79,.52) 0 1.3px, transparent 1.8px),
+      radial-gradient(circle at 62% 61%, rgba(74,82,89,.38) 0 1.1px, transparent 1.6px),
+      linear-gradient(180deg, rgba(247,248,243,.98) 0%, rgba(222,226,220,.96) 100%);
+  }
+}
+
+.screen-title-accessible {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0,0,0,0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.daily-score-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.daily-score-card {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid rgba(173,193,220,.18);
+  border-radius: 15px;
+  background: rgba(8,13,21,.76);
+  box-shadow: 0 10px 26px rgba(0,0,0,.16);
+}
+
+.daily-score-card.my-team-daily-score {
+  border-color: rgba(190,211,235,.36);
+  box-shadow:
+    inset 4px 0 0 rgba(195,211,232,.72),
+    0 10px 26px rgba(0,0,0,.18);
+}
+
+.daily-score-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.daily-score-state,
+.daily-score-source,
+.daily-score-my-team {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 2px 7px;
+  border: 1px solid rgba(173,193,220,.22);
+  border-radius: 999px;
+  font-size: .64rem;
+  font-weight: 950;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.daily-score-state {
+  color: #cbd7e7;
+  background: rgba(53,70,91,.42);
+}
+
+.daily-score-state.live {
+  color: #d9f1df;
+  border-color: rgba(112,181,132,.40);
+  background: rgba(36,91,53,.44);
+}
+
+.daily-score-state.final {
+  color: #dce5ef;
+  background: rgba(63,78,98,.42);
+}
+
+.daily-score-state.upcoming {
+  color: #e6d7b5;
+  border-color: rgba(197,165,95,.34);
+  background: rgba(92,73,34,.34);
+}
+
+.daily-score-source {
+  color: #8f9dad;
+  background: rgba(20,29,41,.62);
+}
+
+.daily-score-matchup {
+  display: grid;
+  gap: 8px;
+}
+
+.daily-score-team {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: #f4f7fb;
+}
+
+.daily-score-team strong {
+  min-width: 0;
+  font-size: 1.04rem;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.daily-score-side-label {
+  color: #7f8fa3;
+  font-size: .62rem;
+  font-weight: 900;
+  letter-spacing: .055em;
+}
+
+.daily-score-team.my-team-score-name strong {
+  color: #ffffff;
+}
+
+.daily-score-my-team {
+  color: #dfe9f5;
+  border-color: rgba(180,201,228,.28);
+  background: rgba(38,54,74,.76);
+}
+
+.daily-score-result {
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px solid rgba(173,193,220,.12);
+  color: #f4f7fb;
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+}
+
+.daily-score-result.upcoming {
+  color: #c8d2df;
+}
+
+.daily-score-venue {
+  margin-top: 6px;
+  color: #8f9dad;
+  font-size: .74rem;
+  line-height: 1.3;
+}
+
+@media (min-width: 760px) {
+  .daily-score-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+
+@media (max-width: 560px) {
+  .standings-mode-switch {
+    width: 100%;
+  }
+
+  .standings-mode-button {
+    font-size: clamp(1.05rem, 5.3vw, 1.3rem);
+    padding-inline: 5px;
+  }
+
+  .daily-score-team {
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+  }
+}

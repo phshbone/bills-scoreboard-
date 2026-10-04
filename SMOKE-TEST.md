@@ -825,3 +825,18 @@ Overall pre-merge classification: **PASS WITH REAL-IPHONE GIANTS ROSTER/PLAYER-D
 - The label parser now preserves punctuation-bearing CBS abbreviations instead of collapsing TGT% to TGT, FD% to FD, 10+ to 10, or 25+ to 25.
 
 Overall pre-merge classification: **PASS WITH REAL-IPHONE LABEL VERIFICATION REQUIRED**.
+
+
+## Stage 11B55 smoke — daily Scores / Standings switch
+### Executed static checks
+- daily-scores-v1.js parses successfully.
+- global-standings-v10.js parses successfully after adding the Scores/Standings mode controller.
+- daily-scores-v1.css and global-standings-v10.css are structurally balanced.
+- index.html references the new daily scores CSS/JS and contains the SCORES-left / STANDINGS-right title switch.
+- sw.js parses successfully, caches both new assets, and uses cache namespace scoreboard-v11b55-daily-scoreboard.
+- CBS route coverage is present for MLB, NFL, NCAA/FBS, NHL, NBA, and WNBA.
+- The CBS parser filters weekly NFL/NCAA pages by the exact local date heading and handles date-specific pro-league pages.
+- A one-minute refresh timer runs only while Scores mode is active.
+- Current public CBS pages were verified to expose date-grouped schedule/result tables for the supported leagues, including live NFL result strings and dated MLB/NHL/WNBA schedules.
+
+Overall pre-merge classification: **PASS WITH REAL-IPHONE CBS SCHEDULE-PARSER VERIFICATION REQUIRED**.
